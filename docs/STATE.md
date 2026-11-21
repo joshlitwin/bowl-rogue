@@ -90,8 +90,19 @@ Lost game 5. Game 1: 9 strikes on one line. Each new layout took one to three ba
 - Cards show name, picture and price; tapping shows what it does in the strip, with Buy for balls, gear and spots (pins still go to a spot).
 - THROW and the sheets' bottom buttons sit at least 22 px above the screen edge (more if the phone reports a safe area). Applied to `game/` too, at Josh's request.
 
+### Runs 2 and 3 (21 November, log in `docs/playtest/`)
+Josh: "I basically just find what works for a strike and hit that every time. We gotta figure out how to make this thing have meaningful choices." Run 3: 37 strikes in 54 balls, scores 2 to 5 times the targets (2,748 against 650), Trophy at +54 per strike. In game 5 he paid $3 to switch back to Headpin right, a layout he'd solved in game 2, and struck first ball. He found the shop confusing next to Balatro's; two designers made shop redesigns (Shelves, Rack first); Shelves is used in the Boss Lab.
+
+## Five-Pin Boss Lab (built 21 November, not yet played by Josh)
+`labs/five-pin-bosses/`: the Variety Lab with the Shelves shop, restructured Balatro-style at Josh's request.
+- **Four levels of three games:** small, big, boss (12 games). Targets 150, 220, 300 / 450, 650, 850 / 1100, 1450, 1800 / 2100, 2600, 3100, pegged to `npm run boss-bot` (aims the best line every ball with a 60 ms timing spread, buys pins by preference); guesses for a human. Pay $4 / $5 / $7 per win plus up to $4 for going over.
+- **Bosses**, four of six drawn per run, one per level, named on the shop's leave button and at the start of the game: Bolted 3-pins and Bolted corners (fall to the ball, or only to a very hard pin hit), Centre post and Twin posts (stop the ball; pins bounce off; the drawn line stops at the post), Left-side start and Right-side start (the other half of the approach hatched and closed). Each leaves about 240 to 500 of 1,014 strike lines on the standard rack, against 1,014 with no boss.
+- **Trophy** capped at +12 per level of the pin.
+- **Looks:** Rec Room (level 1), After Close (level 2), then two new looks for levels 3 and 4 (the scoring computer's hall, then the arrival).
+- Small and big games still reward finding one strike line and repeating it; bosses force a new line once a level.
+
 ## Next
-Josh plays Five-Pin Variety Lab and pastes the log. Questions: does re-finding the line each game feel like play or a chore; does a different ball or a bigger rack change what he does; if it's not fun, which of the three to switch off.
+Josh plays Five-Pin Boss Lab and pastes the log. Questions: does re-finding the line each game feel like play or a chore; does a different ball or a bigger rack change what he does; if it's not fun, which of the three to switch off.
 
 ## Earlier next (Rules Lab)
 Josh plays Five-Pin Rules Lab and pastes the log. Questions: does choosing between striking and picking pins off feel like a decision; do games feel too short when you strike; are the targets right.
