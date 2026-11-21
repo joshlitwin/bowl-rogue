@@ -88,7 +88,7 @@ Lost game 5. Game 1: 9 strikes on one line. Each new layout took one to three ba
 - Next rack: one layout drawn free, two others at $3; the rack map previews the chosen one.
 - Extra pins: an empty dashed spot on the rack map, $6 then $8.
 - Cards show name, picture and price; tapping shows what it does in the strip, with Buy for balls, gear and spots (pins still go to a spot).
-- THROW and the sheets' bottom buttons sit at least 22 px above the screen edge (more if the phone reports a safe area). Not yet in `game/`.
+- THROW and the sheets' bottom buttons sit at least 22 px above the screen edge (more if the phone reports a safe area). Applied to `game/` too, at Josh's request.
 
 ## Next
 Josh plays Five-Pin Variety Lab and pastes the log. Questions: does re-finding the line each game feel like play or a chore; does a different ball or a bigger rack change what he does; if it's not fun, which of the three to switch off.
