@@ -22,4 +22,10 @@ Read `docs/STATE.md` first. It says what is decided, what is open, and what is n
 - Nothing here has automated coverage of real touch input; say so when reporting.
 
 ## Publishing
-- Josh plays on his phone through Claude artifacts. No GitHub Pages site exists for this repo yet.
+- Josh wants to test from URLs, not Claude artifacts. The root `index.html` links to the game and every lab, so the repo can be served as-is by GitHub Pages from `main`.
+- When you add a lab, add its link to the root `index.html` and its row to `README.md`.
+- As of 21 November 2026 Pages had not been switched on; check before quoting a URL.
+
+## Commits
+- Commit as Josh: `Josh Litwin <312256629+joshlitwin@users.noreply.github.com>`. This is set in the clone's local git config; GitHub rejects his regular address.
+- Commit or push only when he asks. Do not commit straight to `main` for anything beyond a small fix; use a branch.
