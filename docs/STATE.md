@@ -4,7 +4,7 @@ Last updated 21 November 2026.
 
 ## What exists
 - **Five-Pin Run** (`game/`): six games of three frames, three balls a frame. The rack of five pins is the build: each spot holds a pin type with a trigger effect, and a ball scores (points of pins that fell) × Mult. A shop after each won game sells pins and gear. The hall changes a little every game and goes "After Close" at game 4.
-- **Throw Lab**, **Big Rack Lab**, **Ball Bag Lab**, **Changing Field Lab**, **Combined Lab**, **Five-Pin Rules Lab** (`labs/`).
+- **Throw Lab**, **Big Rack Lab**, **Ball Bag Lab**, **Changing Field Lab**, **Combined Lab**, **Five-Pin Rules Lab**, **Five-Pin Variety Lab** (`labs/`).
 - Everything is playable from https://joshlitwin.github.io/bowl-rogue/ (GitHub Pages, `main` at the root, switched on 21 November).
 - **Four blind pitches** (`docs/pitches/`): Stacked Spots, The Bag, The House Lays the Lane, The Scoresheet.
 
@@ -62,7 +62,26 @@ What the bot found (`npm run rules-bot`: perfect release over 1,071 lines, stand
 - Late on, a strike build with grown Trophies runs away (leader 2, gold 2, crown 2, two Trophies at +20, Bell: about 488 a frame against 197 for a matching picking build). Trophy's unlimited growth is the cause; not changed yet.
 - A whole game can now be as short as three balls.
 
+### Josh's verdict (21 November)
+One run, lost at game 5 (log in `docs/playtest/`): "Didn't feel all that different." He bought only strike pins (Leader, Crown, Tip jar, Wing, Trophy), so the rule never bit; 13 of 21 balls were strikes on one line. He asked about buying different balls, more pins and changing the pin layout, all at once.
+
+## Five-Pin Variety Lab (built 21 November, not yet played by Josh)
+`labs/five-pin-variety/`, a copy of Five-Pin Run (its rules and targets, not the Rules Lab's) with three changes. Throw, camera, ball roll and pin spacing are untouched; each change can be switched off from the landing page (`?layout=0`, `?balls=0`, `?spots=0`).
+- **Moving rack.** Game 1 is the standard rack; from game 2 each game picks a different layout: Shifted left, Shifted right (whole rack 16 px), Headpin forward (30 px), Headpin left, Headpin right (22 px across, 20 forward). No pins are ever closer than in the standard rack (61 px). Staggered, Wide and Leaning layouts were tried and dropped: Josh's own strike lines still struck on them.
+- **Balls.** From the shop after game 2, one card offers the Big ball (wider) or Heavy ball (heavier), $6; it replaces your ball and shows in the rack sheet's corner. Big ball left the gear list.
+- **Extra pins.** From the shop after game 3, one card offers a sixth pin, back centre (between the corners, worth 3), then a seventh, left flank (headpin row, in line with the left corner, worth 3), $5 each. A deep-centre spot was tried and dropped: three pins in a column hide each other on the lane camera.
+- **Log** adds `layout` and `shop_before_game` (every offer set seen, rerolls included, and what was bought).
+
+What the bot found (`npm run variety-bot`, perfect release over 7,371 lines):
+- Josh's strike lines from the logs strike on 0 or 1 of 9 on Shifted left/right and Headpin left/right, 3 of 9 on Headpin forward.
+- Every layout keeps plenty of strike lines (5 pins, house ball: 463 to 803 against 790 standard), but few of the standard ones (9 to 29 on four layouts; 403 on Headpin forward).
+- Big ball strikes on more lines than the house ball everywhere; Heavy on fewer (668 against 790 standard). Heavy is the weaker strike ball; not tuned.
+- Seven pins cut strike lines to about a quarter on the standard layout (191 against 790).
+
 ## Next
+Josh plays Five-Pin Variety Lab and pastes the log. Questions: does re-finding the line each game feel like play or a chore; does a different ball or a bigger rack change what he does; if it's not fun, which of the three to switch off.
+
+## Earlier next (Rules Lab)
 Josh plays Five-Pin Rules Lab and pastes the log. Questions: does choosing between striking and picking pins off feel like a decision; do games feel too short when you strike; are the targets right.
 
 ## The plan the Combined Lab came from

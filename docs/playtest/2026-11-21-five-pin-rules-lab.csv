@@ -1,0 +1,23 @@
+Five-Pin Rules Lab log. A clear ends the frame; no Mult for strikes or clears. Positions are px from lane centre: headpin 0, 3-spots at -46/+46, corners at -92/+92, lane edges -120/+120. Timing is ms early (-) or late (+). Drift is how far the ball was pushed off the drawn line at the pins. Clean pins is how many pins the drawn line knocks down with a perfect release. Rack lists the pin on each spot in the order headpin, left 3, right 3, left corner, right corner, with its level if above 1.
+run,game,target,frame,ball,start,aim,bend,timing_ms,drift_px,setup_seconds,pins_standing,pins_down,clean_pins,points,mult,score,result,triggers,rack,gear,camera
+1,1,35,1,1,-69,+21,-90,+53,0,5.7,5,5,5,15,1,15,Strike!,,plain plain plain plain plain,none,lane
+1,1,35,2,1,-69,+21,-90,+60,0,2,5,5,5,15,1,15,Strike!,,plain plain plain plain plain,none,lane
+1,1,35,3,1,-69,+21,-90,+29,0,2.7,5,5,5,15,1,15,Strike!,,plain plain plain plain plain,none,lane
+1,2,60,1,1,-77,+18,-89,+90,+4,5.5,5,5,5,15,2,30,Strike!,Leader +1,leader plain plain plain plain,none,lane
+1,2,60,2,1,-77,+18,-89,-116,-13,2.1,5,3,5,10,2,20,hit,Leader +1,leader plain plain plain plain,none,lane
+1,2,60,2,2,-77,-33,+90,-20,0,4,2,1,1,3,1,3,hit,,leader plain plain plain plain,none,lane
+1,2,60,2,3,-77,-65,+61,-106,-7,3,1,1,1,2,1,2,Cleared,,leader plain plain plain plain,none,lane
+1,2,60,3,1,-77,+10,-90,+29,0,5.4,5,5,5,15,2,30,Strike!,Leader +1,leader plain plain plain plain,none,lane
+1,3,100,1,1,-66,+10,-90,+95,+5,144.2,5,5,5,15,3,45,Strike!,Leader +1 + Crown ×1.5 + Tip jar +$1,leader crown tip plain plain,none,lane
+1,3,100,2,1,-66,+10,-90,-9,0,2.6,5,5,5,15,3,45,Strike!,Leader +1 + Crown ×1.5 + Tip jar +$1,leader crown tip plain plain,none,lane
+1,3,100,3,1,-66,+10,-90,-37,0,1.8,5,5,5,15,3,45,Strike!,Leader +1 + Crown ×1.5 + Tip jar +$1,leader crown tip plain plain,none,lane
+1,4,160,1,1,-75,+17,-90,+70,0,13.4,5,5,5,23,4.5,104,Strike!,Wing +8 + Leader +2 + Crown ×1.5 + Tip jar +$1,leader2 crown tip plain wing,none,lane
+1,4,160,2,1,-75,+17,-90,+25,0,2.3,5,5,5,23,4.5,104,Strike!,Wing +8 + Leader +2 + Crown ×1.5 + Tip jar +$1,leader2 crown tip plain wing,none,lane
+1,4,160,3,1,-75,+17,-90,+89,+3,1.8,5,5,5,23,4.5,104,Strike!,Wing +8 + Leader +2 + Crown ×1.5 + Tip jar +$1,leader2 crown tip plain wing,none,lane
+1,5,250,1,1,-78,+8,-73,-134,-17,5.9,5,3,3,18,3,54,hit,Wing +8 + Leader +2,leader2 crown2 tip trophy wing,none,lane
+1,5,250,1,2,-78,+8,-73,+32,0,2.1,2,0,0,0,1,0,Nothing,,leader2 crown2 tip trophy wing,none,lane
+1,5,250,1,3,-78,-23,+70,-121,-12,5.5,2,1,2,3,1,3,hit,,leader2 crown2 tip trophy wing,none,lane
+1,5,250,2,1,-78,+2,-90,-96,-6,4,5,1,3,5,3,15,hit,Leader +2,leader2 crown2 tip trophy wing,none,lane
+1,5,250,2,2,-78,+18,-79,-33,0,159,4,2,2,13,1,13,hit,Wing +8,leader2 crown2 tip trophy wing,none,lane
+1,5,250,2,3,-78,-78,+17,+172,+17,5,2,2,1,5,1,5,Cleared,,leader2 crown2 tip trophy wing,none,lane
+1,5,250,3,1,-78,+14,-90,+62,0,13.5,5,5,5,23,6,138,Strike!,Wing +8 + Leader +2 + Crown ×2 + Tip jar +$1,leader2 crown2 tip trophy wing,none,lane

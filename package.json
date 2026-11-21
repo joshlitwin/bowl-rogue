@@ -8,7 +8,9 @@
     "combined-bot": "node tools/combined-bot.js --fine",
     "combined-flow": "node tools/combined-flow.js",
     "rules-bot": "node tools/rules-bot.js",
-    "rules-flow": "PAGE=labs/five-pin-rules/index.html node tools/flow.js"
+    "rules-flow": "PAGE=labs/five-pin-rules/index.html node tools/flow.js",
+    "variety-bot": "node tools/variety-bot.js",
+    "variety-flow": "QS='?layout=0' PAGE=labs/five-pin-variety/index.html node tools/flow.js"
   },
   "devDependencies": {
     "@napi-rs/canvas": "^1.1.1",

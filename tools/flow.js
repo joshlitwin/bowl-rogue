@@ -1,7 +1,7 @@
 const {JSDOM,VirtualConsole}=require('jsdom');const fs=require('fs');
 const html=fs.readFileSync(require('path').join(__dirname,'..',process.env.PAGE||'game/index.html'),'utf8');const errs=[];
 const vc=new VirtualConsole();vc.on('jsdomError',e=>errs.push(String(e.stack||e).slice(0,700)));
-const dom=new JSDOM(html,{runScripts:'dangerously',pretendToBeVisual:true,virtualConsole:vc,url:'https://x.test/'});const w=dom.window,ev=s=>w.eval(s);
+const dom=new JSDOM(html,{runScripts:'dangerously',pretendToBeVisual:true,virtualConsole:vc,url:'https://x.test/'+(process.env.QS||'')});const w=dom.window,ev=s=>w.eval(s);
 (async()=>{await new Promise(r=>setTimeout(r,200));if(errs.length){console.log(errs.join('\n'));process.exit(1);}
 ev(`function shot(){if(g.rackBalls===0&&g.pins.length===5){g.sx=180;g.ex=191;g.bx=(g.sx+g.ex)/2-42.5;}else{const cx=g.pins.reduce((a,p)=>a+p.x,0)/g.pins.length;g.sx=clamp(cx,80,280);g.ex=cx;g.bx=(g.sx+g.ex)/2;}fixBend();g.ready=true;g.phase=.25;throwBall();let k=0;while(!g.sim.done&&k++<3000)tick(g.sim);resolve();draw();}
 function game(){let k=0;while(g.mode==='aim'&&k++<30)shot();}`);
