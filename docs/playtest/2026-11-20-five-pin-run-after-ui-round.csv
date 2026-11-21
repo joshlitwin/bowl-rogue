@@ -1,0 +1,56 @@
+Five-pin run log (rack build version). Positions are px from lane centre: headpin 0, 3-spots at -46/+46, corners at -92/+92, lane edges -120/+120. Timing is ms early (-) or late (+). Drift is how far the ball was pushed off the drawn line at the pins. Clean pins is how many pins the drawn line knocks down with a perfect release. Rack lists the pin on each spot in the order headpin, left 3, right 3, left corner, right corner, with its level if above 1.
+run,game,target,frame,ball,start,aim,bend,timing_ms,drift_px,setup_seconds,pins_standing,pins_down,clean_pins,points,mult,score,result,triggers,rack,gear,camera
+1,1,50,1,1,-69,+5,-90,+171,+32,17.3,5,2,3,5,1,5,hit,,plain plain plain plain plain,none,lane
+1,1,50,1,2,+60,-8,+80,+1,0,7.9,3,3,3,10,1.5,15,Cleared,,plain plain plain plain plain,none,lane
+1,1,50,1,3,+70,-8,+70,-129,-15,8.3,5,5,3,15,2,30,Strike!,,plain plain plain plain plain,none,lane
+1,1,50,2,1,+70,-8,+70,-192,-34,7.1,5,2,3,5,1,5,hit,,plain plain plain plain plain,none,lane
+1,1,50,2,2,-85,-2,-72,-10,0,10.2,3,1,1,5,1,5,hit,,plain plain plain plain plain,none,lane
+1,1,50,2,3,-85,+27,-89,-29,0,3.5,2,2,2,5,1.5,8,Cleared,,plain plain plain plain plain,none,lane
+1,1,50,3,1,-85,+17,-80,+113,+11,6.8,5,3,5,10,1,10,hit,,plain plain plain plain plain,none,lane
+1,1,50,3,2,-85,-71,-1,-44,0,7.1,2,0,0,0,1,0,Nothing,,plain plain plain plain plain,none,lane
+1,1,50,3,3,+95,-18,+37,+25,0,4.9,2,2,2,5,1.5,8,Cleared,,plain plain plain plain plain,none,lane
+1,2,100,1,1,-58,0,-90,+92,+4,13.2,5,3,2,10,1,10,hit,,plain plain plain domino plain,Lane bell,lane
+1,2,100,1,2,-18,-14,+77,+35,0,7.7,2,2,2,11,1.5,17,Cleared,Domino +6,plain plain plain domino plain,Lane bell,lane
+1,2,100,1,3,+59,+7,+69,+24,0,7.9,5,3,3,16,1,16,hit,Domino +6,plain plain plain domino plain,Lane bell,lane
+1,2,100,2,1,+59,-15,+70,-13,0,6.7,5,5,5,15,3,45,Strike!,Bell +1,plain plain plain domino plain,Lane bell,lane
+1,2,100,2,2,+59,-15,+70,+45,0,1.8,5,5,5,15,3,45,Strike!,Bell +1,plain plain plain domino plain,Lane bell,lane
+1,2,100,2,3,+59,-15,+70,-118,-11,2.1,5,5,5,15,3,45,Strike!,Bell +1,plain plain plain domino plain,Lane bell,lane
+1,2,100,3,1,+59,-15,+70,-65,0,1.8,5,5,5,15,3,45,Strike!,Bell +1,plain plain plain domino plain,Lane bell,lane
+1,2,100,3,2,+59,-15,+70,+31,0,1.6,5,5,5,15,3,45,Strike!,Bell +1,plain plain plain domino plain,Lane bell,lane
+1,2,100,3,3,+59,-15,+70,+11,0,3.6,5,5,5,15,3,45,Strike!,Bell +1,plain plain plain domino plain,Lane bell,lane
+1,3,180,1,1,-75,+19,-90,-81,0,19.2,5,5,5,21,4.5,95,Strike!,Domino +6 + Bell +1 + Crown ×1.5,plain sweep plain domino crown,Lane bell,lane
+1,3,180,1,2,-75,+19,-90,-3,0,2.2,5,5,5,21,4.5,95,Strike!,Domino +6 + Bell +1 + Crown ×1.5,plain sweep plain domino crown,Lane bell,lane
+1,3,180,1,3,-75,+19,-90,+103,+8,1.9,5,5,5,21,4.5,95,Strike!,Domino +6 + Bell +1 + Crown ×1.5,plain sweep plain domino crown,Lane bell,lane
+1,3,180,2,1,-75,+19,-90,+5,0,1.6,5,5,5,21,4.5,95,Strike!,Domino +6 + Bell +1 + Crown ×1.5,plain sweep plain domino crown,Lane bell,lane
+1,3,180,2,2,-75,+19,-90,+13,0,4.8,5,5,5,21,4.5,95,Strike!,Domino +6 + Bell +1 + Crown ×1.5,plain sweep plain domino crown,Lane bell,lane
+1,3,180,2,3,-75,+19,-90,-36,0,2.1,5,5,5,21,4.5,95,Strike!,Domino +6 + Bell +1 + Crown ×1.5,plain sweep plain domino crown,Lane bell,lane
+1,3,180,3,1,-75,+19,-90,+43,0,3.5,5,5,5,21,4.5,95,Strike!,Domino +6 + Bell +1 + Crown ×1.5,plain sweep plain domino crown,Lane bell,lane
+1,3,180,3,2,-75,+19,-90,-4,0,2.1,5,5,5,21,4.5,95,Strike!,Domino +6 + Bell +1 + Crown ×1.5,plain sweep plain domino crown,Lane bell,lane
+1,3,180,3,3,-75,+19,-90,+33,0,2.2,5,5,5,21,4.5,95,Strike!,Domino +6 + Bell +1 + Crown ×1.5,plain sweep plain domino crown,Lane bell,lane
+1,4,300,1,1,-62,+13,-86,-12,0,14.9,5,5,5,21,4.5,95,Strike!,Domino +6 + Bell +1 + Crown ×1.5 + Tip jar +$1,tip sweep trophy domino crown,Lane bell,lane
+1,4,300,1,2,-62,+13,-86,+9,0,2.4,5,5,5,23,4.5,104,Strike!,Trophy +2 + Domino +6 + Bell +1 + Crown ×1.5 + Tip jar +$1,tip sweep trophy domino crown,Lane bell,lane
+1,4,300,1,3,-62,+13,-86,+9,0,1.9,5,5,5,25,4.5,113,Strike!,Trophy +4 + Domino +6 + Bell +1 + Crown ×1.5 + Tip jar +$1,tip sweep trophy domino crown,Lane bell,lane
+1,4,300,2,1,-62,+13,-86,+79,0,2.1,5,5,5,27,4.5,122,Strike!,Trophy +6 + Domino +6 + Bell +1 + Crown ×1.5 + Tip jar +$1,tip sweep trophy domino crown,Lane bell,lane
+1,4,300,2,2,-62,+13,-86,+6,0,1.5,5,5,5,29,4.5,131,Strike!,Trophy +8 + Domino +6 + Bell +1 + Crown ×1.5,tip sweep trophy domino crown,Lane bell,lane
+1,4,300,2,3,-62,+13,-86,-10,0,1.7,5,5,5,31,4.5,140,Strike!,Trophy +10 + Domino +6 + Bell +1 + Crown ×1.5,tip sweep trophy domino crown,Lane bell,lane
+1,4,300,3,1,-62,+13,-86,-8,0,1.9,5,5,5,33,4.5,149,Strike!,Trophy +12 + Domino +6 + Bell +1 + Crown ×1.5,tip sweep trophy domino crown,Lane bell,lane
+1,4,300,3,2,-62,+13,-86,+6,0,1.9,5,5,5,35,4.5,158,Strike!,Trophy +14 + Domino +6 + Bell +1 + Crown ×1.5,tip sweep trophy domino crown,Lane bell,lane
+1,4,300,3,3,-62,+13,-86,-21,0,2.1,5,5,5,37,4.5,167,Strike!,Trophy +16 + Domino +6 + Bell +1 + Crown ×1.5,tip sweep trophy domino crown,Lane bell,lane
+1,5,450,1,1,-71,+16,-90,+10,0,13,5,5,5,39,6,234,Strike!,Trophy +18 + Domino +6 + Bell +1 + Crown ×2 + Tip jar +$1,tip2 sweep trophy domino crown2,Lane bell,lane
+1,5,450,1,2,-71,+16,-90,+66,0,1.9,5,5,5,41,6,246,Strike!,Trophy +20 + Domino +6 + Bell +1 + Crown ×2 + Tip jar +$1,tip2 sweep trophy domino crown2,Lane bell,lane
+1,5,450,1,3,-71,+16,-90,+31,0,2.1,5,5,5,43,6,258,Strike!,Trophy +22 + Domino +6 + Bell +1 + Crown ×2 + Tip jar +$1,tip2 sweep trophy domino crown2,Lane bell,lane
+1,5,450,2,1,-71,+16,-90,-15,0,1.9,5,5,5,45,6,270,Strike!,Trophy +24 + Domino +6 + Bell +1 + Crown ×2 + Tip jar +$1,tip2 sweep trophy domino crown2,Lane bell,lane
+1,5,450,2,2,-71,+16,-90,-8,0,1.9,5,5,5,47,6,282,Strike!,Trophy +26 + Domino +6 + Bell +1 + Crown ×2 + Tip jar +$1,tip2 sweep trophy domino crown2,Lane bell,lane
+1,5,450,2,3,-71,+16,-90,-1,0,1.5,5,5,5,49,6,294,Strike!,Trophy +28 + Domino +6 + Bell +1 + Crown ×2 + Tip jar +$1,tip2 sweep trophy domino crown2,Lane bell,lane
+1,5,450,3,1,-71,+16,-90,-84,-2,1.7,5,5,5,51,6,306,Strike!,Trophy +30 + Domino +6 + Bell +1 + Crown ×2,tip2 sweep trophy domino crown2,Lane bell,lane
+1,5,450,3,2,-71,+16,-90,+48,0,2.4,5,5,5,53,6,318,Strike!,Trophy +32 + Domino +6 + Bell +1 + Crown ×2,tip2 sweep trophy domino crown2,Lane bell,lane
+1,5,450,3,3,-71,+16,-90,+70,0,1.7,5,5,5,55,6,330,Strike!,Trophy +34 + Domino +6 + Bell +1 + Crown ×2,tip2 sweep trophy domino crown2,Lane bell,lane
+1,6,650,1,1,-66,+13,-90,-76,0,9.9,5,5,5,63,6,378,Strike!,Trophy +36 + Domino +12 + Bell +1 + Crown ×2 + Tip jar +$1,tip3 sweep trophy domino2 crown2,Big ball + Lane bell,lane
+1,6,650,1,2,-66,+13,-90,+95,+5,1.9,5,5,5,65,6,390,Strike!,Trophy +38 + Domino +12 + Bell +1 + Crown ×2 + Tip jar +$1,tip3 sweep trophy domino2 crown2,Big ball + Lane bell,lane
+1,6,650,1,3,-66,+13,-90,+49,0,2.3,5,5,5,67,6,402,Strike!,Trophy +40 + Domino +12 + Bell +1 + Crown ×2 + Tip jar +$1,tip3 sweep trophy domino2 crown2,Big ball + Lane bell,lane
+1,6,650,2,1,-66,+13,-90,-7,0,3.4,5,5,5,69,6,414,Strike!,Trophy +42 + Domino +12 + Bell +1 + Crown ×2 + Tip jar +$1,tip3 sweep trophy domino2 crown2,Big ball + Lane bell,lane
+1,6,650,2,2,-66,+13,-90,-167,-31,2.4,5,3,5,54,1,54,hit,Trophy +44,tip3 sweep trophy domino2 crown2,Big ball + Lane bell,lane
+1,6,650,2,3,-66,+13,-90,+15,0,2.1,2,0,0,0,1,0,Nothing,,tip3 sweep trophy domino2 crown2,Big ball + Lane bell,lane
+1,6,650,3,1,-66,+13,-90,-75,0,3.6,5,5,5,71,6,426,Strike!,Trophy +44 + Domino +12 + Bell +1 + Crown ×2 + Tip jar +$1,tip3 sweep trophy domino2 crown2,Big ball + Lane bell,lane
+1,6,650,3,2,-66,+13,-90,+1,0,2,5,5,5,73,6,438,Strike!,Trophy +46 + Domino +12 + Bell +1 + Crown ×2 + Tip jar +$1,tip3 sweep trophy domino2 crown2,Big ball + Lane bell,lane
+1,6,650,3,3,-66,+13,-90,+30,0,2.7,5,5,5,75,6,450,Strike!,Trophy +48 + Domino +12 + Bell +1 + Crown ×2 + Tip jar +$1,tip3 sweep trophy domino2 crown2,Big ball + Lane bell,lane

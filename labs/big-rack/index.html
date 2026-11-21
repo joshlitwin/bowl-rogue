@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<title>Big Rack Lab</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@500;700&family=Silkscreen&display=swap" rel="stylesheet">
+<style>
+:root{
+  /* one-screen app: rack + ball cells + score on top, pixel lane in the middle, throw button at the thumb */
+  --ink:#1d100a;--panel:#3a2016;--chalk:#f3e2b8;--dim:#c9a878;--accent:#d86a28;--go:#d83a2a;--go-ink:#fff8e8;
+  --paper:#f3e2b8;--paper-ink:#2a160e;--paper-dim:#7a4a2c;--now:#d83a2a;--made:#58a878;--pt:#f3e2b8;--mu:#ff8a4a;
+  --deck:#c98f52;--deck-line:#b47a40;--deck-ink:#2a160e;--deck-dim:#6b3f1e;--spot:rgba(42,22,14,.5);
+  --body:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;--display:"Pixelify Sans",system-ui,sans-serif;--num:"Silkscreen",ui-monospace,Menlo,monospace;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0}
+body{background:var(--ink);color:var(--chalk);font-family:var(--body);display:flex;flex-direction:column;overflow:hidden;-webkit-user-select:none;user-select:none;-webkit-tap-highlight-color:transparent}
+button{font-family:inherit;color:inherit}
+button:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+img{image-rendering:pixelated}
+/* ---- play HUD: the rack as it stands, nine ball cells, one score bar ---- */
+.hud{display:flex;gap:6px;padding:6px 10px 0;align-items:stretch}
+#rackBtn{flex:none;display:flex;flex-direction:column;justify-content:center;gap:2px;width:56px;height:48px;padding:0;background:var(--panel);border:2px solid var(--dim);border-radius:3px;box-shadow:0 2px 0 rgba(0,0,0,.45)}
+#rackBtn div{display:flex;justify-content:center;gap:3px}
+#rackBtn i{width:8px;height:8px;border:1px solid var(--ink);background:linear-gradient(var(--b) 0 62%,var(--r) 62%)}
+#rackBtn i.gone{background:transparent;border-color:rgba(201,168,120,.3)}
+.hudR{flex:1;min-width:0;display:flex;flex-direction:column;justify-content:space-between}
+.meta{display:flex;align-items:center;gap:8px;height:20px}
+#title{margin:0;flex:1;min-width:0;font:500 13px/1 var(--display);color:var(--dim);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#camBtn{width:32px;height:20px;padding:0;display:grid;place-items:center;background:transparent;border:2px solid var(--dim);border-radius:3px}
+#camBtn i{width:12px;height:10px;background:var(--chalk);clip-path:polygon(32% 0,68% 0,100% 100%,0 100%)}
+#camBtn[data-cam="top"] i{width:8px;clip-path:none}
+.board{display:flex;gap:3px}
+.cell{flex:1;min-width:0;display:grid;place-items:center;height:22px;background:transparent;color:var(--paper-ink);border:2px solid var(--panel);border-radius:2px;font:400 11px/1 var(--num);letter-spacing:-.04em}
+.cell.done{background:var(--paper);border-color:var(--paper)}
+.cell.now{background:var(--paper);border-color:var(--now)}
+.cell.fill{box-shadow:inset 0 -3px 0 var(--made)}
+.cell:empty::before{content:"";width:4px;height:4px;background:var(--dim)}
+.cell.now:empty::before{background:var(--paper-dim)}
+.goal{display:flex;align-items:center;gap:6px;padding:5px 10px;font-family:var(--num);font-variant-numeric:tabular-nums}
+.goal b{font-weight:400;font-size:18px;line-height:18px;color:var(--chalk);min-width:26px}
+.goal b+div+b{color:var(--accent);text-align:right}
+.bar{flex:1;height:14px;position:relative;background:var(--panel);border:2px solid var(--dim);border-radius:2px;overflow:hidden}
+.bar i{position:absolute;left:0;top:0;bottom:0;background:var(--accent);box-shadow:inset 0 -3px 0 rgba(0,0,0,.22);transition:width .45s steps(8)}
+.goal.made .bar{border-color:var(--made)}.goal.made .bar i{background:var(--made)}.goal.made b+div+b{color:var(--made)}
+.stage{flex:1;min-height:0;display:flex;align-items:center;justify-content:center;position:relative;padding:0 8px}
+canvas{display:block;touch-action:none;border-radius:6px;image-rendering:pixelated}
+.toast{position:absolute;left:0;right:0;top:56%;margin:0 auto;width:max-content;max-width:96%;transform:translateY(-50%);display:grid;grid-template-columns:auto auto;align-items:center;justify-content:center;gap:2px 10px;padding:6px 12px 7px;background:var(--ink);color:var(--chalk);border:3px solid var(--accent);border-radius:3px;box-shadow:0 4px 0 rgba(0,0,0,.5);font-family:var(--num);white-space:nowrap;pointer-events:none;opacity:0}
+.toast em{grid-row:span 2;font-style:normal;font-size:40px;line-height:40px;color:var(--accent)}
+.toast strong{font-weight:400;font-size:30px;line-height:30px}
+.toast em+strong{text-align:left}
+.toast b{font-weight:400;font-size:13px;line-height:14px;color:var(--dim);display:flex;gap:5px;justify-content:center}
+.toast em~b{justify-content:flex-start}
+.toast strong:first-child,.toast strong:first-child+b{grid-column:1/-1;text-align:center}
+.toast .pt{color:var(--pt)}.toast .mu{color:var(--mu)}
+.toast p{grid-column:1/-1;margin:4px 0 0;padding-top:5px;border-top:2px solid var(--panel);display:flex;flex-wrap:wrap;justify-content:center;gap:4px 9px;font-size:12px;line-height:1}
+.toast p span{display:flex;align-items:center;gap:3px}
+.toast p img{width:18px;height:36px}
+.hint{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);margin:0}
+.controls{display:flex;gap:8px;padding:6px 10px 10px;align-items:stretch}
+#throw{flex:1;border:3px solid var(--go);border-radius:4px;background:transparent;color:var(--chalk);font-family:var(--display);font-size:24px;font-weight:700;letter-spacing:.08em;min-height:52px;box-shadow:0 4px 0 rgba(0,0,0,.45)}
+#throw.live{background:var(--go);color:var(--go-ink)}
+#throw:disabled{background:transparent;border-color:var(--panel);color:transparent;box-shadow:none}
+/* ---------- overlay sheets: one screen, no scrolling ---------- */
+.sheet{position:fixed;inset:0;background:rgba(0,0,0,.78);display:flex;align-items:center;justify-content:center;padding:8px;z-index:2}
+.sheet[hidden]{display:none}
+.sheet .box{background:var(--panel);border-radius:10px;padding:10px;width:100%;max-width:380px;max-height:100%;overflow:hidden;display:flex;flex-direction:column;gap:8px;border:3px solid var(--ink);box-shadow:inset 0 0 0 2px rgba(255,255,255,.07)}
+.shead{display:flex;align-items:center;justify-content:space-between;gap:8px;min-height:30px}
+.sheet h2{margin:0;font-family:var(--display);font-size:20px;text-transform:uppercase;letter-spacing:.05em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sheet h2.nm{font-size:17px;text-transform:none;letter-spacing:0;white-space:normal;line-height:1.1}
+.shead small{flex:none;font:400 11px/1.2 var(--num);color:var(--dim);text-align:right}
+.chip{font-family:var(--num);font-weight:400;font-size:20px;line-height:1;color:var(--ink);background:var(--accent);padding:5px 9px 6px;border-radius:5px;box-shadow:0 3px 0 rgba(0,0,0,.4)}
+.row{display:flex;gap:8px}
+.row button{flex:1;min-width:0;padding:11px 8px;border-radius:8px;border:2px solid var(--dim);background:transparent;font-family:var(--display);font-size:15px;font-weight:700;white-space:nowrap}
+.row button.main{flex:1.5;background:var(--accent);border-color:var(--accent);color:var(--ink);box-shadow:0 3px 0 rgba(0,0,0,.4)}
+.row button[hidden]{display:none}
+/* a rack drawn as the bowler sees it: back row on top, headpin at the bottom */
+.tri10{position:relative;flex:none;display:block;width:78px;height:84px}
+.tri10 img{position:absolute;width:18px;height:36px}
+.tri10 img.gone{opacity:.16;filter:grayscale(1)}
+.tri10 u{position:absolute;z-index:1;font:400 9px/1 var(--num);text-decoration:none;color:var(--chalk);background:var(--ink);padding:1px 2px 2px 3px;border-radius:2px}
+.tri10 u.gone{opacity:.3}
+.tri10.big{width:168px;height:152px}
+.tri10.big img{width:27px;height:54px}
+/* start: one card per preset rack */
+.pre{display:flex;align-items:center;gap:10px;padding:6px 8px;text-align:left;border:2px solid var(--paper-dim);border-radius:6px;background:var(--paper);color:var(--paper-ink);box-shadow:0 3px 0 rgba(0,0,0,.4)}
+.pre:active{transform:translateY(2px);box-shadow:none}
+.pre.last{border-color:var(--accent);box-shadow:0 0 0 2px var(--accent),0 3px 0 rgba(0,0,0,.4)}
+.pinfo{flex:1;min-width:0;display:flex;flex-direction:column;gap:3px}
+.pinfo strong{font:700 15px/1.15 var(--display)}
+.lg{display:flex;align-items:center;gap:6px;font-size:11.5px;line-height:1.2;color:var(--paper-dim)}
+.lg img{flex:none;width:9px;height:18px}
+.lg b{color:var(--paper-ink);font-weight:700}
+/* rack sheet: the standing rack and what each kind of pin does */
+.deck{position:relative;display:flex;justify-content:center;border-radius:6px;padding:6px 8px 4px;border:2px solid var(--ink);background:repeating-linear-gradient(90deg,var(--deck) 0 25px,var(--deck-line) 25px 26px)}
+.legend{display:flex;flex-direction:column;gap:4px}
+.legend div{display:flex;align-items:center;gap:9px;min-height:44px;padding:4px 9px;border-radius:6px;background:var(--ink)}
+.legend img{flex:none;width:18px;height:36px}
+.legend p{margin:0;font-size:12px;line-height:1.25;color:var(--dim)}
+.legend p strong{display:block;font:700 14px/1.2 var(--display);color:var(--chalk)}
+.legend p b{color:var(--chalk)}
+.legend em{margin-left:auto;flex:none;font:400 12px/1 var(--num);font-style:normal;color:var(--accent);border:2px solid var(--accent);border-radius:4px;padding:4px 5px;white-space:nowrap}
+/* end of game */
+.track{display:flex;gap:3px}
+.track span{flex:1;min-width:0;text-align:center;font:400 11px/1 var(--num);letter-spacing:-.04em;padding:6px 0;border-radius:4px;border:2px solid var(--dim);color:var(--chalk)}
+.track span.fill{box-shadow:inset 0 -3px 0 var(--made)}
+.final{display:flex;align-items:baseline;justify-content:center;gap:12px;padding:12px 0;border-radius:6px;background:var(--ink);font-family:var(--num)}
+.final b{font-weight:400;font-size:44px;line-height:1;color:var(--chalk)}
+.final small{font-size:13px;color:var(--dim)}
+.final.made b{color:var(--made)}
+#logText{flex:1 1 auto;min-height:60px;width:100%;font:11px ui-monospace,Menlo,monospace;background:var(--ink);color:var(--chalk);border:1px solid var(--dim);border-radius:8px;padding:8px;-webkit-user-select:text;user-select:text;white-space:pre;overflow:auto}
+@media (max-height:620px){.legend div{min-height:40px}}
+</style>
+</head>
+<body>
+<div class="hud">
+  <button id="rackBtn" type="button" aria-label="Rack: what each pin does"></button>
+  <div class="hudR">
+    <div class="meta"><h1 id="title"></h1><button id="camBtn" type="button" aria-label="Change view"><i></i></button></div>
+    <div class="board" id="board"></div>
+  </div>
+</div>
+<div class="goal" id="goal"><b id="tot">0</b><div class="bar"><i id="fill"></i></div><b id="tgt" aria-label="Best"></b></div>
+<div class="stage">
+  <canvas id="lane" width="180" height="300" aria-label="Bowling lane. Drag the ball, the bend handle and the aim ring."></canvas>
+  <div class="toast" id="toast" aria-live="polite"></div>
+</div>
+<p class="hint" id="hint"></p>
+<div class="controls">
+  <button id="throw" type="button" disabled>READY</button>
+</div>
+<div class="sheet" id="start"><div class="box">
+  <div class="shead"><h2>Big Rack Lab</h2><small>9 balls<br>refills when empty</small></div>
+  <div id="presets" style="display:flex;flex-direction:column;gap:7px"></div>
+  <div class="row"><button id="startLog" type="button">Results log</button><button id="startBack" type="button" hidden>Resume</button></div>
+</div></div>
+<div class="sheet" id="rackSheet" hidden><div class="box">
+  <div class="shead"><h2 class="nm" id="rackName"></h2><small id="rackInfo"></small></div>
+  <div class="deck"><span class="tri10 big" id="rackMap"></span></div>
+  <div class="legend" id="rackLegend"></div>
+  <div class="row"><button id="rackLog" type="button">Results log</button><button id="rackSwap" type="button">Racks</button><button class="main" id="rackClose" type="button">Done</button></div>
+</div></div>
+<div class="sheet" id="over" hidden><div class="box">
+  <div class="shead"><h2 class="nm" id="overTitle"></h2></div>
+  <div class="final" id="overTotal"></div>
+  <div class="track" id="overTrack"></div>
+  <div class="row"><button id="overLog" type="button">Results log</button><button id="overSwap" type="button">Racks</button><button class="main" id="again" type="button">New game</button></div>
+</div></div>
+<div class="sheet" id="log" hidden><div class="box">
+  <div class="shead"><h2>Results log</h2></div>
+  <textarea id="logText" readonly rows="12" aria-label="Results log"></textarea>
+  <div class="row"><button id="logClear" type="button">Clear</button><button id="logCopy" type="button">Copy log</button><button class="main" id="logClose" type="button">Done</button></div>
+</div></div>
+
+<script>
+//SIM-START
+const G={L:60,R:300,BACK:30,FOUL:540,SY:520,EY:160,WL:38,WR:322};
+const RACK=[{x:180,y:160,v:5},{x:134,y:120,v:3},{x:226,y:120,v:3},{x:88,y:80,v:2},{x:272,y:80,v:2}];
+let RB=12,MB=2.2,FRIC=1.5;const RP=11,RT=21,MP=1,REST=.78,KNOCK=45;
+let CARRY=1.5,KICK=-.9,DRIVE=0,MESS=.8;
+const POW=[{speed:400,needle:.85},{speed:500,needle:1},{speed:620,needle:1.3}];
+function rack(){return RACK.map(p=>({x:p.x,y:p.y,v:p.v,vx:0,vy:0,down:false,gone:false,age:0,ang:0}));}
+function makePath(sx,ex,bend){
+  const S={x:sx,y:G.SY},E={x:ex,y:G.EY},C={x:(sx+ex)/2+bend,y:(G.SY+G.EY)/2};
+  const pts=[],N=60;
+  for(let i=0;i<=N;i++){const t=i/N,a=(1-t)*(1-t),b=2*t*(1-t),k=t*t;pts.push({x:a*S.x+b*C.x+k*E.x,y:a*S.y+b*C.y+k*E.y});}
+  let tx=E.x-C.x,ty=E.y-C.y;const tl=Math.hypot(tx,ty);tx/=tl;ty/=tl;
+  for(let d=8;d<=260;d+=8)pts.push({x:E.x+tx*d,y:E.y+ty*d});
+  const len=[0];for(let i=1;i<pts.length;i++)len.push(len[i-1]+Math.hypot(pts[i].x-pts[i-1].x,pts[i].y-pts[i-1].y));
+  return{S,E,C,pts,len};
+}
+function pathAt(p,d){
+  const n=p.pts.length;if(d>=p.len[n-1]){const a=p.pts[n-2],b=p.pts[n-1],l=Math.hypot(b.x-a.x,b.y-a.y);return{x:b.x,y:b.y,dx:(b.x-a.x)/l,dy:(b.y-a.y)/l,end:true};}
+  let i=1;while(p.len[i]<d)i++;
+  const a=p.pts[i-1],b=p.pts[i],seg=p.len[i]-p.len[i-1],f=(d-p.len[i-1])/seg;
+  return{x:a.x+(b.x-a.x)*f,y:a.y+(b.y-a.y)*f,dx:(b.x-a.x)/seg,dy:(b.y-a.y)/seg,end:false};
+}
+function pinR(p,rt){if(!p.down)return RP;return RP+(rt-RP)*Math.min(1,p.age/0.1);}
+function newSim(pins,path,power,spin){return{pins,path,t:0,done:false,ball:{spin:spin||0,x:path.S.x,y:path.S.y,vx:0,vy:0,d:0,speed:POW[power].speed,free:false,gutter:false,out:false}};}
+function stepSim(s,dt){
+  const b=s.ball;s.t+=dt;
+  if(!b.out){
+    if(b.gutter){b.y-=b.speed*.8*dt;}
+    else if(!b.free){b.d+=b.speed*dt;const q=pathAt(s.path,b.d);b.x=q.x;b.y=q.y;b.vx=q.dx*b.speed;b.vy=q.dy*b.speed;if(q.end)b.free=true;
+      if(b.x<G.L||b.x>G.R){b.gutter=true;b.x=b.x<G.L?G.L-11:G.R+11;}}
+    else{b.x+=b.vx*dt;b.y+=b.vy*dt;
+      if(b.x<G.WL+RB){b.x=G.WL+RB;b.vx=Math.abs(b.vx)*.4;}if(b.x>G.WR-RB){b.x=G.WR-RB;b.vx=-Math.abs(b.vx)*.4;}
+      if(b.vy>-40)b.vy-=300*dt;
+      if(b.spin&&b.y>G.BACK+20)b.vx+=-Math.sign(b.spin)*Math.abs(b.spin)*DRIVE*dt;}
+    if(b.y<G.BACK-16)b.out=true;
+  }
+  const P=s.pins,rt=RT*(1+MESS*Math.abs(b.spin));
+  if(!b.out&&!b.gutter)for(const p of P){if(p.gone)continue;const r=RB+(p.down?RP:RP);
+    let nx=p.x-b.x,ny=p.y-b.y;const d=Math.hypot(nx,ny);if(d>=r||d===0)continue;nx/=d;ny/=d;
+    const vr=(b.vx-p.vx)*nx+(b.vy-p.vy)*ny;
+    if(vr>0){const sp=Math.abs(b.spin),mb=MB*(1+CARRY*sp);const j=(1+REST)*vr/(1/mb+1/MP);b.vx-=j/mb*nx;b.vy-=j/mb*ny;p.vx+=j/MP*nx;p.vy+=j/MP*ny;
+      if(sp){const hd=-Math.sign(b.spin),tx=-ny,ty=nx,sg=tx*hd>=0?1:-1,k=KICK*sp*vr;p.vx+=sg*tx*k;p.vy+=sg*ty*k;}
+      if(!p.down){p.by='ball';p.ord=s.ord=(s.ord||0)+1;}p.down=true;b.free=true;}
+    p.x=b.x+nx*r;p.y=b.y+ny*r;}
+  for(let i=0;i<P.length;i++){const a=P[i];if(a.gone)continue;for(let k=i+1;k<P.length;k++){const c=P[k];if(c.gone)continue;
+    const am=a.down&&(a.vx||a.vy),cm=c.down&&(c.vx||c.vy);if(!am&&!cm)continue;
+    const r=pinR(a,rt)+pinR(c,rt);let nx=c.x-a.x,ny=c.y-a.y;const d=Math.hypot(nx,ny);if(d>=r||d===0)continue;nx/=d;ny/=d;
+    const vr=(a.vx-c.vx)*nx+(a.vy-c.vy)*ny;
+    if(vr>0){
+      const aFixed=!a.down&&vr<KNOCK,cFixed=!c.down&&vr<KNOCK;
+      if(aFixed){c.vx+=(1+.5)*vr*nx;c.vy+=(1+.5)*vr*ny;}
+      else if(cFixed){a.vx-=(1+.5)*vr*nx;a.vy-=(1+.5)*vr*ny;}
+      else{const j=(1+REST)*vr/2;a.vx-=j*nx;a.vy-=j*ny;c.vx+=j*nx;c.vy+=j*ny;if(!a.down){a.by='pin';a.ord=s.ord=(s.ord||0)+1;}if(!c.down){c.by='pin';c.ord=s.ord=(s.ord||0)+1;}a.down=true;c.down=true;}
+    }
+    const ov=r-d;const aStill=!a.down,cStill=!c.down;
+    if(aStill&&!cStill){c.x+=nx*ov;c.y+=ny*ov;}else if(cStill&&!aStill){a.x-=nx*ov;a.y-=ny*ov;}else if(!aStill&&!cStill){a.x-=nx*ov/2;a.y-=ny*ov/2;c.x+=nx*ov/2;c.y+=ny*ov/2;}
+  }}
+  let moving=false;const fr=Math.exp(-FRIC*dt);
+  for(const p of P){if(p.gone||!p.down)continue;p.age+=dt;
+    p.x+=p.vx*dt;p.y+=p.vy*dt;p.vx*=fr;p.vy*=fr;
+    const r=RP;if(p.x<G.WL+r){p.x=G.WL+r;p.vx=Math.abs(p.vx)*.5;}if(p.x>G.WR-r){p.x=G.WR-r;p.vx=-Math.abs(p.vx)*.5;}
+    if(p.y<G.BACK){p.gone=true;p.vx=p.vy=0;continue;}
+    const sp=Math.hypot(p.vx,p.vy);if(sp>1)p.ang=Math.atan2(p.vy,p.vx);
+    if(sp<14){p.vx=p.vy=0;}else moving=true;}
+  if((b.out||s.t>1.2&&b.free&&Math.hypot(b.vx,b.vy)<10)&&!moving)s.done=true;
+  if(s.t>6)s.done=true;
+}
+function frameMarks(balls){const out=[];let sum=0,n=0;for(const v of balls){sum+=v;n++;if(sum===15){out.push(n===1?'X':n===2?'/':String(v));sum=0;n=0;}else out.push(v===0?'-':String(v));}return out;}
+function scoreFrames(fr){const flat=[].concat(...fr);let idx=0,tot=0;const out=[];
+  for(let i=0;i<fr.length;i++){const b=fr[i];let s=null;const g=k=>flat[idx+k]||0;
+    if(b.length){s=b.reduce((a,v)=>a+v,0);
+      if(i<fr.length-1){if(b[0]===15)s=15+g(1)+g(2);else if(b.length===2&&b[0]+b[1]===15)s=15+g(2);}
+      tot+=s;}
+    out.push(b.length?tot:null);idx+=b.length;}
+  return out;}
+//SIM-END
+
+// ---------- the big rack: ten pins, rows of 1 2 3 4, headpin nearest the bowler ----------
+// The sim block above is untouched. The aim row moves up to the new headpin row; everything else in G stays.
+const HEADY=220,SPX=68,SPY=60,BALLS=9;G.EY=HEADY;
+const R10=[];for(let r=0;r<4;r++)for(let i=0;i<=r;i++)R10.push({x:180+(i-r/2)*SPX,y:HEADY-r*SPY,row:r,col:i});
+const SLOTV=[5,3,3,2,2,2,2,2,2,2],WALLM=2,SURV=4,GOLD=5,CLOSE=3,PICK=3;
+const PINS={
+  plain:{name:'Plain pin',text:'Worth its spot.'},
+  stone:{name:'Stone pin',text:'Only the ball can knock it down.'},
+  wall:{name:'Wallflower pin',text:'While it stands: +2 Mult for each earlier ball that dropped pins.'},
+  gold:{name:'Gold pin',text:'Worth 5× its spot.'},
+  surv:{name:'Survivor pin',text:'+'+SURV+' points for each earlier ball that dropped pins.'},
+  closer:{name:'Closer pin',text:'Mult ×'+CLOSE+' if it falls on the ball that empties the rack.'},
+  picket:{name:'Picket pin',text:'+'+PICK+' points per other pin on the same ball.'}
+};
+const PAL={
+  stone:{w:'#d4d4cc',l:'#a8a8a0',m:'#7e7e78',d:'#565652',R:'#3a3a38',r:'#222220'},
+  wall:{w:'#ecd8ff',l:'#c8a8f0',m:'#9a78d0',d:'#6a4ca0',R:'#5a2f8a',r:'#3c1c64'},
+  gold:{w:'#fff2b0',l:'#ffd866',m:'#e8a020',d:'#b06c10',R:'#d83a2a',r:'#9c2218'},
+  surv:{w:'#b8f0c0',l:'#78d890',m:'#3fae62',d:'#1f7a3c',R:'#fff8e8',r:'#d2bf9a'},
+  closer:{w:'#6a8ad8',l:'#3f5fb8',m:'#28408e',d:'#162664',R:'#ffd866',r:'#e8a020'},
+  picket:{w:'#ffd8e0',l:'#ff9eb4',m:'#e0607e',d:'#a8344e',R:'#fff8e8',r:'#d2bf9a'}
+};
+// spots in bowling order: 1 headpin; 2 3; 4 5 6; 7 8 9 10 (back row, left to right)
+const PRESETS=[
+  {name:'Wallflower headpin',rack:['wall','plain','plain','plain','plain','plain','stone','gold','gold','stone']},
+  {name:'Survivors behind a closer',rack:['plain','plain','plain','plain','closer','plain','stone','surv','surv','stone']},
+  {name:'Pickets with a closer up front',rack:['closer','picket','picket','plain','picket','plain','stone','plain','plain','stone']}
+];
+let LOG=[];try{LOG=JSON.parse(localStorage.getItem('bigrack-log1')||'[]');}catch(e){}
+let BEST={};try{BEST=JSON.parse(localStorage.getItem('bigrack-best1')||'{}');}catch(e){}
+let gameNo=LOG.length?LOG[LOG.length-1].game:0,lastPreset=LOG.length?Math.max(0,PRESETS.findIndex(p=>p.name===LOG[LOG.length-1].preset)):-1,thrown=LOG.length>0;
+const T={speed:.45,win:80,bend:90,risk:1,two:true,cam:'lane'};
+try{if(localStorage.getItem('bigrack-cam')==='top')T.cam='top';}catch(e){}
+const cv=document.getElementById('lane'),c=cv.getContext('2d');
+const LW=180,LH=300;
+function fit(){const box=cv.parentElement.getBoundingClientRect();const s=Math.max(.5,Math.min((box.width-16)/LW,box.height/LH));cv.style.width=Math.floor(LW*s)+'px';cv.style.height=Math.floor(LH*s)+'px';}
+window.addEventListener('resize',fit);
+const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+const $=id=>document.getElementById(id);
+
+// ---------- one game: nine balls at a rack that only refills when it is empty ----------
+let g=null;
+const kindOf=(t,slot)=>t==='plain'?'p'+SLOTV[slot]:t;
+function rackNew(){return R10.map((p,i)=>({x:p.x,y:p.y,x0:p.x,y0:p.y,v:SLOTV[i],vx:0,vy:0,down:false,gone:false,age:0,ang:0,slot:i,item:g.preset.rack[i],kind:kindOf(g.preset.rack[i],i)}));}
+// one step of the lane. A stone pin that another pin knocked over stands straight back up: only the ball counts.
+function tick(s){stepSim(s,1/240);for(const p of s.pins)if(p.down&&!p.seen){if(p.item==='stone'&&p.by!=='ball'){p.down=false;p.by=null;p.x=p.x0;p.y=p.y0;p.vx=p.vy=0;p.age=0;}else p.seen=true;}}
+// what one ball is worth: points from the pins that fell, times Mult. hits = earlier balls of this rack that dropped pins.
+function scoreBall(fell,left,hits){const cleared=left.length===0&&fell.length>0,add={},notes=[];let pts=0,m=1;
+  for(const p of fell){const t=p.item,v=SLOTV[p.slot];let a=v,b=0;
+    if(t==='gold'){a=v*GOLD;add.gold='×'+GOLD;}
+    else if(t==='surv')b=SURV*hits;else if(t==='picket')b=PICK*(fell.length-1);
+    if(b)add[t]=(add[t]||0)+b;pts+=a+b;}
+  for(const t in add)notes.push(NOTE[t]+' '+(add[t]>0?'+'+add[t]:add[t]));
+  if(fell.length){const w=left.filter(p=>p.item==='wall').length*WALLM*hits;if(w){m+=w;notes.push('Wallflower +'+w);}}
+  if(cleared&&fell.some(p=>p.item==='closer')){m*=CLOSE;notes.push('Closer ×'+CLOSE);}
+  return{pts,m,score:pts*m,cleared,notes};}
+const NOTE={gold:'Gold',surv:'Survivor',picket:'Picket'},NK={Gold:'gold',Survivor:'surv',Picket:'picket',Wallflower:'wall',Closer:'closer'},NM={wall:1,closer:1};
+function startGame(i){gameNo++;lastPreset=i;
+  g={preset:PRESETS[i],pi:i,game:gameNo,balls:[],fills:[],rackNo:1,rackBalls:0,hits:0,bx:180,zoneAt:.2,ready:false,t0:performance.now(),pend:null,sx:180,ex:180,bend:0,power:1,phase:.5,mode:'aim',sim:null,trail:[],last:null,intended:null,err:0,toast:null,toastT:0,wait:0,stopped:0};
+  g.pins=rackNew();['over','start','rackSheet','log'].forEach(id=>$(id).hidden=true);
+  $('title').textContent=g.preset.name;$('camBtn').dataset.cam=T.cam;strip();board();hint();setBtn();}
+const total=()=>g.balls.reduce((a,v)=>a+v,0);
+const best=()=>BEST[g.preset.name]||0;
+// the rack button: the ten spots, back row on top, the ones still standing filled in
+const CHIP={5:['#fff8e8','#d83a2a'],3:['#fff8e8','#e8a020'],2:['#fff8e8','#3f8f6a']};
+function strip(){const up=new Set(g.pins.map(p=>p.slot));let h='';
+  for(let r=3;r>=0;r--){h+='<div>';R10.forEach((p,i)=>{if(p.row!==r)return;const t=g.preset.rack[i],col=t==='plain'?CHIP[SLOTV[i]]:[PAL[t].l,PAL[t].R];h+=`<i class="${up.has(i)?'':'gone'}" style="--b:${col[0]};--r:${col[1]}"></i>`;});h+='</div>';}
+  $('rackBtn').innerHTML=h;}
+function board(){let h='';for(let i=0;i<BALLS;i++){const d=i<g.balls.length;h+=`<div class="cell${d?' done':i===g.balls.length&&g.mode!=='over'?' now':''}${g.fills.includes(i)?' fill':''}">${d?g.balls[i]:''}</div>`;}
+  $('board').innerHTML=h;const t=total(),b=best();
+  $('tot').textContent=t;$('tgt').textContent=b||'';$('fill').style.width=(b?Math.min(100,t/b*100):0)+'%';$('goal').className='goal'+(b&&t>b?' made':'');}
+$('camBtn').addEventListener('click',()=>{T.cam=T.cam==='lane'?'top':'lane';drag=null;$('camBtn').dataset.cam=T.cam;try{localStorage.setItem('bigrack-cam',T.cam);}catch(e){}});
+function setBtn(){const b=$('throw');b.disabled=g.mode!=='aim';b.classList.toggle('live',g.mode==='aim'&&g.ready);b.textContent=g.mode==='aim'&&!g.ready?'READY':'THROW';}
+function saveLog(){try{localStorage.setItem('bigrack-log1',JSON.stringify(LOG));}catch(e){}}
+const tri=p=>4*Math.abs((((p%1)+1)%1)-.5)-1;
+function zone(){return Math.min(.6,T.win/1000*4*needleHz());}
+function fixBend(){const mid=(g.sx+g.ex)/2;g.bend=clamp(2*(g.bx-mid),-T.bend,T.bend);g.bx=mid+g.bend/2;}
+function needleHz(){return T.speed*(1+T.risk*Math.abs(g.bend)/T.bend)*POW[g.power].needle;}
+function hint(t){$('hint').textContent=t||(thrown?'Nine balls. Fallen pins stay down; the rack refills only when it is empty. Each ball scores points × Mult.':'Drag the ball, the bend handle and the aim ring. Then press Ready.');}
+const ids=a=>a.map(p=>p.slot+1).sort((x,y)=>x-y).join(' ')||'-';
+function throwBall(){if(!g||g.mode!=='aim')return;
+  if(!g.ready){g.ready=true;g.phase=Math.random();setBtn();hint('The needle is live. Stop it in the green. Touch the lane to go back.');return;}
+  const n=tri(g.phase),z=zone(),hz0=needleHz(),ms=Math.round(n/(4*hz0)*1000);let eff=0;if(Math.abs(n)>z)eff=Math.sign(n)*(Math.abs(n)-z)/(1-z);
+  g.stopped=n;g.zoneAt=z;g.err=eff;g.intended=makePath(g.sx,g.ex,g.bend);
+  const path=makePath(g.sx,g.ex+eff*70,g.bend);
+  let clean=null;if(eff!==0){const cp=g.pins.map(q=>Object.assign({},q)),cs=newSim(cp,g.intended,1,g.bend/90);let k=0;while(!cs.done&&k++<2500)tick(cs);clean=cp.filter(q=>q.down).length;}
+  g.pend={clean,ms,game:g.game,ball:g.balls.length+1,preset:g.preset.name,rack:g.rackNo,start:Math.round(g.sx-180),aim:Math.round(g.ex-180),bend:Math.round(g.bend),drift:Math.round(eff*70),setup:+((performance.now()-g.t0)/1000).toFixed(1),standing:g.pins.length,cam:T.cam};
+  g.sim=newSim(g.pins,path,1,g.bend/90);g.trail=[];g.mode='roll';thrown=true;g.rackBalls++;
+  setBtn();hint();}
+$('throw').addEventListener('click',throwBall);
+
+// a trigger note ("Gold ×3", "Wallflower +2") as a pin icon and its number
+function chip(n){const w=n.split(' '),k=NK[w[0]];return `<span class="${NM[k]?'mu':'pt'}"><img src="${icon(k)}" alt="${w[0]}">${w[1]}</span>`;}
+function resolve(){const fell=g.pins.filter(p=>p.down),left=g.pins.filter(p=>!p.down),r=scoreBall(fell,left,g.hits);
+  g.balls.push(r.score);if(r.cleared)g.fills.push(g.balls.length-1);
+  g.toast=r.score?'x':null;
+  $('toast').innerHTML=(r.cleared?'<em>/</em>':'')+`<strong>+${r.score}</strong>`+(r.m!==1?`<b><span class="pt">${r.pts}</span>×<span class="mu">${r.m}</span></b>`:'')+(r.notes.length?`<p>${r.notes.map(chip).join('')}</p>`:'');
+  g.toastT=r.notes.length?2.2:1.5;
+  if(g.pend){Object.assign(g.pend,{down:fell.length,fell:ids(fell),left:ids(left),points:r.pts,mult:r.m,score:r.score,total:total(),notes:r.notes.join(' + ')});if(g.pend.clean===null)g.pend.clean=fell.length;LOG.push(g.pend);g.pend=null;saveLog();}
+  g.last=g.trail;g.pins=left;if(fell.length)g.hits++;
+  if(r.cleared){g.pins=rackNew();g.rackNo++;g.rackBalls=0;g.hits=0;}
+  g.sim=null;
+  if(g.balls.length>=BALLS){g.mode='over';strip();board();endGame();}
+  else{g.mode='aim';g.ready=false;g.t0=performance.now();strip();board();hint();}
+  setBtn();}
+function endGame(){const t=total(),b=best(),n=g.preset.name;
+  $('overTitle').textContent=n;
+  $('overTotal').className='final'+(t>b&&b?' made':'');$('overTotal').innerHTML=`<b>${t}</b>`+(b?`<small>best ${Math.max(b,t)}</small>`:'');
+  $('overTrack').innerHTML=g.balls.map((v,i)=>`<span class="${g.fills.includes(i)?'fill':''}">${v}</span>`).join('');
+  if(t>b){BEST[n]=t;try{localStorage.setItem('bigrack-best1',JSON.stringify(BEST));}catch(e){}}
+  $('over').hidden=false;}
+$('again').addEventListener('click',()=>startGame(g.pi));
+
+// ---------- sheets: pick a rack, read the rack ----------
+const ICON={};
+function icon(kind){return ICON[kind]||(ICON[kind]=buildTheme(THEME.rec).pins[kind].toDataURL());}
+const rich=s=>s.replace(/(\+\d+ points|\+\d+ Mult|Mult ×\d+|\d+×)/g,'<b>$1</b>');
+const kinds=rk=>Object.keys(PINS).filter(t=>t!=='plain'&&rk.includes(t));
+// ten pins as a triangle of sprites; up = the spots still standing (all, when not given)
+function triHTML(rk,big,up){const w=big?27:18,dx=big?44:20,dy=big?32:16,W=big?168:78;let h='';
+  for(let r=3;r>=0;r--)R10.forEach((p,i)=>{if(p.row!==r)return;const x=Math.round(W/2+(p.col-r/2)*dx-w/2),y=(3-r)*dy,gone=up&&!up.has(i);
+    h+=`<img class="${gone?'gone':''}" style="left:${x}px;top:${y}px" src="${icon(kindOf(rk[i],i))}" alt="${i+1}: ${PINS[rk[i]].name}">`+(big?`<u class="${gone?'gone':''}" style="left:${x+19}px;top:${y+2}px">${SLOTV[i]}</u>`:'');});
+  return h;}
+function showStart(){const el=$('presets');el.innerHTML='';
+  PRESETS.forEach((p,i)=>{const b=document.createElement('button');b.type='button';b.className='pre'+(i===lastPreset?' last':'');
+    b.innerHTML=`<span class="tri10">${triHTML(p.rack)}</span><span class="pinfo"><strong>${p.name}</strong>${kinds(p.rack).map(t=>`<span class="lg"><img src="${icon(t)}" alt="${PINS[t].name}"><span>${rich(PINS[t].text)}</span></span>`).join('')}</span>`;
+    b.addEventListener('click',()=>startGame(i));el.appendChild(b);});
+  $('startBack').hidden=!(g&&g.mode!=='over');['over','rackSheet'].forEach(id=>$(id).hidden=true);$('start').hidden=false;}
+$('startBack').addEventListener('click',()=>$('start').hidden=true);
+function showRack(){const rk=g.preset.rack,up=new Set(g.pins.map(p=>p.slot));
+  $('rackName').textContent=g.preset.name;$('rackInfo').innerHTML=`ball ${Math.min(BALLS,g.balls.length+1)}/${BALLS}<br>rack ${g.rackNo}`;
+  $('rackMap').innerHTML=triHTML(rk,true,up);
+  const live={wall:g.pins.some(p=>p.item==='wall')?'next +'+WALLM*g.hits:'',surv:g.pins.some(p=>p.item==='surv')?'now +'+SURV*g.hits:''};
+  $('rackLegend').innerHTML=kinds(rk).map(t=>`<div><img src="${icon(t)}" alt=""><p><strong>${PINS[t].name.replace(' pin','')}</strong>${rich(PINS[t].text)}</p>${live[t]?`<em>${live[t]}</em>`:''}</div>`).join('');
+  $('rackSheet').hidden=false;}
+$('rackBtn').addEventListener('click',()=>{if(g)showRack();});
+$('rackClose').addEventListener('click',()=>$('rackSheet').hidden=true);
+$('rackSwap').addEventListener('click',showStart);$('overSwap').addEventListener('click',showStart);
+
+// ---------- cameras: the sim stays in flat lane units, the camera only decides where they land on screen ----------
+// lane: a long-lens view from above the foul line, so the pin deck (y 40..220) takes a third of the screen, no row hides another,
+// and the pins are drawn at twice the sprite size (about the same sprite-to-collision ratio as the old far camera)
+const CAM={
+  lane:{id:'lane',horizon:56,
+    proj(x,y){const z=1754-y;return{X:90+(x-180)*864/z,Y:-462.8+894400/z,k:864/z};},
+    inv(px,py){const z=894400/(py+.5+462.8);return{x:180+(px+.5-90)*z/864,y:1754-z,k:864/z};},
+    band(Y){return Y>222?'ball':Y>156?'bend':'aim';}},
+  top:{id:'top',horizon:6,
+    proj(x,y){return{X:x/2,Y:y/2,k:.5};},
+    inv(px,py){return{x:px*2+1,y:py*2+1,k:.5};},
+    band(Y){return Y>222?'ball':Y>156?'bend':'aim';}}
+};
+const HY={ball:G.SY,aim:G.EY,bend:(G.SY+G.EY)/2};
+
+// pointer: three bands pick the handle, drag is relative so nothing jumps
+let drag=null;
+function pt(e){const r=cv.getBoundingClientRect();return{x:(e.clientX-r.left)/r.width*LW,y:(e.clientY-r.top)/r.height*LH};}
+cv.addEventListener('pointerdown',e=>{if(!g||g.mode!=='aim')return;if(g.ready){g.ready=false;setBtn();}hint();const p=pt(e),cm=CAM[T.cam];const which=cm.band(p.y);
+  drag={which,x0:p.x,v0:which==='ball'?g.sx:which==='aim'?g.ex:g.bx,k:cm.proj(180,HY[which]).k};try{cv.setPointerCapture(e.pointerId);}catch(_){ }e.preventDefault();});
+cv.addEventListener('pointermove',e=>{if(!drag||g.mode!=='aim')return;const dx=(pt(e).x-drag.x0)/drag.k;
+  if(drag.which==='ball')g.sx=clamp(drag.v0+dx,G.L+RB+2,G.R-RB-2);
+  else if(drag.which==='aim')g.ex=clamp(drag.v0+dx,G.L+8,G.R-8);
+  else g.bx=drag.v0+dx;
+  fixBend();});
+['pointerup','pointercancel'].forEach(n=>cv.addEventListener(n,()=>drag=null));
+
+function logText(){const sg=v=>(v>0?'+':'')+v;let t='Big Rack Lab log. One row per ball; nine balls a game; fallen pins stay down and the rack refills only when empty (rack = which rack of the game). Spots are numbered like ten-pin: 1 headpin, 2-3 second row, 4-6 third row, 7-10 back row, left to right. Start, aim and bend are lane units from lane centre (headpin 0, row spacing 68 across, back corners -102/+102, lane edges -120/+120); aim is where the drawn line crosses the headpin row. Timing is ms early (-) or late (+). Drift is how far the ball was pushed off the drawn line at the headpin row. Clean pins is how many the drawn line knocks down with a perfect release. Fell and left list spot numbers. Racks: '+PRESETS.map(p=>p.name+' = '+p.rack.join(' ')).join('; ')+'.\n';
+  t+='game,ball,preset,rack,start,aim,bend,timing_ms,drift_px,setup_seconds,pins_standing_before,pins_down,clean_pins,fell,left,points,mult,score,total,triggers,camera\n';
+  LOG.forEach(r=>{t+=[r.game,r.ball,r.preset,r.rack,sg(r.start),sg(r.aim),sg(r.bend),sg(r.ms),sg(r.drift),r.setup,r.standing,r.down,r.clean,r.fell,r.left,r.points,r.mult,r.score,r.total,r.notes,r.cam].join(',')+'\n';});return t;}
+function openLog(){$('logText').value=LOG.length?logText():'No throws recorded yet.';$('log').hidden=false;}
+['rackLog','overLog','startLog'].forEach(id=>$(id).addEventListener('click',openLog));
+$('logClose').addEventListener('click',()=>$('log').hidden=true);
+$('logClear').addEventListener('click',()=>{LOG=[];saveLog();openLog();});
+$('logCopy').addEventListener('click',async e=>{const b=e.currentTarget,ta=$('logText');try{await navigator.clipboard.writeText(ta.value);b.textContent='Copied';}catch(_){ta.focus();ta.select();b.textContent='Selected';}setTimeout(()=>b.textContent='Copy log',2200);});
+
+// ---------- pixel kit ----------
+function mk(w,h){const k=document.createElement('canvas');k.width=w;k.height=h;return k;}
+const B4=[0,8,2,10,12,4,14,6,3,11,1,9,15,7,13,5];
+const hex=h=>[parseInt(h.slice(1,3),16),parseInt(h.slice(3,5),16),parseInt(h.slice(5,7),16)];
+const thr=(x,y)=>(B4[(y&3)*4+(x&3)]+.5)/16;
+function ramp(cols,L,x,y){const n=cols.length-1;const v=Math.max(0,Math.min(.999,L))*n,i=Math.floor(v);return cols[(v-i)>thr(x,y)?i+1:i];}
+const px=(k,x,y,w,h,col)=>{k.fillStyle=col;k.fillRect(Math.round(x),Math.round(y),w,h);};
+function disc(k,cx,cy,r,col){k.fillStyle=col;for(let y=-r;y<=r;y++){const w=Math.floor(Math.sqrt(r*r-y*y+.6));k.fillRect(cx-w,cy+y,w*2+1,1);}}
+function ringPx(k,cx,cy,rx,ry,col){k.fillStyle=col;const n=Math.ceil((rx+ry)*5);for(let i=0;i<n;i++){const a=i/n*6.28319;k.fillRect(Math.round(cx+Math.cos(a)*rx),Math.round(cy+Math.sin(a)*ry),1,1);}}
+function plotLine(k,x0,y0,x1,y1,col){const n=Math.max(1,Math.ceil(Math.max(Math.abs(x1-x0),Math.abs(y1-y0))));k.fillStyle=col;for(let i=0;i<=n;i++)k.fillRect(Math.round(x0+(x1-x0)*i/n),Math.round(y0+(y1-y0)*i/n),1,1);}
+const FONT={'0':'111101101101111','1':'010110010010111','2':'111001111100111','3':'111001111001111','4':'101101111001001','5':'111100111001111','6':'111100111101111','7':'111001001001001','8':'111101111101111','9':'111101111001111',A:'111101111101101',B:'110101110101110',C:'111100100100111',D:'110101101101110',E:'111100111100111',F:'111100111100100',G:'111100101101111',H:'101101111101101',I:'111010010010111',K:'101101110101101',L:'100100100100111',M:'101111111101101',N:'111101101101101',O:'111101101101111',P:'111101111100100',R:'111101110101101',S:'111100111001111',T:'111010010010010',U:'101101101101111',V:'101101101101010',W:'101101111111101',X:'101101010101101',Y:'101101010010010','/':'001001010100100','-':'000000111000000',' ':'000000000000000'};
+function txt(k,s,x,y,col,m){m=m||1;k.fillStyle=col;for(const ch of s){const f=FONT[ch]||FONT[' '];for(let i=0;i<15;i++)if(f[i]==='1')k.fillRect(x+(i%3)*m,y+((i/3)|0)*m,m,m);x+=4*m;}}
+function sprite(rows,pal){const w=Math.max(...rows.map(r=>r.length)),k=mk(w,rows.length),q=k.getContext('2d');rows.forEach((r,y)=>{for(let x=0;x<r.length;x++){const col=pal[r[x]];if(col){q.fillStyle=col;q.fillRect(x,y,1,1);}}});return k;}
+function turned(s,flip){const k=mk(s.height,s.width),q=k.getContext('2d');if(flip){q.translate(0,s.width);q.rotate(-Math.PI/2);}else{q.translate(s.height,0);q.rotate(Math.PI/2);}q.drawImage(s,0,0);return k;}
+const PIN=['...ooo...','..owwlo..','..owwlo..','..owwlo..','...owo...','...owo...','..owwlo..','.owwwlmo.','.owwwlmo.','owwwwlmdo','oRRRRRrro','oRRRRRrro','owwwwlmdo','owwwwlmdo','.owwwlmo.','.owwwlmo.','..owlmo..','...ooo...'];
+function ballSprite(r,cols){const n=r*2+1,k=mk(n,n),q=k.getContext('2d');for(let y=-r;y<=r;y++)for(let x=-r;x<=r;x++){const d2=x*x+y*y;if(d2>r*r+.6)continue;const edge=r>2&&d2>(r-1)*(r-1)+.2;let L=.62-(x*.5+y*.62)/r*.42+(Math.sin(x*1.3+y*.7)>.72?.12:0);q.fillStyle=edge?cols[0]:ramp(cols.slice(1),L,x+8,y+8);q.fillRect(x+r,y+r,1,1);}q.fillStyle=cols[cols.length-1];q.fillRect(r-Math.ceil(r/2.2),r-Math.ceil(r/2.2),1,1);return k;}
+function hash(a,b){let h=(Math.imul(a|0,374761393)+Math.imul(b|0,668265263))|0;h=Math.imul(h^(h>>>13),1274126177);return((h^(h>>>16))>>>0)/4294967296;}
+
+// ---------- the hall ----------
+const THEME={
+rec:{wood:['#5a2f1a','#8a4e26','#b97a36','#dba552','#f0cf86'],gutter:['#170e0b','#2a1a15','#43291f'],line:'#2a160e',arrow:'#8a3c1c',cap:'#6b3f2a',pit:'#0a0605',wallBase:'#4c2a1a',neon:null,
+  pin:{o:'#3b261c',w:'#fff8e8',l:'#efe2c4',m:'#d2bf9a',d:'#a58f6e'},band:{5:['#d83a2a','#9c2218'],3:['#e8a020','#b06c10'],2:['#3f8f6a','#286248']},
+  ball:['#2a0e10','#5c1418','#8f1e22','#c63a2e','#ef7a4a','#ffd9b0'],
+  ui:['#2a160e','#f3e2b8','#3f8f6a','#d83a2a'],plate:'#1d100a',dot:'#fff8e8',dotSh:'#4a2412',dim:'#8a4e26',trail:'#fff8e8',shadow:'#3b1f12',handle:'#d83a2a',edge:'#2a160e',hi:'#fff8e8',ink:'#2a160e',mark:'#fff8e8',
+  // back wall for the long-lens view: a low sign band over a wide masking unit (the pit opening is as wide as lane + gutters at the far end)
+  wall(k){px(k,0,0,180,5,'#1d100a');px(k,0,5,180,35,'#4c2a1a');for(let x=4;x<180;x+=9)px(k,x,5,1,35,'#3a2016');
+    px(k,19,9,142,3,'#d86a28');px(k,19,12,142,3,'#f3e2b8');px(k,19,15,142,3,'#8a3c1c');
+    px(k,0,40,180,16,'#120a07');px(k,19,40,142,16,'#0a0605');px(k,0,40,180,2,'#1d100a');px(k,17,42,2,14,'#4c2a1a');px(k,161,42,2,14,'#4c2a1a');},
+  strip(k){px(k,0,0,180,5,'#4c2a1a');for(let x=4;x<180;x+=9)px(k,x,0,1,5,'#3a2016');px(k,0,5,180,1,'#1d100a');}}
+};
+function buildTheme(o){if(o.built)return o;o.built=1;
+  o._wood=o.wood.map(hex);o._gut=o.gutter.map(hex);o._line=hex(o.line);o._arrow=hex(o.arrow);o._cap=hex(o.cap);o._pit=hex(o.pit);o._wall=hex(o.wallBase);o._neon=null;
+  o.pins={};const mkPin=(key,band,body)=>{const s=sprite(PIN,Object.assign({R:band[0],r:band[1]},body||o.pin));o.pins[key]=s;o.pins[key+'r']=turned(s,false);o.pins[key+'l']=turned(s,true);};
+  [5,3,2].forEach(n=>mkPin('p'+n,o.band[n]));for(const t in PAL)mkPin(t,[PAL[t].R,PAL[t].r],Object.assign({o:o.pin.o},PAL[t]));
+  o.pins2={};for(const k in o.pins){const s=o.pins[k],d=mk(s.width*2,s.height*2),q=d.getContext('2d');q.imageSmoothingEnabled=false;q.drawImage(s,0,0,d.width,d.height);o.pins2[k]=d;}
+  o.balls={};for(let r=2;r<=11;r++)o.balls[r]=ballSprite(r,o.ball);o.bg={};return o;}
+const DECK=HEADY+30;
+const BOARD=240/13;
+// what colour the floor is at a point on the lane (flat lane units), dithered at the screen pixel it lands on
+function shade(o,x,y,sx,sy,k){
+  if(y<30)return o._pit;
+  const ax=Math.abs(x-180);let u=ax,s=x-180,nb=false;
+  if(ax>=154){s=ax-296;u=Math.abs(s);nb=true;}
+  if(u>=142)return o._cap;
+  if(u>=120)return ramp(o._gut,(nb?.1:.2)+(u-120)/22*.6,sx,sy);
+  const bf=(s+120)/BOARD,bi=Math.floor(bf),fr=bf-bi;
+  let L=.52+((bi*37)%5-2)*.04+(hash(bi+(nb?40:0),Math.floor(y/(26+(bi%3)*9)))-.5)*.1;
+  if(!nb){L+=Math.max(0,1-ax/75)*.13;if(y<DECK)L+=.07;if(y>545)L+=.1;}
+  if(fr<Math.max(.12,1/(k*BOARD)))L-=.14;
+  if(nb)L*=.5;
+  let col=ramp(o._wood,L,sx,sy);
+  if(!nb){
+    if(y>=540&&y<545)return o._line;
+    for(let i=-2;i<=2;i++){const cx=180+i*40,ay=398+Math.abs(i)*14;if(y>=ay&&y<ay+22&&Math.abs(x-cx)<=(y-ay)/22*8)return o._arrow;}
+    if(o._neon&&y<430){const st=(430-y)/400*.75,b=thr(sx,sy);if(x>92&&x<144&&b<st)col=o._neon[0];else if(x>216&&x<268&&b<st)col=o._neon[1];}
+  }
+  return col;}
+function buildBg(o,cm){const k=mk(LW,LH),q=k.getContext('2d'),im=q.createImageData(LW,LH),d=im.data;
+  for(let sy=0;sy<LH;sy++)for(let sx=0;sx<LW;sx++){let col;
+    if(sy<cm.horizon)col=o._wall;else{const p=cm.inv(sx,sy);col=shade(o,p.x,p.y,sx,sy,p.k);}
+    const i=(sy*LW+sx)*4;d[i]=col[0];d[i+1]=col[1];d[i+2]=col[2];d[i+3]=255;}
+  q.putImageData(im,0,0);cm.id==='lane'?o.wall(q):o.strip(q);
+  return{cv:k,data:q.getImageData(0,0,LW,LH).data};}
+function getBg(o,cm){return o.bg[cm.id]||(o.bg[cm.id]=buildBg(o,cm));}
+
+// ---------- drawing ----------
+function drawPin(o,cm,p){const q=cm.proj(p.x,p.y),X=Math.round(q.X),Y=Math.round(q.Y),lane=cm.id==='lane',dir=Math.cos(p.ang)<0?'l':'r';
+  if(p.down){if(lane)c.drawImage(o.pins2[p.kind+dir],X-18,Y-13);else c.drawImage(o.pins[p.kind+dir],X-9,Y-4);return;}
+  if(lane){const s=o.pins2[p.kind];px(c,X-6,Y-1,13,3,o.shadow);c.save();c.globalAlpha=.2;c.beginPath();c.rect(X-9,Y+2,18,9);c.clip();c.translate(0,2*Y+2);c.scale(1,-1);c.drawImage(s,X-9,Y-35);c.restore();c.drawImage(s,X-9,Y-35);}
+  else{px(c,X-3,Y+4,8,3,o.shadow);c.drawImage(o.pins[p.kind],X-4,Y-12);}}
+function drawBall(o,cm,b){const q=cm.proj(b.x,b.y),X=Math.round(q.X),Y=Math.round(q.Y),r=clamp(Math.round(RB*q.k),2,11),B=o.balls;
+  if(cm.id==='lane'){px(c,X-r+1,Y,2*r-1,2,o.shadow);c.drawImage(B[r],X-r,Y-2*r);return{X,Y:Y-r,r};}
+  disc(c,X+1,Y+2,r,o.shadow);c.drawImage(B[r],X-r,Y-r);return{X,Y,r};}
+function dots(o,cm,p,dim){let i=0;for(const q of p.pts){if(q.y<G.BACK)break;const s=cm.proj(q.x,q.y),X=Math.round(s.X),Y=Math.round(s.Y);
+  if(dim){if(i%2===0)px(c,X,Y,1,1,o.dim);}else{px(c,X,Y+1,1,1,o.dotSh);px(c,X,Y,1,1,o.dot);}i++;}}
+function label(o,s,x,y){txt(c,s,x+1,y+1,o.mark);txt(c,s,x,y,o.ink);}
+function drawNeedle(o){const x0=22,w=136,y=284,h=8,mid=x0+w/2,half=w/2;
+  px(c,0,y-6,LW,LH-(y-6),o.plate);
+  px(c,x0-1,y-1,w+2,h+2,o.ui[0]);px(c,x0,y,w,h,o.ui[1]);
+  const zz=g.mode==='aim'?zone():g.zoneAt,zw=Math.max(1,Math.round(half*zz));px(c,mid-zw,y,zw*2,h,o.ui[2]);
+  if(!(g.mode==='aim'&&T.two&&!g.ready)){const n=g.mode==='aim'?tri(g.phase):g.stopped,nx=Math.round(mid+n*(half-1));px(c,nx-2,y-3,4,h+6,o.ui[0]);px(c,nx-1,y-2,2,h+4,o.ui[3]);}}
+function draw(){
+  const cm=CAM[T.cam],lane=cm.id==='lane',o=buildTheme(THEME.rec);
+  c.setTransform(1,0,0,1,0,0);c.globalAlpha=1;c.imageSmoothingEnabled=false;
+  c.drawImage(getBg(o,cm).cv,0,0);
+  if(!g)return;
+  const act=drag?drag.which:null,al=k=>act&&act!==k?.35:1;
+  let aimPos=null;
+  if(g.mode==='aim'){if(g.last&&g.last.length>1){c.globalAlpha=.6;for(let i=1;i<g.last.length;i++){const a=cm.proj(g.last[i-1].x,g.last[i-1].y),b=cm.proj(g.last[i].x,g.last[i].y);plotLine(c,a.X,a.Y,b.X,b.Y,o.ink);}c.globalAlpha=1;}const p=makePath(g.sx,g.ex,g.bend);dots(o,cm,p,false);
+    // aim ring: a mark on the floor in front of the headpin row
+    const a=cm.proj(g.ex,G.EY+(lane?26:34)),AX=Math.round(a.X),AY=Math.round(a.Y),rx=lane?9:6,ry=lane?4:6;
+    c.globalAlpha=al('aim');if(act==='aim')ringPx(c,AX,AY,rx+3,ry+2,o.hi);
+    ringPx(c,AX,AY,rx+1,ry+1,o.edge);ringPx(c,AX,AY,rx,ry,o.handle);px(c,AX-rx-5,AY,4,1,o.handle);px(c,AX+rx+2,AY,4,1,o.handle);c.globalAlpha=1;
+    aimPos={X:AX,Y:AY,rx};
+  }else if(g.intended){dots(o,cm,g.intended,true);
+    for(let i=1;i<g.trail.length;i++){const a=cm.proj(g.trail[i-1].x,g.trail[i-1].y),b=cm.proj(g.trail[i].x,g.trail[i].y);plotLine(c,a.X,a.Y+1,b.X,b.Y+1,o.dotSh);plotLine(c,a.X,a.Y,b.X,b.Y,o.trail);}}
+
+  // pins and ball, far ones first
+  const ents=[];for(const p of g.pins)if(!p.gone)ents.push({y:p.y,p});
+  const b=g.sim?g.sim.ball:{x:g.sx,y:G.SY};if(!g.sim||!b.out)ents.push({y:b.y+.5,b});
+  ents.sort((m,n)=>m.y-n.y);let ballPos=null;
+  for(const e of ents){if(e.p)drawPin(o,cm,e.p);else{if(g.mode==='aim')c.globalAlpha=al('ball');ballPos=drawBall(o,cm,e.b);
+    if(g.mode==='aim'&&act==='ball')ringPx(c,ballPos.X,ballPos.Y,ballPos.r+3,ballPos.r+3,o.hi);c.globalAlpha=1;}}
+
+  if(g.mode==='aim'){const s=cm.proj(g.bx,HY.bend),X=Math.round(s.X),Y=Math.round(s.Y);
+    c.globalAlpha=al('bend');if(act==='bend')ringPx(c,X,Y,10,10,o.hi);
+    c.fillStyle=o.edge;for(let d=-7;d<=7;d++){const w=7-Math.abs(d);c.fillRect(X-w,Y+d,2*w+1,1);}
+    c.fillStyle=o.handle;for(let d=-6;d<=6;d++){const w=6-Math.abs(d);c.fillRect(X-w,Y+d,2*w+1,1);}
+    px(c,X-4,Y,2,1,o.hi);px(c,X-3,Y-1,1,3,o.hi);px(c,X+3,Y,2,1,o.hi);px(c,X+3,Y-1,1,3,o.hi);c.globalAlpha=1;
+    if(!thrown){label(o,'AIM',aimPos.X+aimPos.rx+8,aimPos.Y-2);label(o,'BEND',X+11,Y-2);if(ballPos)label(o,'START',ballPos.X+ballPos.r+4,ballPos.Y-2);}
+  }
+  drawNeedle(o);
+}
+
+const toastEl=$('toast');
+let lastT=0,acc=0;
+function loop(ts){const dt=Math.min(.05,(ts-lastT)/1000||0);lastT=ts;
+  if(g){
+    if(g.mode==='aim'&&g.ready)g.phase+=needleHz()*dt;
+    if(g.mode==='roll'){acc+=dt;while(acc>1/240&&!g.sim.done){tick(g.sim);acc-=1/240;}
+      const b=g.sim.ball;if(!b.out)g.trail.push({x:b.x,y:b.y});
+      if(g.sim.done){g.mode='settle';g.wait=.55;acc=0;}}
+    else if(g.mode==='settle'){g.wait-=dt;if(g.wait<=0)resolve();}
+    if(g.toastT>0)g.toastT-=dt;
+    toastEl.style.opacity=g.toast&&g.toastT>0?Math.min(1,g.toastT*2):0;}
+  draw();requestAnimationFrame(loop);}
+showStart();fit();requestAnimationFrame(loop);
+</script>
+</body>
+</html>

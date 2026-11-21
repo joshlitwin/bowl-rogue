@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<title>Five-Pin Throw Lab</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@500;700&family=Silkscreen&display=swap" rel="stylesheet">
+<style>
+:root{
+  /* layout: one-screen app. score sheet on top, pixel lane fills the middle, throw button at the thumb */
+  --ink:#1d100a;
+  --panel:#3a2016;
+  --chalk:#f3e2b8;
+  --dim:#c9a878;
+  --accent:#d86a28;
+  --go:#d83a2a;
+  --go-ink:#fff8e8;
+  --paper:#f3e2b8;
+  --paper-ink:#2a160e;
+  --paper-dim:#7a4a2c;
+  --now:#d83a2a;
+  --body:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --display:"Pixelify Sans",system-ui,sans-serif;
+  --num:"Silkscreen",ui-monospace,Menlo,monospace;
+  color-scheme:dark;
+}
+body[data-stage="night"]{
+  --ink:#05071a;
+  --panel:#141a44;
+  --chalk:#f2f6ff;
+  --dim:#9aa8de;
+  --accent:#3fe0ff;
+  --go:#ff4fa8;
+  --go-ink:#05071a;
+  --paper:#0c1030;
+  --paper-ink:#f2f6ff;
+  --paper-dim:#9aa8de;
+  --now:#3fe0ff;
+}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0}
+body{background:var(--ink);color:var(--chalk);font-family:var(--body);display:flex;flex-direction:column;overflow:hidden;-webkit-user-select:none;user-select:none;-webkit-tap-highlight-color:transparent;transition:background-color .6s,color .6s}
+button{font-family:inherit;color:inherit}
+button:focus-visible,input:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.top{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:8px 12px 4px}
+.top h1{font-family:var(--display);font-size:17px;margin:0;font-weight:700;letter-spacing:.04em;text-transform:uppercase;white-space:nowrap}
+.top span{display:flex;gap:5px}
+.top button{font-family:var(--display);font-size:13px;font-weight:500;padding:6px 9px;border-radius:6px;border:2px solid var(--dim);background:transparent;white-space:nowrap}
+.board{display:grid;grid-template-columns:repeat(4,1fr) 1.25fr;gap:5px;padding:4px 12px 6px}
+.cell{background:var(--paper);color:var(--paper-ink);border-radius:4px;padding:4px 6px;min-width:0;border:2px solid transparent;transition:background-color .6s,color .6s}
+.cell.now{border-color:var(--now)}
+.cell small{display:block;font-family:var(--display);font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--paper-dim)}
+.marks{font-family:var(--num);font-size:12px;display:flex;gap:6px;min-height:17px}
+.sum{font-family:var(--num);font-size:18px;font-variant-numeric:tabular-nums;line-height:1.1}
+.cell.goal{background:transparent;border-color:var(--accent);color:var(--chalk)}
+.cell.goal small{color:var(--dim)}
+.cell.goal .sum{color:var(--accent)}
+.stage{flex:1;min-height:0;display:flex;align-items:center;justify-content:center;position:relative;padding:0 8px}
+canvas{display:block;touch-action:none;border-radius:6px;image-rendering:pixelated;image-rendering:crisp-edges;image-rendering:pixelated}
+.toast{position:absolute;left:50%;top:44%;transform:translate(-50%,-50%);font-family:var(--display);font-weight:700;font-size:26px;padding:6px 16px;background:var(--ink);color:var(--accent);border:3px solid var(--accent);border-radius:6px;pointer-events:none;opacity:0;white-space:nowrap;max-width:92%;overflow:hidden;text-overflow:ellipsis}
+.hint{font-size:13px;color:var(--dim);text-align:center;margin:0;padding:4px 12px 0;min-height:40px}
+.controls{display:flex;gap:8px;padding:6px 12px 12px;align-items:stretch}
+.seg{display:flex;border:2px solid var(--dim);border-radius:8px;overflow:hidden}
+.seg button{flex:1;border:0;background:transparent;padding:9px 10px;font-size:13px;font-weight:600}
+.seg button[aria-pressed="true"]{background:var(--chalk);color:var(--ink)}
+#throw{flex:1;border:0;border-radius:8px;background:var(--go);color:var(--go-ink);font-family:var(--display);font-size:24px;font-weight:700;letter-spacing:.08em;min-height:52px;box-shadow:0 4px 0 rgba(0,0,0,.45);transition:background-color .6s,color .6s}
+#throw:disabled{background:var(--panel);color:var(--dim);box-shadow:none}
+.sheet{position:absolute;inset:0;background:rgba(0,0,0,.78);display:flex;align-items:center;justify-content:center;padding:16px;z-index:2}
+.sheet[hidden]{display:none}
+.sheet .box{background:var(--panel);border-radius:10px;padding:18px;width:100%;max-width:340px;max-height:100%;overflow:auto;display:flex;flex-direction:column;gap:12px}
+.sheet h2{margin:0;font-family:var(--display);font-size:22px}
+.sheet p{margin:0;color:var(--dim);font-size:14px;line-height:1.45}
+.sheet label{display:grid;grid-template-columns:1fr auto;gap:2px 8px;font-size:14px}
+.sheet label output{font-family:var(--num);color:var(--accent)}
+.sheet input[type=range]{grid-column:1/-1;width:100%;accent-color:var(--accent)}
+.field{display:flex;flex-direction:column;gap:4px;font-size:14px}
+.row{display:flex;gap:8px;flex-wrap:wrap}
+.row button{flex:1;padding:11px 12px;border-radius:8px;border:2px solid var(--dim);background:transparent;font-size:14px;font-weight:700}
+.row button.main{background:var(--accent);border-color:var(--accent);color:var(--ink)}
+</style>
+</head>
+<body data-stage="rec">
+<div class="top"><h1>Throw lab</h1><span><button id="lightsBtn" type="button">Lights off</button><button id="logBtn" type="button">Log (0)</button><button id="tuneBtn" type="button">Knobs</button></span></div>
+<div class="board" id="board"></div>
+<div class="stage">
+  <canvas id="lane" width="180" height="300" aria-label="Bowling lane. Drag the ball, the bend handle and the aim ring."></canvas>
+  <div class="toast" id="toast" aria-live="polite"></div>
+  <div class="sheet" id="over" hidden><div class="box">
+    <h2 id="overTitle"></h2><p id="overText"></p>
+    <div class="row"><button id="overLog" type="button">Results log</button><button class="main" id="again" type="button">Bowl again</button></div>
+  </div></div>
+  <div class="sheet" id="tune" hidden><div class="box">
+    <h2>Tuning knobs</h2>
+    <p>These are the numbers upgrades would change in the full game. Find where the throw feels fair but not safe.</p>
+    <div class="field"><span>Camera</span><div class="seg" id="camSeg"><button type="button" data-cam="lane">Down the lane</button><button type="button" data-cam="top">Top-down</button></div></div>
+    <label for="k-speed">Needle speed (Control)<output id="o-speed"></output><input id="k-speed" type="range" min="0.25" max="1.4" step="0.05"></label>
+    <label for="k-win">Green zone, ms either side (Control)<output id="o-win"></output><input id="k-win" type="range" min="30" max="200" step="10"></label>
+    <label for="k-bend">How far the line can bend (Spin)<output id="o-bend"></output><input id="k-bend" type="range" min="30" max="150" step="5"></label>
+    <label for="k-risk">How much bending speeds the needle<output id="o-risk"></output><input id="k-risk" type="range" min="0" max="3" step="0.1"></label>
+    <label for="k-two" style="grid-template-columns:auto 1fr;align-items:center"><input id="k-two" type="checkbox" style="width:20px;height:20px;accent-color:var(--accent)"><span>Two steps: set the shot, press Ready, then the needle starts</span></label>
+    <div class="row"><button id="tuneReset" type="button">Reset</button><button id="tuneCopy" type="button">Copy settings</button><button class="main" id="tuneClose" type="button">Done</button></div>
+  </div></div>
+  <div class="sheet" id="log" hidden><div class="box">
+    <h2>Results log</h2>
+    <p>Every throw is recorded here and kept between games. Copy it and paste it into our chat.</p>
+    <textarea id="logText" readonly rows="9" aria-label="Results log" style="width:100%;font:11px ui-monospace,Menlo,monospace;background:var(--ink);color:var(--chalk);border:1px solid var(--dim);border-radius:8px;padding:8px;-webkit-user-select:text;user-select:text;white-space:pre;overflow:auto"></textarea>
+    <div class="row"><button id="logClear" type="button">Clear</button><button id="logCopy" type="button">Copy log</button><button class="main" id="logClose" type="button">Done</button></div>
+  </div></div>
+</div>
+<p class="hint" id="hint"></p>
+<div class="controls">
+  <button id="throw" type="button">THROW</button>
+</div>
+
+<script>
+//SIM-START
+const G={L:60,R:300,BACK:30,FOUL:540,SY:520,EY:160,WL:38,WR:322};
+const RACK=[{x:180,y:160,v:5},{x:134,y:120,v:3},{x:226,y:120,v:3},{x:88,y:80,v:2},{x:272,y:80,v:2}];
+const RB=12,RP=11,RT=21,MB=2.2,MP=1,REST=.78,KNOCK=45;
+let CARRY=1.5,KICK=-.9,DRIVE=0,MESS=.8;
+const POW=[{speed:400,needle:.85},{speed:500,needle:1},{speed:620,needle:1.3}];
+function rack(){return RACK.map(p=>({x:p.x,y:p.y,v:p.v,vx:0,vy:0,down:false,gone:false,age:0,ang:0}));}
+function makePath(sx,ex,bend){
+  const S={x:sx,y:G.SY},E={x:ex,y:G.EY},C={x:(sx+ex)/2+bend,y:(G.SY+G.EY)/2};
+  const pts=[],N=60;
+  for(let i=0;i<=N;i++){const t=i/N,a=(1-t)*(1-t),b=2*t*(1-t),k=t*t;pts.push({x:a*S.x+b*C.x+k*E.x,y:a*S.y+b*C.y+k*E.y});}
+  let tx=E.x-C.x,ty=E.y-C.y;const tl=Math.hypot(tx,ty);tx/=tl;ty/=tl;
+  for(let d=8;d<=260;d+=8)pts.push({x:E.x+tx*d,y:E.y+ty*d});
+  const len=[0];for(let i=1;i<pts.length;i++)len.push(len[i-1]+Math.hypot(pts[i].x-pts[i-1].x,pts[i].y-pts[i-1].y));
+  return{S,E,C,pts,len};
+}
+function pathAt(p,d){
+  const n=p.pts.length;if(d>=p.len[n-1]){const a=p.pts[n-2],b=p.pts[n-1],l=Math.hypot(b.x-a.x,b.y-a.y);return{x:b.x,y:b.y,dx:(b.x-a.x)/l,dy:(b.y-a.y)/l,end:true};}
+  let i=1;while(p.len[i]<d)i++;
+  const a=p.pts[i-1],b=p.pts[i],seg=p.len[i]-p.len[i-1],f=(d-p.len[i-1])/seg;
+  return{x:a.x+(b.x-a.x)*f,y:a.y+(b.y-a.y)*f,dx:(b.x-a.x)/seg,dy:(b.y-a.y)/seg,end:false};
+}
+function pinR(p,rt){if(!p.down)return RP;return RP+(rt-RP)*Math.min(1,p.age/0.1);}
+function newSim(pins,path,power,spin){return{pins,path,t:0,done:false,ball:{spin:spin||0,x:path.S.x,y:path.S.y,vx:0,vy:0,d:0,speed:POW[power].speed,free:false,gutter:false,out:false}};}
+function stepSim(s,dt){
+  const b=s.ball;s.t+=dt;
+  if(!b.out){
+    if(b.gutter){b.y-=b.speed*.8*dt;}
+    else if(!b.free){b.d+=b.speed*dt;const q=pathAt(s.path,b.d);b.x=q.x;b.y=q.y;b.vx=q.dx*b.speed;b.vy=q.dy*b.speed;if(q.end)b.free=true;
+      if(b.x<G.L||b.x>G.R){b.gutter=true;b.x=b.x<G.L?G.L-11:G.R+11;}}
+    else{b.x+=b.vx*dt;b.y+=b.vy*dt;
+      if(b.x<G.WL+RB){b.x=G.WL+RB;b.vx=Math.abs(b.vx)*.4;}if(b.x>G.WR-RB){b.x=G.WR-RB;b.vx=-Math.abs(b.vx)*.4;}
+      if(b.vy>-40)b.vy-=300*dt;
+      if(b.spin&&b.y>G.BACK+20)b.vx+=-Math.sign(b.spin)*Math.abs(b.spin)*DRIVE*dt;}
+    if(b.y<G.BACK-16)b.out=true;
+  }
+  const P=s.pins,rt=RT*(1+MESS*Math.abs(b.spin));
+  if(!b.out&&!b.gutter)for(const p of P){if(p.gone)continue;const r=RB+(p.down?RP:RP);
+    let nx=p.x-b.x,ny=p.y-b.y;const d=Math.hypot(nx,ny);if(d>=r||d===0)continue;nx/=d;ny/=d;
+    const vr=(b.vx-p.vx)*nx+(b.vy-p.vy)*ny;
+    if(vr>0){const sp=Math.abs(b.spin),mb=MB*(1+CARRY*sp);const j=(1+REST)*vr/(1/mb+1/MP);b.vx-=j/mb*nx;b.vy-=j/mb*ny;p.vx+=j/MP*nx;p.vy+=j/MP*ny;
+      if(sp){const hd=-Math.sign(b.spin),tx=-ny,ty=nx,sg=tx*hd>=0?1:-1,k=KICK*sp*vr;p.vx+=sg*tx*k;p.vy+=sg*ty*k;}
+      p.down=true;b.free=true;}
+    p.x=b.x+nx*r;p.y=b.y+ny*r;}
+  for(let i=0;i<P.length;i++){const a=P[i];if(a.gone)continue;for(let k=i+1;k<P.length;k++){const c=P[k];if(c.gone)continue;
+    const am=a.down&&(a.vx||a.vy),cm=c.down&&(c.vx||c.vy);if(!am&&!cm)continue;
+    const r=pinR(a,rt)+pinR(c,rt);let nx=c.x-a.x,ny=c.y-a.y;const d=Math.hypot(nx,ny);if(d>=r||d===0)continue;nx/=d;ny/=d;
+    const vr=(a.vx-c.vx)*nx+(a.vy-c.vy)*ny;
+    if(vr>0){
+      const aFixed=!a.down&&vr<KNOCK,cFixed=!c.down&&vr<KNOCK;
+      if(aFixed){c.vx+=(1+.5)*vr*nx;c.vy+=(1+.5)*vr*ny;}
+      else if(cFixed){a.vx-=(1+.5)*vr*nx;a.vy-=(1+.5)*vr*ny;}
+      else{const j=(1+REST)*vr/2;a.vx-=j*nx;a.vy-=j*ny;c.vx+=j*nx;c.vy+=j*ny;a.down=true;c.down=true;}
+    }
+    const ov=r-d;const aStill=!a.down,cStill=!c.down;
+    if(aStill&&!cStill){c.x+=nx*ov;c.y+=ny*ov;}else if(cStill&&!aStill){a.x-=nx*ov;a.y-=ny*ov;}else if(!aStill&&!cStill){a.x-=nx*ov/2;a.y-=ny*ov/2;c.x+=nx*ov/2;c.y+=ny*ov/2;}
+  }}
+  let moving=false;const fr=Math.exp(-1.5*dt);
+  for(const p of P){if(p.gone||!p.down)continue;p.age+=dt;
+    p.x+=p.vx*dt;p.y+=p.vy*dt;p.vx*=fr;p.vy*=fr;
+    const r=RP;if(p.x<G.WL+r){p.x=G.WL+r;p.vx=Math.abs(p.vx)*.5;}if(p.x>G.WR-r){p.x=G.WR-r;p.vx=-Math.abs(p.vx)*.5;}
+    if(p.y<G.BACK){p.gone=true;p.vx=p.vy=0;continue;}
+    const sp=Math.hypot(p.vx,p.vy);if(sp>1)p.ang=Math.atan2(p.vy,p.vx);
+    if(sp<14){p.vx=p.vy=0;}else moving=true;}
+  if((b.out||s.t>1.2&&b.free&&Math.hypot(b.vx,b.vy)<10)&&!moving)s.done=true;
+  if(s.t>6)s.done=true;
+}
+function frameMarks(balls){const out=[];let sum=0,n=0;for(const v of balls){sum+=v;n++;if(sum===15){out.push(n===1?'X':n===2?'/':String(v));sum=0;n=0;}else out.push(v===0?'-':String(v));}return out;}
+function scoreFrames(fr){const flat=[].concat(...fr);let idx=0,tot=0;const out=[];
+  for(let i=0;i<fr.length;i++){const b=fr[i];let s=null;const g=k=>flat[idx+k]||0;
+    if(b.length){s=b.reduce((a,v)=>a+v,0);
+      if(i<fr.length-1){if(b[0]===15)s=15+g(1)+g(2);else if(b.length===2&&b[0]+b[1]===15)s=15+g(2);}
+      tot+=s;}
+    out.push(b.length?tot:null);idx+=b.length;}
+  return out;}
+//SIM-END
+
+const TARGET=60, FRAMES=4;
+const DEF={speed:.45,win:80,bend:90,risk:1,two:true,cam:'lane'};
+let LOG=[];try{LOG=JSON.parse(localStorage.getItem('throwlab-log2')||'[]');}catch(e){}
+let gameNo=LOG.length?LOG[LOG.length-1].game:0;
+const T=Object.assign({},DEF);
+try{Object.assign(T,JSON.parse(localStorage.getItem('throwlab-tune2')||'{}'));}catch(e){}
+if(T.cam!=='top')T.cam='lane';
+const cv=document.getElementById('lane'),c=cv.getContext('2d');
+const LW=180,LH=300;
+function fit(){const box=cv.parentElement.getBoundingClientRect();const s=Math.max(.5,Math.min((box.width-16)/LW,box.height/LH));cv.style.width=Math.floor(LW*s)+'px';cv.style.height=Math.floor(LH*s)+'px';}
+window.addEventListener('resize',fit);
+const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+
+// ---------- stage (the hall's look) ----------
+let stage='rec',fx=null;
+const still=window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+function setChrome(s){document.body.dataset.stage=s;document.getElementById('lightsBtn').textContent=s==='rec'?'Lights off':'Lights on';}
+function startFx(to){if(fx||to===stage)return;fx={from:stage,to,t:still?.5:0,flip:false};}
+document.getElementById('lightsBtn').addEventListener('click',()=>startFx(stage==='rec'?'night':'rec'));
+
+let g;
+function newGame(){gameNo++;g={bx:180,zoneAt:.2,keep:null,ready:false,t0:performance.now(),pend:null,frame:0,frames:Array.from({length:FRAMES},()=>[]),pins:rack(),rackBalls:0,sx:180,ex:180,bend:0,power:1,phase:.5,mode:'aim',sim:null,trail:[],intended:null,err:0,toast:null,toastT:0,wait:0,thrown:false,stopped:0};
+  document.getElementById('over').hidden=true;board();hint();setBtn();logCount();}
+function setBtn(){const b=document.getElementById('throw');b.disabled=g.mode!=='aim';b.textContent=g.mode==='aim'&&T.two&&!g.ready?'READY':'THROW';}
+function logCount(){document.getElementById('logBtn').textContent='Log ('+LOG.length+')';}
+function saveLog(){try{localStorage.setItem('throwlab-log2',JSON.stringify(LOG));}catch(e){}logCount();}
+function saveTune(){try{localStorage.setItem('throwlab-tune2',JSON.stringify(T));}catch(_){}}
+const tri=p=>4*Math.abs((((p%1)+1)%1)-.5)-1;
+function zone(){return Math.min(.6,T.win/1000*4*needleHz());}
+function fixBend(){const mid=(g.sx+g.ex)/2;g.bend=clamp(2*(g.bx-mid),-T.bend,T.bend);g.bx=mid+g.bend/2;}
+function needleHz(){return T.speed*(1+T.risk*Math.abs(g.bend)/T.bend)*POW[g.power].needle;}
+
+function board(){const el=document.getElementById('board');const sc=scoreFrames(g.frames);let h='';
+  for(let i=0;i<FRAMES;i++){const m=frameMarks(g.frames[i]);h+=`<div class="cell${i===g.frame&&g.mode!=='over'?' now':''}"><small>Frame ${i+1}</small><div class="marks">${m.map(x=>`<span>${x}</span>`).join('')}</div><div class="sum">${sc[i]===null?'&nbsp;':sc[i]}</div></div>`;}
+  h+=`<div class="cell goal"><small>Target</small><div class="marks"><span>score</span></div><div class="sum">${TARGET}</div></div>`;el.innerHTML=h;}
+function total(){const sc=scoreFrames(g.frames).filter(x=>x!==null);return sc.length?sc[sc.length-1]:0;}
+function hint(t){const el=document.getElementById('hint');
+  el.textContent=t||(g.thrown?'Three balls a frame. The pins are worth 2, 3, 5, 3, 2.':(T.two?'Drag the ball, the bend handle and the aim ring. Only the one you touch moves. Then press Ready.':'Drag the ball, the bend handle and the aim ring. Then stop the needle in the green.'));}
+function throwBall(){if(g.mode!=='aim')return;
+  if(T.two&&!g.ready){g.ready=true;g.phase=Math.random();setBtn();hint('The needle is live. Stop it in the green. Touch the lane to go back.');return;}
+  const n=tri(g.phase),z=zone(),hz0=needleHz(),ms=Math.round(n/(4*hz0)*1000);let eff=0;if(Math.abs(n)>z)eff=Math.sign(n)*(Math.abs(n)-z)/(1-z);
+  g.stopped=n;g.zoneAt=z;g.err=eff;g.intended=makePath(g.sx,g.ex,g.bend);
+  const path=makePath(g.sx,g.ex+eff*70,g.bend);
+  let clean=null;if(eff!==0){const cp=g.pins.map(q=>Object.assign({},q)),cs=newSim(cp,g.intended,1,g.bend/90);let k=0;while(!cs.done&&k++<2500)stepSim(cs,1/240);clean=cp.filter(q=>q.down).reduce((a,q)=>a+q.v,0);}
+  g.keep=null;
+  g.pend={clean,ms,game:gameNo,frame:g.frame+1,ball:g.frames[g.frame].length+1,mode:T.two?'two-step':'always',start:Math.round(g.sx-180),aim:Math.round(g.ex-180),bend:Math.round(g.bend),needle:+n.toFixed(2),drift:Math.round(eff*70),hz:+needleHz().toFixed(2),setup:+((performance.now()-g.t0)/1000).toFixed(1),standing:g.pins.map(p=>p.v).join(' '),knobs:`spd ${T.speed} green ${T.win}ms bendmax ${T.bend} risk ${T.risk}`,cam:T.cam,look:fx?fx.to:stage};
+  g.sim=newSim(g.pins,path,1,g.bend/90);g.trail=[];g.mode='roll';g.thrown=true;g.rackBalls++;
+  setBtn();
+  hint(g.keep);}
+document.getElementById('throw').addEventListener('click',throwBall);
+
+function resolve(){let pts=0,only5=false;const fell=g.pins.filter(p=>p.down);fell.forEach(p=>pts+=p.v);
+  const fresh=g.rackBalls===1&&g.pins.length===5;only5=fresh&&fell.length===1&&fell[0].v===5;
+  g.pins=g.pins.filter(p=>!p.down);const f=g.frames[g.frame];f.push(pts);
+  const cleared=g.pins.length===0,last=g.frame===FRAMES-1;
+  g.toast=g.sim.ball.gutter?'Gutter':cleared?(g.rackBalls===1?'Strike!':g.rackBalls===2?'Spare!':'Cleared +'+pts):only5?'Headpin punched out alone':pts?'+'+pts:'Nothing';
+  g.toastT=1.4;document.getElementById('toast').textContent=g.toast;
+  if(g.pend){g.pend.pinfall=pts;if(g.pend.clean===null)g.pend.clean=pts;g.pend.result=g.toast;LOG.push(g.pend);g.pend=null;saveLog();}
+  let end=false;
+  if(last){if(f.length===3)end=true;else if(cleared){g.pins=rack();g.rackBalls=0;}}
+  else if(cleared||f.length===3){g.frame++;g.pins=rack();g.rackBalls=0;}
+  g.sim=null;board();
+  if(end){g.mode='over';const t=total(),won=t>=TARGET,closing=won&&stage==='rec'&&!fx;
+    document.getElementById('overTitle').textContent=won?'Target beaten':'Short of the target';
+    document.getElementById('overText').textContent=`You scored ${t} against a target of ${TARGET}. In the full game this is where the shop would open.`;
+    const again=document.getElementById('again');again.textContent=closing?'Stay after close':'Bowl again';again.dataset.close=closing?'1':'';
+    document.getElementById('over').hidden=false;}
+  else{g.mode='aim';g.ready=false;g.t0=performance.now();hint(g.keep);}
+  setBtn();
+}
+document.getElementById('again').addEventListener('click',e=>{const close=e.currentTarget.dataset.close==='1';newGame();if(close)startFx('night');});
+
+// ---------- cameras: the sim stays in flat lane units, the camera only decides where they land on screen ----------
+const CAM={
+  lane:{id:'lane',horizon:68,
+    proj(x,y){const z=851-y;return{X:90+(x-180)*212.5/z,Y:-47+96140/z,k:212.5/z};},
+    inv(px,py){const z=96140/(py+.5+47);return{x:180+(px+.5-90)*z/212.5,y:851-z,k:212.5/z};},
+    band(Y){return Y>192?'ball':Y>118?'bend':'aim';}},
+  top:{id:'top',horizon:6,
+    proj(x,y){return{X:x/2,Y:y/2,k:.5};},
+    inv(px,py){return{x:px*2+1,y:py*2+1,k:.5};},
+    band(Y){return Y>215?'ball':Y>117?'bend':'aim';}}
+};
+const HY={ball:G.SY,aim:G.EY,bend:(G.SY+G.EY)/2};
+
+// pointer: three bands pick the handle, drag is relative so nothing jumps
+let drag=null;
+function pt(e){const r=cv.getBoundingClientRect();return{x:(e.clientX-r.left)/r.width*LW,y:(e.clientY-r.top)/r.height*LH};}
+cv.addEventListener('pointerdown',e=>{if(g.mode!=='aim')return;if(g.ready){g.ready=false;setBtn();}g.keep=null;hint();const p=pt(e),cm=CAM[T.cam];const which=cm.band(p.y);
+  drag={which,x0:p.x,v0:which==='ball'?g.sx:which==='aim'?g.ex:g.bx,k:cm.proj(180,HY[which]).k};try{cv.setPointerCapture(e.pointerId);}catch(_){ }e.preventDefault();});
+cv.addEventListener('pointermove',e=>{if(!drag||g.mode!=='aim')return;const dx=(pt(e).x-drag.x0)/drag.k;
+  if(drag.which==='ball')g.sx=clamp(drag.v0+dx,G.L+RB+2,G.R-RB-2);
+  else if(drag.which==='aim')g.ex=clamp(drag.v0+dx,G.L+8,G.R-8);
+  else g.bx=drag.v0+dx;
+  fixBend();});
+['pointerup','pointercancel'].forEach(n=>cv.addEventListener(n,()=>drag=null));
+
+// tuning
+const KN=['speed','win','bend','risk'];
+function showTune(){document.getElementById('k-two').checked=!!T.two;KN.forEach(k=>{document.getElementById('k-'+k).value=T[k];document.getElementById('o-'+k).textContent=T[k];});
+  document.querySelectorAll('#camSeg button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.cam===T.cam));}
+KN.forEach(k=>document.getElementById('k-'+k).addEventListener('input',e=>{T[k]=+e.target.value;document.getElementById('o-'+k).textContent=T[k];fixBend();saveTune();}));
+document.getElementById('k-two').addEventListener('change',e=>{T.two=e.target.checked;g.ready=false;setBtn();saveTune();});
+document.querySelectorAll('#camSeg button').forEach(b=>b.addEventListener('click',()=>{T.cam=b.dataset.cam;drag=null;showTune();saveTune();}));
+function logText(){const sg=v=>(v>0?'+':'')+v;let t='Five-pin throw lab log. Positions are px from lane centre: headpin 0, 3-pins at -46/+46, 2-pins at -92/+92, lane edges -120/+120. Needle runs -1 (early) to +1 (late). Timing is ms early (-) or late (+). Drift is how far the ball was pushed off the drawn line at the pins. Clean line score is what the drawn line scores with a perfect release. Camera is lane (looking down the lane) or top (top-down); look is rec (Rec Room 74) or night (After Close). Rows from before the pixel skin have both blank.\n';
+  t+='game,frame,ball,needle_mode,start,aim,bend,needle,needle_hz,timing_ms,drift_px,setup_seconds,pins_standing,pinfall,clean_line_score,result,knobs,camera,look\n';
+  LOG.forEach(r=>{t+=[r.game,r.frame,r.ball,r.mode,sg(r.start),sg(r.aim),sg(r.bend),sg(r.needle),r.hz,sg(r.ms),sg(r.drift),r.setup,r.standing,r.pinfall,r.clean,r.result,r.knobs,r.cam||'',r.look||''].join(',')+'\n';});return t;}
+function openLog(){document.getElementById('logText').value=LOG.length?logText():'No throws recorded yet.';document.getElementById('log').hidden=false;}
+document.getElementById('logBtn').addEventListener('click',openLog);document.getElementById('overLog').addEventListener('click',openLog);
+document.getElementById('logClose').addEventListener('click',()=>document.getElementById('log').hidden=true);
+document.getElementById('logClear').addEventListener('click',()=>{LOG=[];saveLog();openLog();});
+document.getElementById('logCopy').addEventListener('click',async e=>{const b=e.currentTarget,ta=document.getElementById('logText');try{await navigator.clipboard.writeText(ta.value);b.textContent='Copied';}catch(_){ta.focus();ta.select();b.textContent='Selected: copy it by hand';}setTimeout(()=>b.textContent='Copy log',2200);});
+document.getElementById('tuneBtn').addEventListener('click',()=>{showTune();document.getElementById('tune').hidden=false;});
+document.getElementById('tuneClose').addEventListener('click',()=>document.getElementById('tune').hidden=true);
+document.getElementById('tuneReset').addEventListener('click',()=>{Object.assign(T,DEF);showTune();g.ready=false;setBtn();try{localStorage.removeItem('throwlab-tune2');}catch(_){}});
+document.getElementById('tuneCopy').addEventListener('click',async e=>{const b=e.currentTarget;const txt=`Throw lab settings: needle speed ${T.speed}, green zone ${T.win} ms, bend limit ${T.bend}, bend risk ${T.risk}, two-step ${T.two}, camera ${T.cam}`;try{await navigator.clipboard.writeText(txt);b.textContent='Copied';}catch(_){b.textContent='Copy failed';}setTimeout(()=>b.textContent='Copy settings',1800);});
+
+// ---------- pixel kit ----------
+function mk(w,h){const k=document.createElement('canvas');k.width=w;k.height=h;return k;}
+const B4=[0,8,2,10,12,4,14,6,3,11,1,9,15,7,13,5];
+const hex=h=>[parseInt(h.slice(1,3),16),parseInt(h.slice(3,5),16),parseInt(h.slice(5,7),16)];
+const thr=(x,y)=>(B4[(y&3)*4+(x&3)]+.5)/16;
+function ramp(cols,L,x,y){const n=cols.length-1;const v=Math.max(0,Math.min(.999,L))*n,i=Math.floor(v);return cols[(v-i)>thr(x,y)?i+1:i];}
+const px=(k,x,y,w,h,col)=>{k.fillStyle=col;k.fillRect(Math.round(x),Math.round(y),w,h);};
+function disc(k,cx,cy,r,col){k.fillStyle=col;for(let y=-r;y<=r;y++){const w=Math.floor(Math.sqrt(r*r-y*y+.6));k.fillRect(cx-w,cy+y,w*2+1,1);}}
+function ringPx(k,cx,cy,rx,ry,col){k.fillStyle=col;const n=Math.ceil((rx+ry)*5);for(let i=0;i<n;i++){const a=i/n*6.28319;k.fillRect(Math.round(cx+Math.cos(a)*rx),Math.round(cy+Math.sin(a)*ry),1,1);}}
+function plotLine(k,x0,y0,x1,y1,col){const n=Math.max(1,Math.ceil(Math.max(Math.abs(x1-x0),Math.abs(y1-y0))));k.fillStyle=col;for(let i=0;i<=n;i++)k.fillRect(Math.round(x0+(x1-x0)*i/n),Math.round(y0+(y1-y0)*i/n),1,1);}
+const FONT={'0':'111101101101111','1':'010110010010111','2':'111001111100111','3':'111001111001111','4':'101101111001001','5':'111100111001111','6':'111100111101111','7':'111001001001001','8':'111101111101111','9':'111101111001111',A:'111101111101101',B:'110101110101110',C:'111100100100111',D:'110101101101110',E:'111100111100111',F:'111100111100100',G:'111100101101111',H:'101101111101101',I:'111010010010111',K:'101101110101101',L:'100100100100111',M:'101111111101101',N:'111101101101101',O:'111101101101111',P:'111101111100100',R:'111101110101101',S:'111100111001111',T:'111010010010010',U:'101101101101111',V:'101101101101010',W:'101101111111101',X:'101101010101101',Y:'101101010010010','/':'001001010100100','-':'000000111000000',' ':'000000000000000'};
+function txt(k,s,x,y,col,m){m=m||1;k.fillStyle=col;for(const ch of s){const f=FONT[ch]||FONT[' '];for(let i=0;i<15;i++)if(f[i]==='1')k.fillRect(x+(i%3)*m,y+((i/3)|0)*m,m,m);x+=4*m;}}
+function sprite(rows,pal){const w=Math.max(...rows.map(r=>r.length)),k=mk(w,rows.length),q=k.getContext('2d');rows.forEach((r,y)=>{for(let x=0;x<r.length;x++){const col=pal[r[x]];if(col){q.fillStyle=col;q.fillRect(x,y,1,1);}}});return k;}
+function turned(s,flip){const k=mk(s.height,s.width),q=k.getContext('2d');if(flip){q.translate(0,s.width);q.rotate(-Math.PI/2);}else{q.translate(s.height,0);q.rotate(Math.PI/2);}q.drawImage(s,0,0);return k;}
+const PIN=['...ooo...','..owwlo..','..owwlo..','..owwlo..','...owo...','...owo...','..owwlo..','.owwwlmo.','.owwwlmo.','owwwwlmdo','oRRRRRrro','oRRRRRrro','owwwwlmdo','owwwwlmdo','.owwwlmo.','.owwwlmo.','..owlmo..','...ooo...'];
+const BOWLER=['.....oooooo.....','....ohhhhhho....','...ohhhhhhhho...','...ohhHhhhhho...','...ohhhhhhhho...','...oshhhhhhso...','....osssssso....','.....osssso.....','...ooAAAAAAoo...','..oAAAABBAAAAo..','.oAAAAABBAAAAAo.','.oAAAAABBAAAAAo.','.oAoAAABBAAAoAo.','.oAoAAABBAAAoAo.','.oaoAAABBAAAoao.','.osoAAABBAAAoso.','.osoaaaBBaaaoso.','..oopppppppoo...','...oppppppppo...','...opppoopppo...','...opppoopppo...','...opppoopppo...','...oqqqooqqqo...','...oqqqooqqqo...','..okkkkookkkko..','..oooooooooooo..'];
+function ballSprite(r,cols){const n=r*2+1,k=mk(n,n),q=k.getContext('2d');for(let y=-r;y<=r;y++)for(let x=-r;x<=r;x++){const d2=x*x+y*y;if(d2>r*r+.6)continue;const edge=r>2&&d2>(r-1)*(r-1)+.2;let L=.62-(x*.5+y*.62)/r*.42+(Math.sin(x*1.3+y*.7)>.72?.12:0);q.fillStyle=edge?cols[0]:ramp(cols.slice(1),L,x+8,y+8);q.fillRect(x+r,y+r,1,1);}q.fillStyle=cols[cols.length-1];q.fillRect(r-Math.ceil(r/2.2),r-Math.ceil(r/2.2),1,1);return k;}
+function hash(a,b){let h=(Math.imul(a|0,374761393)+Math.imul(b|0,668265263))|0;h=Math.imul(h^(h>>>13),1274126177);return((h^(h>>>16))>>>0)/4294967296;}
+
+// ---------- the two looks of the hall ----------
+const THEME={
+rec:{wood:['#5a2f1a','#8a4e26','#b97a36','#dba552','#f0cf86'],gutter:['#170e0b','#2a1a15','#43291f'],line:'#2a160e',arrow:'#8a3c1c',cap:'#6b3f2a',pit:'#0a0605',wallBase:'#4c2a1a',neon:null,
+  pin:{o:'#3b261c',w:'#fff8e8',l:'#efe2c4',m:'#d2bf9a',d:'#a58f6e'},band:{5:['#d83a2a','#9c2218'],3:['#e8a020','#b06c10'],2:['#3f8f6a','#286248']},
+  ball:['#2a0e10','#5c1418','#8f1e22','#c63a2e','#ef7a4a','#ffd9b0'],bowl:{o:'#2a160e',h:'#4a2a18',H:'#7a4a2c',s:'#e8b088',A:'#f3e2b8',a:'#d6c08e',B:'#d86a28',p:'#3a4a6a',q:'#2c3854',k:'#f3e2b8'},
+  ui:['#2a160e','#f3e2b8','#3f8f6a','#d83a2a'],plate:'#1d100a',label:'#f3e2b8',dot:'#fff8e8',dotSh:'#4a2412',dim:'#8a4e26',trail:'#fff8e8',shadow:'#3b1f12',handle:'#d83a2a',edge:'#2a160e',hi:'#fff8e8',ink:'#2a160e',mark:'#fff8e8',
+  dispL:[41,16,26,11,'#f3e2b8','#3a2016'],dispR:[113,16,27,11,'#2a160e','#f3e2b8'],
+  wall(k){px(k,0,0,180,10,'#1d100a');px(k,0,10,180,42,'#4c2a1a');for(let x=4;x<180;x+=9)px(k,x,10,1,42,'#3a2016');
+    px(k,35,13,110,36,'#7a4a2c');px(k,35,13,110,1,'#96623a');px(k,35,30,110,4,'#d86a28');px(k,35,34,110,4,'#f3e2b8');px(k,35,38,110,4,'#8a3c1c');
+    disc(k,90,31,14,'#3a2016');disc(k,90,31,13,'#f3e2b8');txt(k,'5',85,24,'#d83a2a',3);
+    px(k,0,52,180,16,'#120a07');px(k,54,52,72,16,'#0a0605');px(k,0,52,180,2,'#1d100a');px(k,52,54,2,14,'#4c2a1a');px(k,126,54,2,14,'#4c2a1a');
+    [36,90,144].forEach(x=>{px(k,x,0,1,5,'#0c0705');px(k,x-4,5,9,3,'#d86a28');px(k,x-3,8,7,1,'#ffe9a8');if(x!==90)for(let i=0;i<10;i++)for(let j=-i-2;j<=i+2;j++)if(((i+j)&1)&&((i*7+j*3)%5+5)%5<2)px(k,x+j,10+i,1,1,'#96623a');});},
+  strip(k){px(k,0,0,180,5,'#4c2a1a');for(let x=4;x<180;x+=9)px(k,x,0,1,5,'#3a2016');px(k,0,5,180,1,'#1d100a');}},
+night:{wood:['#10142e','#1c2550','#2c3a74','#445a9e','#7c93d6'],gutter:['#05071a','#0b0f2c','#151a42'],line:'#05071a',arrow:'#ff4fa8',cap:'#0c1030',pit:'#020308',wallBase:'#0c1030',neon:['#ff4fa8','#3fe0ff'],
+  pin:{o:'#0b0f2c',w:'#f2f6ff',l:'#cfd8f6',m:'#9aa8de',d:'#6a78b8'},band:{5:['#ff4fa8','#b02a72'],3:['#ffd23f','#b8901c'],2:['#3fe0ff','#1f92b0']},
+  ball:['#051a22','#0b4656','#12788c','#23b4c8','#7cecf4','#ffffff'],bowl:{o:'#05071a',h:'#1a1430',H:'#3a2c5c',s:'#b88a8a',A:'#ff4fa8',a:'#b02a72',B:'#f2f6ff',p:'#141a44',q:'#0c1030',k:'#f2f6ff'},
+  ui:['#05071a','#141a44','#3fe0ff','#ff4fa8'],plate:'#05071a',label:'#9aa8de',dot:'#f2f6ff',dotSh:'#05071a',dim:'#445a9e',trail:'#f2f6ff',shadow:'#05071a',handle:'#3fe0ff',edge:'#05071a',hi:'#ffffff',ink:'#f2f6ff',mark:'#05071a',
+  dispL:[39,15,18,9,'#0a1a2a','#3fe0ff'],dispR:[119,15,28,9,'#0a1a2a','#3fe0ff'],
+  wall(k){px(k,0,0,180,10,'#04050f');px(k,0,10,180,42,'#0c1030');px(k,35,13,110,36,'#141a44');px(k,35,13,110,1,'#1d2558');
+    [[-1,0],[1,0],[0,-1],[0,1],[-1,-1],[1,1],[1,-1],[-1,1]].forEach(([a,b])=>txt(k,'5 PIN',61+a,24+b,'#7a1f5c',3));txt(k,'5 PIN',61,24,'#ff4fa8',3);
+    px(k,39,43,102,1,'#14506a');px(k,39,45,102,1,'#14506a');px(k,39,44,102,1,'#3fe0ff');
+    px(k,0,52,180,16,'#04050f');px(k,54,52,72,16,'#020308');px(k,52,54,2,14,'#141a44');px(k,126,54,2,14,'#141a44');
+    px(k,90,0,1,5,'#020308');px(k,86,5,9,3,'#1d2558');
+    for(let i=0;i<14;i++)for(let j=-i-3;j<=i+3;j++)if(((i+j)&1)&&((i*5+j*3)%7+7)%7<2)px(k,90+j,52+i,1,1,'#1d2558');},
+  strip(k){px(k,0,0,180,5,'#0c1030');px(k,0,5,180,1,'#3fe0ff');}}
+};
+function buildTheme(o){if(o.built)return o;o.built=1;
+  o._wood=o.wood.map(hex);o._gut=o.gutter.map(hex);o._line=hex(o.line);o._arrow=hex(o.arrow);o._cap=hex(o.cap);o._pit=hex(o.pit);o._wall=hex(o.wallBase);o._neon=o.neon&&o.neon.map(hex);
+  o.pins={};[5,3,2].forEach(n=>{const s=sprite(PIN,Object.assign({R:o.band[n][0],r:o.band[n][1]},o.pin));o.pins[n]=s;o.pins[n+'r']=turned(s,false);o.pins[n+'l']=turned(s,true);});
+  o.bw=sprite(BOWLER,o.bowl);o.balls={};for(let r=2;r<=9;r++)o.balls[r]=ballSprite(r,o.ball);o.bg={};return o;}
+const BOARD=240/13;
+// what colour the floor is at a point on the lane (flat lane units), dithered at the screen pixel it lands on
+function shade(o,x,y,sx,sy,k){
+  if(y<30)return o._pit;
+  const ax=Math.abs(x-180);let u=ax,s=x-180,nb=false;
+  if(ax>=154){s=ax-296;u=Math.abs(s);nb=true;}
+  if(u>=142)return o._cap;
+  if(u>=120)return ramp(o._gut,(nb?.1:.2)+(u-120)/22*.6,sx,sy);
+  const bf=(s+120)/BOARD,bi=Math.floor(bf),fr=bf-bi;
+  let L=.52+((bi*37)%5-2)*.04+(hash(bi+(nb?40:0),Math.floor(y/(26+(bi%3)*9)))-.5)*.1;
+  if(!nb){L+=Math.max(0,1-ax/75)*.13;if(y<190)L+=.07;if(y>545)L+=.1;}
+  if(fr<Math.max(.12,1/(k*BOARD)))L-=.14;
+  if(nb)L*=.5;
+  let col=ramp(o._wood,L,sx,sy);
+  if(!nb){
+    if(y>=540&&y<545)return o._line;
+    for(let i=-2;i<=2;i++){const cx=180+i*40,ay=398+Math.abs(i)*14;if(y>=ay&&y<ay+22&&Math.abs(x-cx)<=(y-ay)/22*8)return o._arrow;}
+    if(o._neon&&y<430){const st=(430-y)/400*.75,b=thr(sx,sy);if(x>92&&x<144&&b<st)col=o._neon[0];else if(x>216&&x<268&&b<st)col=o._neon[1];}
+  }
+  return col;}
+function buildBg(o,cm){const k=mk(LW,LH),q=k.getContext('2d'),im=q.createImageData(LW,LH),d=im.data;
+  for(let sy=0;sy<LH;sy++)for(let sx=0;sx<LW;sx++){let col;
+    if(sy<cm.horizon)col=o._wall;else{const p=cm.inv(sx,sy);col=shade(o,p.x,p.y,sx,sy,p.k);}
+    const i=(sy*LW+sx)*4;d[i]=col[0];d[i+1]=col[1];d[i+2]=col[2];d[i+3]=255;}
+  q.putImageData(im,0,0);cm.id==='lane'?o.wall(q):o.strip(q);
+  return{cv:k,data:q.getImageData(0,0,LW,LH).data};}
+function getBg(o,cm){return o.bg[cm.id]||(o.bg[cm.id]=buildBg(o,cm));}
+
+// the lights going down: old hall flickers, new hall dithers in from the far wall toward you, then the sign catches
+const MIX=new Float32Array(LW*LH);for(let y=0;y<LH;y++)for(let x=0;x<LW;x++)MIX[y*LW+x]=y/LH*.78+thr(x,y)*.22;
+const mixIm=c.createImageData(LW,LH);
+function drawFx(cm){const A=getBg(buildTheme(THEME[fx.from]),cm),B=getBg(buildTheme(THEME[fx.to]),cm),t=fx.t;
+  if(t<.5){c.drawImage(A.cv,0,0);if(Math.floor(t*20)%3===0){c.fillStyle='rgba(0,0,0,.42)';c.fillRect(0,0,LW,LH);}}
+  else if(t<1.9){const p=(t-.5)/1.4,out=mixIm.data,a=A.data,b=B.data;for(let i=0,j=0;i<MIX.length;i++,j+=4){const s=MIX[i]<p?b:a;out[j]=s[j];out[j+1]=s[j+1];out[j+2]=s[j+2];out[j+3]=255;}c.putImageData(mixIm,0,0);}
+  else{c.drawImage(B.cv,0,0);if(!still&&Math.floor(t*22)%4===0){if(fx.to==='night'){if(cm.id==='lane')px(c,57,20,66,27,'#141a44');}else{c.fillStyle='rgba(0,0,0,.3)';c.fillRect(0,0,LW,LH);}}}}
+
+// ---------- drawing ----------
+function drawPin(o,cm,p){const q=cm.proj(p.x,p.y),X=Math.round(q.X),Y=Math.round(q.Y);
+  if(p.down){c.drawImage(o.pins[p.v+(Math.cos(p.ang)<0?'l':'r')],X-9,Y-(cm.id==='lane'?7:4));return;}
+  if(cm.id==='lane'){px(c,X-3,Y,7,2,o.shadow);c.save();c.globalAlpha=.2;c.translate(0,2*Y+2);c.scale(1,-1);c.drawImage(o.pins[p.v],X-4,Y-17);c.restore();c.drawImage(o.pins[p.v],X-4,Y-17);}
+  else{px(c,X-3,Y+4,8,3,o.shadow);c.drawImage(o.pins[p.v],X-4,Y-12);}}
+function drawBall(o,cm,b){const q=cm.proj(b.x,b.y),X=Math.round(q.X),Y=Math.round(q.Y),r=clamp(Math.round(RB*q.k),2,9);
+  if(cm.id==='lane'){px(c,X-r+1,Y,2*r-1,2,o.shadow);c.drawImage(o.balls[r],X-r,Y-2*r);return{X,Y:Y-r,r};}
+  disc(c,X+1,Y+2,r,o.shadow);c.drawImage(o.balls[r],X-r,Y-r);return{X,Y,r};}
+function dots(o,cm,p,dim){let i=0;for(const q of p.pts){if(q.y<G.BACK)break;const s=cm.proj(q.x,q.y),X=Math.round(s.X),Y=Math.round(s.Y);
+  if(dim){if(i%2===0)px(c,X,Y,1,1,o.dim);}else{px(c,X,Y+1,1,1,o.dotSh);px(c,X,Y,1,1,o.dot);}i++;}}
+function label(o,s,x,y){txt(c,s,x+1,y+1,o.mark);txt(c,s,x,y,o.ink);}
+function drawNeedle(o){const x0=22,w=136,y=284,h=8,mid=x0+w/2,half=w/2;
+  px(c,0,y-14,LW,LH-(y-14),o.plate);
+  txt(c,'EARLY',x0,y-9,o.label);txt(c,'LATE',x0+w-15,y-9,o.label);
+  px(c,x0-1,y-1,w+2,h+2,o.ui[0]);px(c,x0,y,w,h,o.ui[1]);
+  const zz=g.mode==='aim'?zone():g.zoneAt,zw=Math.max(1,Math.round(half*zz));px(c,mid-zw,y,zw*2,h,o.ui[2]);
+  if(!(g.mode==='aim'&&T.two&&!g.ready)){const n=g.mode==='aim'?tri(g.phase):g.stopped,nx=Math.round(mid+n*(half-1));px(c,nx-2,y-3,4,h+6,o.ui[0]);px(c,nx-1,y-2,2,h+4,o.ui[3]);}}
+function draw(){
+  const cm=CAM[T.cam],lane=cm.id==='lane';
+  const o=buildTheme(THEME[fx?(fx.flip?fx.to:fx.from):stage]);
+  c.setTransform(1,0,0,1,0,0);c.globalAlpha=1;c.imageSmoothingEnabled=false;
+  if(fx)drawFx(cm);else c.drawImage(getBg(o,cm).cv,0,0);
+  if(lane){const L=o.dispL,R=o.dispR,s=total()+'/'+TARGET;
+    px(c,L[0],L[1],L[2],L[3],L[4]);txt(c,'F'+(g.frame+1),L[0]+Math.floor((L[2]-7)/2),L[1]+Math.floor((L[3]-5)/2),L[5]);
+    px(c,R[0],R[1],R[2],R[3],R[4]);txt(c,s,R[0]+Math.floor((R[2]-(s.length*4-1))/2),R[1]+Math.floor((R[3]-5)/2),R[5]);}
+
+  const act=drag?drag.which:null,al=k=>act&&act!==k?.35:1;
+  let aimPos=null,bendPos=null;
+  if(g.mode==='aim'){const p=makePath(g.sx,g.ex,g.bend);dots(o,cm,p,false);
+    // aim ring: a mark on the floor in front of the headpin row
+    const a=cm.proj(g.ex,G.EY+(lane?24:34)),AX=Math.round(a.X),AY=Math.round(a.Y),rx=lane?9:6,ry=lane?3:6;
+    c.globalAlpha=al('aim');if(act==='aim')ringPx(c,AX,AY,rx+3,ry+2,o.hi);
+    ringPx(c,AX,AY,rx+1,ry+1,o.edge);ringPx(c,AX,AY,rx,ry,o.handle);px(c,AX-rx-5,AY,4,1,o.handle);px(c,AX+rx+2,AY,4,1,o.handle);c.globalAlpha=1;
+    aimPos={X:AX,Y:AY,rx};
+  }else if(g.intended){dots(o,cm,g.intended,true);
+    for(let i=1;i<g.trail.length;i++){const a=cm.proj(g.trail[i-1].x,g.trail[i-1].y),b=cm.proj(g.trail[i].x,g.trail[i].y);plotLine(c,a.X,a.Y+1,b.X,b.Y+1,o.dotSh);plotLine(c,a.X,a.Y,b.X,b.Y,o.trail);}}
+
+  // pins and ball, far ones first
+  const ents=[];for(const p of g.pins)if(!p.gone)ents.push({y:p.y,p});
+  const b=g.sim?g.sim.ball:{x:g.sx,y:G.SY};if(!g.sim||!b.out)ents.push({y:b.y+.5,b});
+  ents.sort((m,n)=>m.y-n.y);let ballPos=null;
+  for(const e of ents){if(e.p)drawPin(o,cm,e.p);else{if(g.mode==='aim')c.globalAlpha=al('ball');ballPos=drawBall(o,cm,e.b);
+    if(g.mode==='aim'&&act==='ball')ringPx(c,ballPos.X,ballPos.Y,ballPos.r+3,ballPos.r+3,o.hi);c.globalAlpha=1;}}
+
+
+  if(g.mode==='aim'){const s=cm.proj(g.bx,HY.bend),X=Math.round(s.X),Y=Math.round(s.Y);
+    c.globalAlpha=al('bend');if(act==='bend')ringPx(c,X,Y,10,10,o.hi);
+    c.fillStyle=o.edge;for(let d=-7;d<=7;d++){const w=7-Math.abs(d);c.fillRect(X-w,Y+d,2*w+1,1);}
+    c.fillStyle=o.handle;for(let d=-6;d<=6;d++){const w=6-Math.abs(d);c.fillRect(X-w,Y+d,2*w+1,1);}
+    px(c,X-4,Y,2,1,o.hi);px(c,X-3,Y-1,1,3,o.hi);px(c,X+3,Y,2,1,o.hi);px(c,X+3,Y-1,1,3,o.hi);c.globalAlpha=1;
+    if(!g.thrown){label(o,'AIM',aimPos.X+aimPos.rx+8,aimPos.Y-2);label(o,'BEND',X+11,Y-2);if(ballPos)label(o,'START',ballPos.X+ballPos.r+4,ballPos.Y-2);}
+  }
+  drawNeedle(o);
+}
+
+const toastEl=document.getElementById('toast');
+let lastT=0,acc=0;
+function loop(ts){const dt=Math.min(.05,(ts-lastT)/1000||0);lastT=ts;
+  if(g.mode==='aim'&&(!T.two||g.ready))g.phase+=needleHz()*dt;
+  if(g.mode==='roll'){acc+=dt;while(acc>1/240){stepSim(g.sim,1/240);acc-=1/240;}
+    const b=g.sim.ball;if(!b.out)g.trail.push({x:b.x,y:b.y});
+    if(g.sim.done){g.mode='settle';g.wait=.55;}}
+  else if(g.mode==='settle'){g.wait-=dt;if(g.wait<=0)resolve();}
+  if(g.toastT>0)g.toastT-=dt;
+  toastEl.style.opacity=g.toast&&g.toastT>0?Math.min(1,g.toastT*2):0;
+  if(fx){fx.t+=dt;if(!fx.flip&&fx.t>=.9){fx.flip=true;setChrome(fx.to);}
+    if(fx.t>=(still?1.9:2.7)){stage=fx.to;fx=null;}}
+  draw();requestAnimationFrame(loop);}
+setChrome(stage);newGame();fit();requestAnimationFrame(loop);
+</script>
+</body>
+</html>

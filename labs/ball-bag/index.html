@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<title>Ball Bag Lab</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@500;700&family=Silkscreen&display=swap" rel="stylesheet">
+<style>
+:root{
+  /* layout: one screen. rack + frames on top, one info line, pixel lane with the ball bag beside it, throw button at the thumb */
+  --ink:#1d100a;--panel:#3a2016;--chalk:#f3e2b8;--dim:#c9a878;--accent:#d86a28;--go:#d83a2a;--go-ink:#fff8e8;
+  --paper:#f3e2b8;--paper-ink:#2a160e;--paper-dim:#7a4a2c;--now:#d83a2a;--pt:#f3e2b8;--mu:#ff8a4a;
+  --body:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --display:"Pixelify Sans",system-ui,sans-serif;
+  --num:"Silkscreen",ui-monospace,Menlo,monospace;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0}
+body{background:var(--ink);color:var(--chalk);font-family:var(--body);display:flex;flex-direction:column;overflow:hidden;-webkit-user-select:none;user-select:none;-webkit-tap-highlight-color:transparent}
+button{font-family:inherit;color:inherit}
+button:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+img{image-rendering:pixelated}
+.hud{display:flex;gap:6px;padding:6px 10px 0;align-items:stretch}
+#rack{flex:none;display:flex;align-items:flex-start;gap:3px;padding:3px 6px 1px;height:46px;background:var(--panel);border:2px solid var(--dim);border-radius:3px;box-shadow:0 2px 0 rgba(0,0,0,.45)}
+#rack button{position:relative;display:block;width:18px;height:36px;padding:0;border:0;background:transparent}
+#rack img{display:block;width:18px;height:36px}
+#rack button:nth-child(2),#rack button:nth-child(4){top:2px}
+#rack button:nth-child(3){top:4px}
+#rack button.sel::after{content:"";position:absolute;left:3px;right:3px;bottom:-5px;height:2px;background:var(--chalk)}
+.hudR{flex:1;min-width:0;display:flex;flex-direction:column;justify-content:space-between}
+.meta{display:flex;align-items:center;gap:8px;height:20px}
+#tot{font-family:var(--num);font-weight:400;font-size:18px;line-height:18px;margin-right:auto;font-variant-numeric:tabular-nums}
+.meta button{width:32px;height:20px;padding:0;display:grid;place-items:center;background:transparent;border:2px solid var(--dim);border-radius:3px}
+#camBtn i{width:12px;height:10px;background:var(--chalk);clip-path:polygon(32% 0,68% 0,100% 100%,0 100%)}
+#camBtn[data-cam="top"] i{width:8px;clip-path:none}
+#logBtn i{width:12px;height:2px;background:var(--chalk);box-shadow:0 -4px 0 var(--chalk),0 4px 0 var(--chalk)}
+.board{display:flex;gap:4px}
+.cell{flex:1;min-width:0;display:flex;justify-content:center;align-items:center;gap:4px;height:22px;background:transparent;color:var(--paper-ink);border:2px solid var(--panel);border-radius:2px;font:400 12px/1 var(--num)}
+.cell.done,.cell.now{background:var(--paper)}
+.cell.done{border-color:var(--paper)}
+.cell.now{border-color:var(--now)}
+.cell span{min-width:8px;text-align:center}
+.cell span:empty::before{content:"";display:block;width:4px;height:4px;margin:auto;background:var(--dim)}
+.cell.now span:empty::before{background:var(--paper-dim)}
+/* one fixed line: what the selected ball (or a tapped pin) does */
+.info{flex:none;display:flex;align-items:center;gap:7px;height:26px;margin:5px 10px;padding:0 8px;background:var(--panel);border-radius:3px;font-size:12px;line-height:1;color:var(--dim);white-space:nowrap;overflow:hidden}
+.info img{flex:none}
+.info b{font-family:var(--display);font-size:14px;font-weight:700;color:var(--chalk)}
+.info span{min-width:0;overflow:hidden;text-overflow:ellipsis}
+.info.ask{justify-content:flex-end;color:var(--chalk);background:transparent}
+.tri{display:inline-block;width:0;height:0;border:5px solid transparent;border-left:8px solid var(--accent);border-right:0}
+.stage{flex:1;min-height:0;display:flex;align-items:stretch;gap:6px;padding:0 6px 0 8px}
+.lanebox{flex:1;min-width:0;position:relative;display:flex;align-items:center;justify-content:center}
+canvas{display:block;touch-action:none;border-radius:6px;image-rendering:pixelated}
+/* the bag: nine one-off balls, fixed places */
+.bag{flex:none;width:46px;display:flex;flex-direction:column;gap:2px;padding:2px;background:var(--panel);border:2px solid var(--dim);border-radius:3px}
+.bag.ask{border-color:var(--accent)}
+.bag button{flex:1;min-height:0;padding:0;display:grid;place-items:center;background:transparent;border:2px solid transparent;border-radius:3px}
+.bag button.sel{border-color:var(--chalk);background:rgba(255,255,255,.16)}
+.bag button.used{opacity:.14}
+.toast{position:absolute;left:0;right:0;top:47%;margin:0 auto;width:max-content;max-width:96%;transform:translateY(-50%);display:grid;grid-template-columns:auto auto;align-items:center;justify-content:center;gap:2px 10px;padding:6px 12px 7px;background:var(--ink);color:var(--chalk);border:3px solid var(--accent);border-radius:3px;box-shadow:0 4px 0 rgba(0,0,0,.5);font-family:var(--num);white-space:nowrap;pointer-events:none;opacity:0}
+.toast em{grid-row:span 2;font-style:normal;font-size:40px;line-height:40px;color:var(--accent)}
+.toast strong{font-weight:400;font-size:30px;line-height:30px}
+.toast em+strong{text-align:left}
+.toast b{font-weight:400;font-size:13px;line-height:14px;color:var(--dim);display:flex;gap:5px;justify-content:center}
+.toast em~b{justify-content:flex-start}
+.toast strong:first-child,.toast strong:first-child+b{grid-column:1/-1;text-align:center}
+.toast .pt{color:var(--pt)}.toast .mu{color:var(--mu)}
+.toast p{grid-column:1/-1;margin:4px 0 0;padding-top:5px;border-top:2px solid var(--panel);display:flex;flex-wrap:wrap;justify-content:center;gap:4px 9px;font-size:12px;line-height:1}
+.toast p span{display:flex;align-items:center;gap:3px}
+.hint{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);margin:0}
+.controls{display:flex;gap:8px;padding:6px 10px 10px;align-items:stretch}
+#throw{flex:1;border:3px solid var(--go);border-radius:4px;background:transparent;color:var(--chalk);font-family:var(--display);font-size:24px;font-weight:700;letter-spacing:.08em;min-height:52px;box-shadow:0 4px 0 rgba(0,0,0,.45)}
+#throw.live{background:var(--go);color:var(--go-ink)}
+#throw:disabled{background:transparent;border-color:var(--panel);color:transparent;box-shadow:none}
+.sheet{position:fixed;inset:0;background:rgba(0,0,0,.78);display:flex;align-items:center;justify-content:center;padding:8px;z-index:2}
+.sheet[hidden]{display:none}
+.sheet .box{background:var(--panel);border-radius:10px;padding:12px;width:100%;max-width:340px;max-height:100%;overflow:hidden;display:flex;flex-direction:column;gap:10px;border:3px solid var(--ink);box-shadow:inset 0 0 0 2px rgba(255,255,255,.07)}
+.shead{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.sheet h2{margin:0;font-family:var(--display);font-size:20px;text-transform:uppercase;letter-spacing:.05em}
+.chip{font-family:var(--num);font-weight:400;font-size:30px;line-height:1;color:var(--ink);background:var(--accent);padding:5px 10px 7px;border-radius:5px;box-shadow:0 3px 0 rgba(0,0,0,.4)}
+/* end of game: the nine balls where they were thrown, and what each made */
+.recap{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.recap div{display:flex;flex-direction:column;gap:4px;padding:6px;background:var(--ink);border-radius:5px}
+.recap span{display:grid;grid-template-columns:38px 1fr;align-items:center;height:38px;font:400 15px/1 var(--num)}
+.recap img{justify-self:center}
+.row{display:flex;gap:8px}
+.row button{flex:1;min-width:0;padding:11px 8px;border-radius:8px;border:2px solid var(--dim);background:transparent;font-family:var(--display);font-size:15px;font-weight:700;white-space:nowrap}
+.row button.main{flex:1.4;background:var(--accent);border-color:var(--accent);color:var(--ink);box-shadow:0 3px 0 rgba(0,0,0,.4)}
+#logText{flex:1 1 auto;min-height:60px;width:100%;font:11px ui-monospace,Menlo,monospace;background:var(--ink);color:var(--chalk);border:1px solid var(--dim);border-radius:8px;padding:8px;-webkit-user-select:text;user-select:text;white-space:pre;overflow:auto}
+</style>
+</head>
+<body>
+<div class="hud">
+  <div id="rack" aria-label="The rack"></div>
+  <div class="hudR">
+    <div class="meta"><b id="tot" aria-label="Score">0</b><button id="logBtn" type="button" aria-label="Results log"><i></i></button><button id="camBtn" type="button" aria-label="Change view"><i></i></button></div>
+    <div class="board" id="board"></div>
+  </div>
+</div>
+<div class="info" id="info" aria-live="polite"></div>
+<div class="stage">
+  <div class="lanebox">
+    <canvas id="lane" width="180" height="300" aria-label="Bowling lane. Drag the ball, the bend handle and the aim ring."></canvas>
+    <div class="toast" id="toast" aria-live="polite"></div>
+  </div>
+  <div class="bag" id="bag" aria-label="Ball bag"></div>
+</div>
+<div class="controls">
+  <button id="throw" type="button">THROW</button>
+</div>
+<div class="sheet" id="over" hidden><div class="box">
+  <div class="shead"><h2 id="overTitle"></h2><b class="chip" id="overTot"></b></div>
+  <div class="recap" id="overRecap"></div>
+  <div class="row"><button id="overLog" type="button">Results log</button><button class="main" id="again" type="button">New game</button></div>
+</div></div>
+<div class="sheet" id="log" hidden><div class="box">
+  <h2>Results log</h2>
+  <textarea id="logText" readonly rows="12" aria-label="Results log"></textarea>
+  <div class="row"><button id="logClear" type="button">Clear</button><button id="logCopy" type="button">Copy log</button><button class="main" id="logClose" type="button">Done</button></div>
+</div></div>
+
+<script>
+//SIM-START
+const G={L:60,R:300,BACK:30,FOUL:540,SY:520,EY:160,WL:38,WR:322};
+const RACK=[{x:180,y:160,v:5},{x:134,y:120,v:3},{x:226,y:120,v:3},{x:88,y:80,v:2},{x:272,y:80,v:2}];
+let RB=12,MB=2.2,FRIC=1.5;const RP=11,RT=21,MP=1,REST=.78,KNOCK=45;
+let CARRY=1.5,KICK=-.9,DRIVE=0,MESS=.8;
+const POW=[{speed:400,needle:.85},{speed:500,needle:1},{speed:620,needle:1.3}];
+function rack(){return RACK.map(p=>({x:p.x,y:p.y,v:p.v,vx:0,vy:0,down:false,gone:false,age:0,ang:0}));}
+function makePath(sx,ex,bend){
+  const S={x:sx,y:G.SY},E={x:ex,y:G.EY},C={x:(sx+ex)/2+bend,y:(G.SY+G.EY)/2};
+  const pts=[],N=60;
+  for(let i=0;i<=N;i++){const t=i/N,a=(1-t)*(1-t),b=2*t*(1-t),k=t*t;pts.push({x:a*S.x+b*C.x+k*E.x,y:a*S.y+b*C.y+k*E.y});}
+  let tx=E.x-C.x,ty=E.y-C.y;const tl=Math.hypot(tx,ty);tx/=tl;ty/=tl;
+  for(let d=8;d<=260;d+=8)pts.push({x:E.x+tx*d,y:E.y+ty*d});
+  const len=[0];for(let i=1;i<pts.length;i++)len.push(len[i-1]+Math.hypot(pts[i].x-pts[i-1].x,pts[i].y-pts[i-1].y));
+  return{S,E,C,pts,len};
+}
+function pathAt(p,d){
+  const n=p.pts.length;if(d>=p.len[n-1]){const a=p.pts[n-2],b=p.pts[n-1],l=Math.hypot(b.x-a.x,b.y-a.y);return{x:b.x,y:b.y,dx:(b.x-a.x)/l,dy:(b.y-a.y)/l,end:true};}
+  let i=1;while(p.len[i]<d)i++;
+  const a=p.pts[i-1],b=p.pts[i],seg=p.len[i]-p.len[i-1],f=(d-p.len[i-1])/seg;
+  return{x:a.x+(b.x-a.x)*f,y:a.y+(b.y-a.y)*f,dx:(b.x-a.x)/seg,dy:(b.y-a.y)/seg,end:false};
+}
+function pinR(p,rt){if(!p.down)return RP;return RP+(rt-RP)*Math.min(1,p.age/0.1);}
+// k: optional ball kind (see BALLS). Without it this is the house ball: radius RB, weight MB, nothing special
+function newSim(pins,path,power,spin,k){k=k||{};return{pins,path,t:0,done:false,ball:{r:k.r||RB,m:k.m||MB,pass:k.pass||0,soft:k.soft||1,stop:!!k.stop,burst:k.burst||0,dead:false,spin:spin||0,x:path.S.x,y:path.S.y,vx:0,vy:0,d:0,speed:POW[power].speed,free:false,gutter:false,out:false}};}
+// dart: the touched pin tips over and the ball stops dead. burst: every standing pin within reach drops where it stands and the ball is spent
+function firstTouch(s,p,nx,ny){const b=s.ball,hit=(q,vx,vy)=>{if(q.down)return;q.by='ball';q.ord=s.ord=(s.ord||0)+1;q.down=true;q.vx=vx;q.vy=vy;};
+  if(b.stop){hit(p,nx*30,ny*30);b.dead=b.free=true;b.vx=b.vy=0;return;}
+  hit(p,nx*40,ny*40);for(const q of s.pins){if(q.gone||q.down)continue;const dx=q.x-b.x,dy=q.y-b.y,d=Math.hypot(dx,dy);if(d<b.burst)hit(q,dx/d*40,dy/d*40);}
+  s.boom={x:b.x,y:b.y,r:b.burst,t:s.t};b.out=true;}
+function stepSim(s,dt){
+  const b=s.ball;s.t+=dt;
+  if(!b.out){
+    if(b.gutter){b.y-=b.speed*.8*dt;}
+    else if(!b.free){b.d+=b.speed*dt;const q=pathAt(s.path,b.d);b.x=q.x;b.y=q.y;b.vx=q.dx*b.speed;b.vy=q.dy*b.speed;if(q.end)b.free=true;
+      if(b.x<G.L||b.x>G.R){b.gutter=true;b.x=b.x<G.L?G.L-11:G.R+11;}}
+    else{b.x+=b.vx*dt;b.y+=b.vy*dt;
+      if(b.x<G.WL+b.r){b.x=G.WL+b.r;b.vx=Math.abs(b.vx)*.4;}if(b.x>G.WR-b.r){b.x=G.WR-b.r;b.vx=-Math.abs(b.vx)*.4;}
+      if(b.vy>-40)b.vy-=300*dt;
+      if(b.spin&&b.y>G.BACK+20)b.vx+=-Math.sign(b.spin)*Math.abs(b.spin)*DRIVE*dt;}
+    if(b.y<G.BACK-16)b.out=true;
+  }
+  const P=s.pins,rt=RT*(1+MESS*Math.abs(b.spin));
+  if(!b.out&&!b.gutter&&!b.dead)for(const p of P){if(p.gone)continue;const r=b.r+RP;
+    let nx=p.x-b.x,ny=p.y-b.y;const d=Math.hypot(nx,ny);if(d>=r||d===0)continue;nx/=d;ny/=d;
+    if(b.pass){if(!p.down){p.by='ball';p.ord=s.ord=(s.ord||0)+1;p.down=true;p.vx=b.vx*.06;p.vy=b.vy*.06;}continue;}   // ghost: the pin drops where it stands, the ball is not turned
+    if(b.stop||b.burst){firstTouch(s,p,nx,ny);break;}
+    const vr=(b.vx-p.vx)*nx+(b.vy-p.vy)*ny;
+    if(vr>0){const sp=Math.abs(b.spin),mb=b.m*(1+CARRY*sp);const j=(1+REST)*vr/(1/mb+1/MP);b.vx-=j/mb*nx;b.vy-=j/mb*ny;p.vx+=j/MP*nx*b.soft;p.vy+=j/MP*ny*b.soft;
+      if(sp){const hd=-Math.sign(b.spin),tx=-ny,ty=nx,sg=tx*hd>=0?1:-1,k=KICK*sp*vr;p.vx+=sg*tx*k*b.soft;p.vy+=sg*ty*k*b.soft;}
+      if(!p.down){p.by='ball';p.ord=s.ord=(s.ord||0)+1;}p.down=true;b.free=true;}
+    p.x=b.x+nx*r;p.y=b.y+ny*r;}
+  for(let i=0;i<P.length;i++){const a=P[i];if(a.gone)continue;for(let k=i+1;k<P.length;k++){const c=P[k];if(c.gone)continue;
+    const am=a.down&&(a.vx||a.vy),cm=c.down&&(c.vx||c.vy);if(!am&&!cm)continue;
+    const r=pinR(a,rt)+pinR(c,rt);let nx=c.x-a.x,ny=c.y-a.y;const d=Math.hypot(nx,ny);if(d>=r||d===0)continue;nx/=d;ny/=d;
+    const vr=(a.vx-c.vx)*nx+(a.vy-c.vy)*ny;
+    if(vr>0){
+      const aFixed=!a.down&&vr<KNOCK,cFixed=!c.down&&vr<KNOCK;
+      if(aFixed){c.vx+=(1+.5)*vr*nx;c.vy+=(1+.5)*vr*ny;}
+      else if(cFixed){a.vx-=(1+.5)*vr*nx;a.vy-=(1+.5)*vr*ny;}
+      else{const j=(1+REST)*vr/2;a.vx-=j*nx;a.vy-=j*ny;c.vx+=j*nx;c.vy+=j*ny;if(!a.down){a.by='pin';a.ord=s.ord=(s.ord||0)+1;}if(!c.down){c.by='pin';c.ord=s.ord=(s.ord||0)+1;}a.down=true;c.down=true;}
+    }
+    const ov=r-d;const aStill=!a.down,cStill=!c.down;
+    if(aStill&&!cStill){c.x+=nx*ov;c.y+=ny*ov;}else if(cStill&&!aStill){a.x-=nx*ov;a.y-=ny*ov;}else if(!aStill&&!cStill){a.x-=nx*ov/2;a.y-=ny*ov/2;c.x+=nx*ov/2;c.y+=ny*ov/2;}
+  }}
+  let moving=false;const fr=Math.exp(-FRIC*dt);
+  for(const p of P){if(p.gone||!p.down)continue;p.age+=dt;
+    p.x+=p.vx*dt;p.y+=p.vy*dt;p.vx*=fr;p.vy*=fr;
+    const r=RP;if(p.x<G.WL+r){p.x=G.WL+r;p.vx=Math.abs(p.vx)*.5;}if(p.x>G.WR-r){p.x=G.WR-r;p.vx=-Math.abs(p.vx)*.5;}
+    if(p.y<G.BACK){p.gone=true;p.vx=p.vy=0;continue;}
+    const sp=Math.hypot(p.vx,p.vy);if(sp>1)p.ang=Math.atan2(p.vy,p.vx);
+    if(sp<14){p.vx=p.vy=0;}else moving=true;}
+  if((b.out||s.t>1.2&&b.free&&Math.hypot(b.vx,b.vy)<10)&&!moving)s.done=true;
+  if(s.t>6)s.done=true;
+}
+function frameMarks(balls){const out=[];let sum=0,n=0;for(const v of balls){sum+=v;n++;if(sum===15){out.push(n===1?'X':n===2?'/':String(v));sum=0;n=0;}else out.push(v===0?'-':String(v));}return out;}
+function scoreFrames(fr){const flat=[].concat(...fr);let idx=0,tot=0;const out=[];
+  for(let i=0;i<fr.length;i++){const b=fr[i];let s=null;const g=k=>flat[idx+k]||0;
+    if(b.length){s=b.reduce((a,v)=>a+v,0);
+      if(i<fr.length-1){if(b[0]===15)s=15+g(1)+g(2);else if(b.length===2&&b[0]+b[1]===15)s=15+g(2);}
+      tot+=s;}
+    out.push(b.length?tot:null);idx+=b.length;}
+  return out;}
+//SIM-END
+
+// ---------- the lab: one game, a fixed rack, a bag of nine one-off balls ----------
+const FRAMES=3,PER=3;
+const SLOTV=[5,3,3,2,2],SLOTC=['5','3L','3R','2L','2R'],SLOTN=['Headpin','Left 3','Right 3','Left corner','Right corner'];
+const PINS={
+  plain:{name:'Plain',text:'Worth its spot.'},
+  gold:{name:'Gold',text:'Worth 2× its spot.'},
+  domino:{name:'Domino',text:'+6 points when a pin knocks it down.'},
+  wall:{name:'Wallflower',text:'+1 Mult to a ball that leaves it up.'}
+};
+const PAL={
+  gold:{w:'#fff2b0',l:'#ffd866',m:'#e8a020',d:'#b06c10',R:'#d83a2a',r:'#9c2218'},
+  domino:{w:'#fff8e8',l:'#efe2c4',m:'#d2bf9a',d:'#a58f6e',R:'#1a1a1a',r:'#000000'},
+  wall:{w:'#ecd8ff',l:'#c8a8f0',m:'#9a78d0',d:'#6a4ca0',R:'#5a2f8a',r:'#3c1c64'}
+};
+// the rack, by spot: headpin, left 3, right 3, left corner, right corner
+const PRESET=['gold','domino','plain','wall','wall'];
+// ball kinds. r radius and m weight in lane units (house 12 / 2.2); bendK scales how far the line may bend;
+// pass: goes through pins, dropping each where it stands; stop: halts at the first pin; burst: radius of the blast at first touch; soft: share of the knock a pin receives
+const BALLS={
+  house:{name:'House ball',text:'The ordinary ball.',r:12,m:2.2,pal:['#2a0e10','#5c1418','#8f1e22','#c63a2e','#ef7a4a','#ffd9b0']},
+  heavy:{name:'Heavy ball',text:'Small and heavy. Bends half as far.',r:10,m:7,bendK:.5,pal:['#0c0a10','#1e1a26','#34304a','#544e78','#8a84b0','#e0dcff']},
+  wide:{name:'Wide ball',text:'Wide, soft. Pins it touches tip over.',r:17,m:.8,soft:.04,pal:['#08221a','#12503a','#1f7a56','#3fae7c','#8fe0b4','#ffffff']},
+  curve:{name:'Curve ball',text:'Bends twice as far.',r:12,m:2.2,bendK:2,pal:['#081a33','#123a6e','#1f5ea8','#3f8ed8','#8cc4f4','#ffffff']},
+  dart:{name:'Dart ball',text:'Stops at the first pin. That pin ×3.',r:6,m:2.2,stop:true,pal:['#3a2a04','#7a5a08','#b88a10','#e8c020','#fff08a','#ffffff']},
+  ghost:{name:'Ghost ball',text:'Drops only the pins its line crosses.',r:12,m:2.2,pass:1,pal:['#5a6470','#8e98a4','#b8c2cc','#d8e0e8','#f0f4f8','#ffffff']},
+  burst:{name:'Burst ball',text:'Bursts on touch. Pins near it drop.',r:12,m:2.2,burst:80,pal:['#000000','#1a1a20','#2a2a34','#3e3e4c','#ff9a30','#ffe880']},
+  spare:{name:'Spare ball',text:'Clearing a started rack: Mult ×3.',r:12,m:2.2,pal:['#3a0a24','#7a1a4a','#b82a72','#e85a9a','#ffa8cc','#ffffff']},
+  reset:{name:'Reset ball',text:'The rack resets after it.',r:12,m:2.2,pal:['#062a2a','#0e5a5a','#1a8a8a','#3ac0c0','#9aeaea','#ffffff']}
+};
+const BAG=Object.keys(BALLS);
+const KEY='ballbag-log1';
+let LOG=[];try{LOG=JSON.parse(localStorage.getItem(KEY)||'[]');}catch(e){}
+let gameNo=LOG.length?LOG[LOG.length-1].game:0,thrown=LOG.length>0;
+const T={speed:.45,win:80,bend:90,risk:1,cam:'lane'};
+try{if(localStorage.getItem('pinrun-cam')==='top')T.cam='top';}catch(e){}
+const cv=document.getElementById('lane'),c=cv.getContext('2d');
+const LW=180,LH=300;
+function fit(){const box=cv.parentElement.getBoundingClientRect();const s=Math.max(.5,Math.min(box.width/LW,box.height/LH));cv.style.width=Math.floor(LW*s)+'px';cv.style.height=Math.floor(LH*s)+'px';}
+window.addEventListener('resize',fit);
+const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+const $=id=>document.getElementById(id);
+
+let g,tapPin=null;
+function rackNew(){return rack().map((p,i)=>{p.slot=i;p.t=PRESET[i];p.kind=p.t==='plain'?'p'+SLOTV[i]:p.t;return p;});}
+// what one ball is worth: points from the pins that fell, times Mult
+function scoreBall(fell,left,fresh,kind){const cleared=left.length===0&&fell.length>0,strike=cleared&&fresh,notes=[];let pts=0,m=1;
+  for(const p of fell){const v=SLOTV[p.slot];let a=v;
+    if(p.t==='gold'){a=v*2;notes.push('Gold ×2');}
+    else if(p.t==='domino'&&p.by==='pin'){a+=6;notes.push('Domino +6');}
+    pts+=a;}
+  if(kind==='dart'&&fell.length){pts*=3;notes.push('Dart ×3');}
+  if(strike)m+=1;else if(cleared)m+=.5;
+  const walls=fell.length?left.filter(p=>p.t==='wall').length:0;if(walls){m+=walls;notes.push('Wallflower +'+walls);}
+  if(kind==='spare'&&cleared&&fell.length<5){m*=3;notes.push('Spare ×3');}
+  return{pts,m,score:Math.round(pts*m),strike,cleared,notes};}
+function newGame(){gameNo++;
+  g={n:gameNo,bag:BAG.slice(),sel:null,kind:null,bx:180,zoneAt:.2,ready:false,pend:null,frame:0,frames:Array.from({length:FRAMES},()=>({balls:[],marks:[],kinds:[]})),pins:rackNew(),rackBalls:0,sx:180,ex:180,bend:0,power:1,phase:.5,mode:'aim',sim:null,trail:[],last:null,intended:null,err:0,toast:null,toastT:0,wait:0,stopped:0};
+  tapPin=null;$('over').hidden=true;$('log').hidden=true;$('camBtn').dataset.cam=T.cam;strip();board();bag();info();setBtn();}
+// the rack, left to right as it stands on the lane; tap a pin to read it
+function strip(){$('rack').innerHTML=[3,1,0,2,4].map(i=>`<button type="button" data-i="${i}" class="${tapPin===i?'sel':''}" aria-label="${SLOTN[i]}: ${PINS[PRESET[i]].name} pin"><img src="${icon(PRESET[i]==='plain'?'p'+SLOTV[i]:PRESET[i])}" alt=""></button>`).join('');}
+$('rack').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;const i=+b.dataset.i;tapPin=tapPin===i?null:i;strip();info();});
+$('camBtn').addEventListener('click',()=>{T.cam=T.cam==='lane'?'top':'lane';drag=null;$('camBtn').dataset.cam=T.cam;try{localStorage.setItem('pinrun-cam',T.cam);}catch(e){}});
+// the bag keeps every ball in its place; thrown ones fade
+function bag(){const el=$('bag');el.className='bag'+(g.mode==='aim'&&!g.sel?' ask':'');
+  el.innerHTML=BAG.map(k=>{const im=bicon(k),used=!g.bag.includes(k);return `<button type="button" data-k="${k}" class="${used?'used':g.sel===k?'sel':''}"${used?' disabled':''} aria-label="${BALLS[k].name}${used?', thrown':'. '+BALLS[k].text}" aria-pressed="${g.sel===k}"><img src="${im.src}" width="${im.n*2}" height="${im.n*2}" alt=""></button>`;}).join('');}
+function pick(k){if(g.mode!=='aim'||!g.bag.includes(k))return;g.sel=k;g.ready=false;tapPin=null;g.sx=clamp(g.sx,G.L+BALLS[k].r+2,G.R-BALLS[k].r-2);fixBend();strip();bag();info();setBtn();}
+$('bag').addEventListener('click',e=>{const b=e.target.closest('button');if(b)pick(b.dataset.k);});
+function info(){const el=$('info');el.className='info';
+  if(tapPin!==null){const t=PRESET[tapPin];el.innerHTML=`<img src="${icon(t==='plain'?'p'+SLOTV[tapPin]:t)}" width="9" height="18" alt=""><b>${PINS[t].name} ${SLOTV[tapPin]}</b><span>${PINS[t].text}</span>`;return;}
+  const k=g.mode==='aim'?g.sel:g.kind;
+  if(k){const im=bicon(k);el.innerHTML=`<img src="${im.src}" width="${im.n}" height="${im.n}" alt=""><b>${BALLS[k].name}</b><span>${BALLS[k].text}</span>`;}
+  else if(g.mode==='aim'){el.className='info ask';el.innerHTML='Pick a ball<i class="tri"></i>';}
+  else el.innerHTML='';}
+function setBtn(){const b=$('throw');b.disabled=g.mode!=='aim'||!g.sel;b.classList.toggle('live',g.mode==='aim'&&g.ready);b.textContent=g.mode==='aim'&&!g.ready?'READY':'THROW';}
+function saveLog(){try{localStorage.setItem(KEY,JSON.stringify(LOG));}catch(e){}}
+const tri=p=>4*Math.abs((((p%1)+1)%1)-.5)-1;
+function bendMax(){return T.bend*(g.sel&&BALLS[g.sel].bendK||1);}
+function zone(){return Math.min(.6,T.win/1000*4*needleHz());}
+function fixBend(){const mid=(g.sx+g.ex)/2,m=bendMax();g.bend=clamp(2*(g.bx-mid),-m,m);g.bx=mid+g.bend/2;}
+function needleHz(){return T.speed*(1+T.risk*Math.abs(g.bend)/bendMax())*POW[g.power].needle;}
+function total(){let t=0;g.frames.forEach(f=>f.balls.forEach(v=>t+=v));return t;}
+function board(){let h='';
+  for(let i=0;i<FRAMES;i++){const f=g.frames[i];let m='';for(let k=0;k<PER;k++)m+=`<span>${f.marks[k]||''}</span>`;
+    h+=`<div class="cell${i===g.frame&&g.mode!=='over'?' now':f.balls.length?' done':''}">${m}</div>`;}
+  $('board').innerHTML=h;$('tot').textContent=total();}
+const spots=ps=>ps.map(p=>SLOTC[p.slot]).join(' ')||'none';
+function tick(s){stepSim(s,1/240);}
+function throwBall(){if(g.mode!=='aim'||!g.sel)return;
+  if(!g.ready){g.ready=true;g.phase=Math.random();setBtn();return;}
+  const K=BALLS[g.sel],n=tri(g.phase),z=zone(),ms=Math.round(n/(4*needleHz())*1000);let eff=0;if(Math.abs(n)>z)eff=Math.sign(n)*(Math.abs(n)-z)/(1-z);
+  g.stopped=n;g.zoneAt=z;g.err=eff;g.intended=makePath(g.sx,g.ex,g.bend);
+  const path=makePath(g.sx,g.ex+eff*70,g.bend);
+  let clean=null;if(eff!==0){const cp=g.pins.map(q=>Object.assign({},q)),cs=newSim(cp,g.intended,1,g.bend/90,K);let k=0;while(!cs.done&&k++<2500)tick(cs);clean=cp.filter(q=>q.down).length;}
+  g.kind=g.sel;g.sel=null;g.bag.splice(g.bag.indexOf(g.kind),1);
+  g.pend={clean,ms,game:g.n,frame:g.frame+1,ball:g.frames[g.frame].balls.length+1,kind:g.kind,left:g.bag.join(' ')||'none',start:Math.round(g.sx-180),aim:Math.round(g.ex-180),bend:Math.round(g.bend),drift:Math.round(eff*70),before:spots(g.pins),cam:T.cam};
+  g.sim=newSim(g.pins,path,1,g.bend/90,K);g.trail=[];g.mode='roll';thrown=true;g.rackBalls++;tapPin=null;
+  strip();bag();info();setBtn();}
+$('throw').addEventListener('click',throwBall);
+
+// a trigger note ("Gold ×2", "Spare ×3") as its pin or ball and the number
+const NK={Gold:'gold',Domino:'domino',Wallflower:'wall'},BK={Dart:'dart',Spare:'spare'},NM={Wallflower:1,Spare:1};
+function chip(n){const w=n.split(' ');let im;if(NK[w[0]])im=`<img src="${icon(NK[w[0]])}" width="18" height="36" alt="${w[0]}">`;else{const b=bicon(BK[w[0]]);im=`<img src="${b.src}" width="${b.n*2}" height="${b.n*2}" alt="${w[0]}">`;}
+  return `<span class="${NM[w[0]]?'mu':'pt'}">${im}${w[1]}</span>`;}
+function resolve(){const kind=g.kind,fell=g.pins.filter(p=>p.down),left=g.pins.filter(p=>!p.down),r=scoreBall(fell,left,g.rackBalls===1,kind);
+  const f=g.frames[g.frame];f.balls.push(r.score);f.marks.push(r.strike?'X':r.cleared?'/':fell.length?String(fell.length):'-');f.kinds.push(kind);
+  const mark=r.strike?'X':r.cleared?'/':'';g.toast=r.score?'x':null;
+  $('toast').innerHTML=(mark?`<em>${mark}</em>`:'')+`<strong>+${r.score}</strong>`+(r.m!==1?`<b><span class="pt">${r.pts}</span>×<span class="mu">${r.m}</span></b>`:'')+(r.notes.length?`<p>${r.notes.map(chip).join('')}</p>`:'');
+  g.toastT=r.notes.length?2.2:1.5;
+  if(g.pend){Object.assign(g.pend,{down:fell.length,fell:spots(fell),points:r.pts,mult:r.m,score:r.score,total:total(),notes:r.notes.join(' + ')});if(g.pend.clean===null)g.pend.clean=fell.length;LOG.push(g.pend);g.pend=null;saveLog();}
+  g.last=g.trail;g.pins=left;let end=false;
+  if(f.balls.length>=PER){if(g.frame===FRAMES-1)end=true;else{g.frame++;g.pins=rackNew();g.rackBalls=0;}}
+  else if(r.cleared||kind==='reset'){g.pins=rackNew();g.rackBalls=0;}
+  g.sim=null;g.kind=null;
+  if(end){g.mode='over';endGame();}
+  else{g.mode='aim';g.ready=false;if(g.bag.length===1)g.sel=g.bag[0];fixBend();}
+  board();bag();info();setBtn();}
+function endGame(){$('overTitle').textContent='Game '+g.n;$('overTot').textContent=total();
+  $('overRecap').innerHTML=g.frames.map(f=>'<div>'+f.kinds.map((k,i)=>{const b=bicon(k);return `<span><img src="${b.src}" width="${b.n*2}" height="${b.n*2}" alt="${BALLS[k].name}">${f.balls[i]}</span>`;}).join('')+'</div>').join('');
+  $('over').hidden=false;}
+$('again').addEventListener('click',newGame);
+
+// ---------- cameras: the sim stays in flat lane units, the camera only decides where they land on screen ----------
+const CAM={
+  lane:{id:'lane',horizon:68,
+    proj(x,y){const z=851-y;return{X:90+(x-180)*212.5/z,Y:-47+96140/z,k:212.5/z};},
+    inv(px,py){const z=96140/(py+.5+47);return{x:180+(px+.5-90)*z/212.5,y:851-z,k:212.5/z};},
+    band(Y){return Y>192?'ball':Y>118?'bend':'aim';}},
+  top:{id:'top',horizon:6,
+    proj(x,y){return{X:x/2,Y:y/2,k:.5};},
+    inv(px,py){return{x:px*2+1,y:py*2+1,k:.5};},
+    band(Y){return Y>215?'ball':Y>117?'bend':'aim';}}
+};
+const HY={ball:G.SY,aim:G.EY,bend:(G.SY+G.EY)/2};
+
+// pointer: three bands pick the handle, drag is relative so nothing jumps
+let drag=null;
+function pt(e){const r=cv.getBoundingClientRect();return{x:(e.clientX-r.left)/r.width*LW,y:(e.clientY-r.top)/r.height*LH};}
+cv.addEventListener('pointerdown',e=>{if(g.mode!=='aim')return;if(g.ready){g.ready=false;setBtn();}const p=pt(e),cm=CAM[T.cam];const which=cm.band(p.y);
+  drag={which,x0:p.x,v0:which==='ball'?g.sx:which==='aim'?g.ex:g.bx,k:cm.proj(180,HY[which]).k};try{cv.setPointerCapture(e.pointerId);}catch(_){ }e.preventDefault();});
+cv.addEventListener('pointermove',e=>{if(!drag||g.mode!=='aim')return;const dx=(pt(e).x-drag.x0)/drag.k,r=g.sel?BALLS[g.sel].r:RB;
+  if(drag.which==='ball')g.sx=clamp(drag.v0+dx,G.L+r+2,G.R-r-2);
+  else if(drag.which==='aim')g.ex=clamp(drag.v0+dx,G.L+8,G.R-8);
+  else g.bx=drag.v0+dx;
+  fixBend();});
+['pointerup','pointercancel'].forEach(n=>cv.addEventListener(n,()=>drag=null));
+
+function logText(){const sg=v=>(v>0?'+':'')+v;
+  let t='Ball Bag Lab log, one row per ball. start/aim/bend are px from lane centre (headpin 0, 3-pins -46/+46, corners -92/+92, lane edges -120/+120); timing_ms is early (-) or late (+); drift_px is how far a missed release pushed the ball off the drawn line at the pins; pins are named 5 3L 3R 2L 2R; bag_left is the ball kinds still unthrown after this ball; clean_pins is the pinfall of the drawn line with a perfect release; score = points x mult; total is the game total so far. Rack: 5='+PRESET[0]+' 3L='+PRESET[1]+' 3R='+PRESET[2]+' 2L='+PRESET[3]+' 2R='+PRESET[4]+'.\n';
+  t+='game,frame,ball,kind,bag_left,start,aim,bend,timing_ms,drift_px,pins_standing_before,pins_down,pins_felled,clean_pins,points,mult,score,total,triggers,camera\n';
+  LOG.forEach(r=>{t+=[r.game,r.frame,r.ball,r.kind,r.left,sg(r.start),sg(r.aim),sg(r.bend),sg(r.ms),sg(r.drift),r.before,r.down,r.fell,r.clean,r.points,r.mult,r.score,r.total,r.notes,r.cam].join(',')+'\n';});return t;}
+function openLog(){$('logText').value=LOG.length?logText():'No throws recorded yet.';$('log').hidden=false;}
+$('logBtn').addEventListener('click',openLog);$('overLog').addEventListener('click',openLog);
+$('logClose').addEventListener('click',()=>$('log').hidden=true);
+$('logClear').addEventListener('click',()=>{LOG=[];saveLog();openLog();});
+$('logCopy').addEventListener('click',async e=>{const b=e.currentTarget,ta=$('logText');try{await navigator.clipboard.writeText(ta.value);b.textContent='Copied';}catch(_){ta.focus();ta.select();b.textContent='Selected';}setTimeout(()=>b.textContent='Copy log',2200);});
+
+// ---------- pixel kit ----------
+function mk(w,h){const k=document.createElement('canvas');k.width=w;k.height=h;return k;}
+const B4=[0,8,2,10,12,4,14,6,3,11,1,9,15,7,13,5];
+const hex=h=>[parseInt(h.slice(1,3),16),parseInt(h.slice(3,5),16),parseInt(h.slice(5,7),16)];
+const thr=(x,y)=>(B4[(y&3)*4+(x&3)]+.5)/16;
+function ramp(cols,L,x,y){const n=cols.length-1;const v=Math.max(0,Math.min(.999,L))*n,i=Math.floor(v);return cols[(v-i)>thr(x,y)?i+1:i];}
+const px=(k,x,y,w,h,col)=>{k.fillStyle=col;k.fillRect(Math.round(x),Math.round(y),w,h);};
+function disc(k,cx,cy,r,col){k.fillStyle=col;for(let y=-r;y<=r;y++){const w=Math.floor(Math.sqrt(r*r-y*y+.6));k.fillRect(cx-w,cy+y,w*2+1,1);}}
+function ringPx(k,cx,cy,rx,ry,col){k.fillStyle=col;const n=Math.ceil((rx+ry)*5);for(let i=0;i<n;i++){const a=i/n*6.28319;k.fillRect(Math.round(cx+Math.cos(a)*rx),Math.round(cy+Math.sin(a)*ry),1,1);}}
+function plotLine(k,x0,y0,x1,y1,col){const n=Math.max(1,Math.ceil(Math.max(Math.abs(x1-x0),Math.abs(y1-y0))));k.fillStyle=col;for(let i=0;i<=n;i++)k.fillRect(Math.round(x0+(x1-x0)*i/n),Math.round(y0+(y1-y0)*i/n),1,1);}
+const FONT={'0':'111101101101111','1':'010110010010111','2':'111001111100111','3':'111001111001111','4':'101101111001001','5':'111100111001111','6':'111100111101111','7':'111001001001001','8':'111101111101111','9':'111101111001111',A:'111101111101101',B:'110101110101110',C:'111100100100111',D:'110101101101110',E:'111100111100111',F:'111100111100100',G:'111100101101111',H:'101101111101101',I:'111010010010111',K:'101101110101101',L:'100100100100111',M:'101111111101101',N:'111101101101101',O:'111101101101111',P:'111101111100100',R:'111101110101101',S:'111100111001111',T:'111010010010010',U:'101101101101111',V:'101101101101010',W:'101101111111101',X:'101101010101101',Y:'101101010010010','/':'001001010100100','-':'000000111000000',' ':'000000000000000'};
+function txt(k,s,x,y,col,m){m=m||1;k.fillStyle=col;for(const ch of s){const f=FONT[ch]||FONT[' '];for(let i=0;i<15;i++)if(f[i]==='1')k.fillRect(x+(i%3)*m,y+((i/3)|0)*m,m,m);x+=4*m;}}
+function sprite(rows,pal){const w=Math.max(...rows.map(r=>r.length)),k=mk(w,rows.length),q=k.getContext('2d');rows.forEach((r,y)=>{for(let x=0;x<r.length;x++){const col=pal[r[x]];if(col){q.fillStyle=col;q.fillRect(x,y,1,1);}}});return k;}
+function turned(s,flip){const k=mk(s.height,s.width),q=k.getContext('2d');if(flip){q.translate(0,s.width);q.rotate(-Math.PI/2);}else{q.translate(s.height,0);q.rotate(Math.PI/2);}q.drawImage(s,0,0);return k;}
+const PIN=['...ooo...','..owwlo..','..owwlo..','..owwlo..','...owo...','...owo...','..owwlo..','.owwwlmo.','.owwwlmo.','owwwwlmdo','oRRRRRrro','oRRRRRrro','owwwwlmdo','owwwwlmdo','.owwwlmo.','.owwwlmo.','..owlmo..','...ooo...'];
+function ballSprite(r,cols){const n=r*2+1,k=mk(n,n),q=k.getContext('2d');for(let y=-r;y<=r;y++)for(let x=-r;x<=r;x++){const d2=x*x+y*y;if(d2>r*r+.6)continue;const edge=r>2&&d2>(r-1)*(r-1)+.2;let L=.62-(x*.5+y*.62)/r*.42+(Math.sin(x*1.3+y*.7)>.72?.12:0);q.fillStyle=edge?cols[0]:ramp(cols.slice(1),L,x+8,y+8);q.fillRect(x+r,y+r,1,1);}q.fillStyle=cols[cols.length-1];q.fillRect(r-Math.ceil(r/2.2),r-Math.ceil(r/2.2),1,1);return k;}
+function hash(a,b){let h=(Math.imul(a|0,374761393)+Math.imul(b|0,668265263))|0;h=Math.imul(h^(h>>>13),1274126177);return((h^(h>>>16))>>>0)/4294967296;}
+
+// ---------- the hall ----------
+const THEME={wood:['#5a2f1a','#8a4e26','#b97a36','#dba552','#f0cf86'],gutter:['#170e0b','#2a1a15','#43291f'],line:'#2a160e',arrow:'#8a3c1c',cap:'#6b3f2a',pit:'#0a0605',wallBase:'#4c2a1a',neon:null,
+  pin:{o:'#3b261c',w:'#fff8e8',l:'#efe2c4',m:'#d2bf9a',d:'#a58f6e'},band:{5:['#d83a2a','#9c2218'],3:['#e8a020','#b06c10'],2:['#3f8f6a','#286248']},
+  ball:['#2a0e10','#5c1418','#8f1e22','#c63a2e','#ef7a4a','#ffd9b0'],bowl:{o:'#2a160e',h:'#4a2a18',H:'#7a4a2c',s:'#e8b088',A:'#f3e2b8',a:'#d6c08e',B:'#d86a28',p:'#3a4a6a',q:'#2c3854',k:'#f3e2b8'},
+  ui:['#2a160e','#f3e2b8','#3f8f6a','#d83a2a'],plate:'#1d100a',label:'#f3e2b8',dot:'#fff8e8',dotSh:'#4a2412',dim:'#8a4e26',trail:'#fff8e8',shadow:'#3b1f12',handle:'#d83a2a',edge:'#2a160e',hi:'#fff8e8',ink:'#2a160e',mark:'#fff8e8',
+  dispL:[41,16,26,11,'#f3e2b8','#3a2016'],dispR:[113,16,27,11,'#2a160e','#f3e2b8'],
+  wall(k){px(k,0,0,180,10,'#1d100a');px(k,0,10,180,42,'#4c2a1a');for(let x=4;x<180;x+=9)px(k,x,10,1,42,'#3a2016');
+    px(k,35,13,110,36,'#7a4a2c');px(k,35,13,110,1,'#96623a');px(k,35,30,110,4,'#d86a28');px(k,35,34,110,4,'#f3e2b8');px(k,35,38,110,4,'#8a3c1c');
+    disc(k,90,31,14,'#3a2016');disc(k,90,31,13,'#f3e2b8');txt(k,'5',85,24,'#d83a2a',3);
+    px(k,0,52,180,16,'#120a07');px(k,54,52,72,16,'#0a0605');px(k,0,52,180,2,'#1d100a');px(k,52,54,2,14,'#4c2a1a');px(k,126,54,2,14,'#4c2a1a');
+    [36,90,144].forEach(x=>{px(k,x,0,1,5,'#0c0705');px(k,x-4,5,9,3,'#d86a28');px(k,x-3,8,7,1,'#ffe9a8');if(x!==90)for(let i=0;i<10;i++)for(let j=-i-2;j<=i+2;j++)if(((i+j)&1)&&((i*7+j*3)%5+5)%5<2)px(k,x+j,10+i,1,1,'#96623a');});},
+  strip(k){px(k,0,0,180,5,'#4c2a1a');for(let x=4;x<180;x+=9)px(k,x,0,1,5,'#3a2016');px(k,0,5,180,1,'#1d100a');}};
+function buildTheme(o){if(o.built)return o;o.built=1;
+  o._wood=o.wood.map(hex);o._gut=o.gutter.map(hex);o._line=hex(o.line);o._arrow=hex(o.arrow);o._cap=hex(o.cap);o._pit=hex(o.pit);o._wall=hex(o.wallBase);o._neon=null;
+  o.pins={};const mkPin=(key,band,body)=>{const s=sprite(PIN,Object.assign({R:band[0],r:band[1]},body||o.pin));o.pins[key]=s;o.pins[key+'r']=turned(s,false);o.pins[key+'l']=turned(s,true);};
+  [5,3,2].forEach(n=>mkPin('p'+n,o.band[n]));for(const t in PAL)mkPin(t,[PAL[t].R,PAL[t].r],Object.assign({o:o.pin.o},PAL[t]));
+  o.ballsBy={};for(const id in BALLS){o.ballsBy[id]={};for(let r=2;r<=12;r++)o.ballsBy[id][r]=ballSprite(r,BALLS[id].pal);}o.bg={};return o;}
+const ICON={};
+function icon(kind){return ICON[kind]||(ICON[kind]=buildTheme(THEME).pins[kind].toDataURL());}
+// a ball as it sits in the bag: drawn at its own size, so wide looks wide and the dart looks small
+function bicon(k){if(ICON['b'+k])return ICON['b'+k];const r=clamp(Math.round(BALLS[k].r*.56),4,10);return ICON['b'+k]={src:buildTheme(THEME).ballsBy[k][r].toDataURL(),n:2*r+1};}
+const BOARD=240/13;
+// what colour the floor is at a point on the lane (flat lane units), dithered at the screen pixel it lands on
+function shade(o,x,y,sx,sy,k){
+  if(y<30)return o._pit;
+  const ax=Math.abs(x-180);let u=ax,s=x-180,nb=false;
+  if(ax>=154){s=ax-296;u=Math.abs(s);nb=true;}
+  if(u>=142)return o._cap;
+  if(u>=120)return ramp(o._gut,(nb?.1:.2)+(u-120)/22*.6,sx,sy);
+  const bf=(s+120)/BOARD,bi=Math.floor(bf),fr=bf-bi;
+  let L=.52+((bi*37)%5-2)*.04+(hash(bi+(nb?40:0),Math.floor(y/(26+(bi%3)*9)))-.5)*.1;
+  if(!nb){L+=Math.max(0,1-ax/75)*.13;if(y<190)L+=.07;if(y>545)L+=.1;}
+  if(fr<Math.max(.12,1/(k*BOARD)))L-=.14;
+  if(nb)L*=.5;
+  let col=ramp(o._wood,L,sx,sy);
+  if(!nb){
+    if(y>=540&&y<545)return o._line;
+    for(let i=-2;i<=2;i++){const cx=180+i*40,ay=398+Math.abs(i)*14;if(y>=ay&&y<ay+22&&Math.abs(x-cx)<=(y-ay)/22*8)return o._arrow;}
+    if(o._neon&&y<430){const st=(430-y)/400*.75,b=thr(sx,sy);if(x>92&&x<144&&b<st)col=o._neon[0];else if(x>216&&x<268&&b<st)col=o._neon[1];}
+  }
+  return col;}
+function buildBg(o,cm){const k=mk(LW,LH),q=k.getContext('2d'),im=q.createImageData(LW,LH),d=im.data;
+  for(let sy=0;sy<LH;sy++)for(let sx=0;sx<LW;sx++){let col;
+    if(sy<cm.horizon)col=o._wall;else{const p=cm.inv(sx,sy);col=shade(o,p.x,p.y,sx,sy,p.k);}
+    const i=(sy*LW+sx)*4;d[i]=col[0];d[i+1]=col[1];d[i+2]=col[2];d[i+3]=255;}
+  q.putImageData(im,0,0);cm.id==='lane'?o.wall(q):o.strip(q);
+  return{cv:k,data:q.getImageData(0,0,LW,LH).data};}
+function getBg(o,cm){return o.bg[cm.id]||(o.bg[cm.id]=buildBg(o,cm));}
+
+// ---------- drawing ----------
+function drawPin(o,cm,p){const q=cm.proj(p.x,p.y),X=Math.round(q.X),Y=Math.round(q.Y);
+  if(p.down){c.drawImage(o.pins[p.kind+(Math.cos(p.ang)<0?'l':'r')],X-9,Y-(cm.id==='lane'?7:4));return;}
+  if(cm.id==='lane'){px(c,X-3,Y,7,2,o.shadow);c.save();c.globalAlpha=.2;c.translate(0,2*Y+2);c.scale(1,-1);c.drawImage(o.pins[p.kind],X-4,Y-17);c.restore();c.drawImage(o.pins[p.kind],X-4,Y-17);}
+  else{px(c,X-3,Y+4,8,3,o.shadow);c.drawImage(o.pins[p.kind],X-4,Y-12);}}
+function drawBall(o,cm,b,kind){const q=cm.proj(b.x,b.y),X=Math.round(q.X),Y=Math.round(q.Y),r=clamp(Math.round(BALLS[kind].r*q.k),2,12),B=o.ballsBy[kind],a=c.globalAlpha;
+  if(cm.id==='lane'){px(c,X-r+1,Y,2*r-1,2,o.shadow);if(kind==='ghost')c.globalAlpha=a*.55;c.drawImage(B[r],X-r,Y-2*r);c.globalAlpha=a;return{X,Y:Y-r,r};}
+  if(kind==='ghost')c.globalAlpha=a*.55;else disc(c,X+1,Y+2,r,o.shadow);c.drawImage(B[r],X-r,Y-r);c.globalAlpha=a;return{X,Y,r};}
+function dots(o,cm,p,dim){let i=0;for(const q of p.pts){if(q.y<G.BACK)break;const s=cm.proj(q.x,q.y),X=Math.round(s.X),Y=Math.round(s.Y);
+  if(dim){if(i%2===0)px(c,X,Y,1,1,o.dim);}else{px(c,X,Y+1,1,1,o.dotSh);px(c,X,Y,1,1,o.dot);}i++;}}
+function label(o,s,x,y){txt(c,s,x+1,y+1,o.mark);txt(c,s,x,y,o.ink);}
+function drawNeedle(o){const x0=22,w=136,y=284,h=8,mid=x0+w/2,half=w/2;
+  px(c,0,y-6,LW,LH-(y-6),o.plate);
+  px(c,x0-1,y-1,w+2,h+2,o.ui[0]);px(c,x0,y,w,h,o.ui[1]);
+  const zz=g.mode==='aim'?zone():g.zoneAt,zw=Math.max(1,Math.round(half*zz));px(c,mid-zw,y,zw*2,h,o.ui[2]);
+  if(!(g.mode==='aim'&&!g.ready)){const n=g.mode==='aim'?tri(g.phase):g.stopped,nx=Math.round(mid+n*(half-1));px(c,nx-2,y-3,4,h+6,o.ui[0]);px(c,nx-1,y-2,2,h+4,o.ui[3]);}}
+function draw(){
+  const cm=CAM[T.cam],lane=cm.id==='lane',o=buildTheme(THEME);
+  c.setTransform(1,0,0,1,0,0);c.globalAlpha=1;c.imageSmoothingEnabled=false;
+  c.drawImage(getBg(o,cm).cv,0,0);
+  if(lane){const L=o.dispL,R=o.dispR,s=String(total());
+    px(c,L[0],L[1],L[2],L[3],L[4]);txt(c,'F'+(g.frame+1),L[0]+Math.floor((L[2]-7)/2),L[1]+Math.floor((L[3]-5)/2),L[5]);
+    px(c,R[0],R[1],R[2],R[3],R[4]);txt(c,s,R[0]+Math.floor((R[2]-(s.length*4-1))/2),R[1]+Math.floor((R[3]-5)/2),R[5]);}
+  const act=drag?drag.which:null,al=k=>act&&act!==k?.35:1;
+  let aimPos=null;
+  if(g.mode==='aim'){if(g.last&&g.last.length>1){c.globalAlpha=.6;for(let i=1;i<g.last.length;i++){const a=cm.proj(g.last[i-1].x,g.last[i-1].y),b=cm.proj(g.last[i].x,g.last[i].y);plotLine(c,a.X,a.Y,b.X,b.Y,o.ink);}c.globalAlpha=1;}
+    dots(o,cm,makePath(g.sx,g.ex,g.bend),false);
+    // aim ring: a mark on the floor in front of the headpin row
+    const a=cm.proj(g.ex,G.EY+(lane?24:34)),AX=Math.round(a.X),AY=Math.round(a.Y),rx=lane?9:6,ry=lane?3:6;
+    c.globalAlpha=al('aim');if(act==='aim')ringPx(c,AX,AY,rx+3,ry+2,o.hi);
+    ringPx(c,AX,AY,rx+1,ry+1,o.edge);ringPx(c,AX,AY,rx,ry,o.handle);px(c,AX-rx-5,AY,4,1,o.handle);px(c,AX+rx+2,AY,4,1,o.handle);c.globalAlpha=1;
+    aimPos={X:AX,Y:AY,rx};
+  }else if(g.intended){dots(o,cm,g.intended,true);
+    for(let i=1;i<g.trail.length;i++){const a=cm.proj(g.trail[i-1].x,g.trail[i-1].y),b=cm.proj(g.trail[i].x,g.trail[i].y);plotLine(c,a.X,a.Y+1,b.X,b.Y+1,o.dotSh);plotLine(c,a.X,a.Y,b.X,b.Y,o.trail);}}
+  // pins and ball, far ones first
+  const ents=[];for(const p of g.pins)if(!p.gone)ents.push({y:p.y,p});
+  const kind=g.mode==='aim'?g.sel:g.kind,b=g.sim?g.sim.ball:{x:g.sx,y:G.SY};if(kind&&(!g.sim||!b.out))ents.push({y:b.y+.5,b});
+  ents.sort((m,n)=>m.y-n.y);let ballPos=null;
+  for(const e of ents){if(e.p)drawPin(o,cm,e.p);else{if(g.mode==='aim')c.globalAlpha=al('ball');ballPos=drawBall(o,cm,e.b,kind);c.globalAlpha=1;}}
+  if(g.mode==='aim'&&!kind){const q=cm.proj(g.sx,G.SY),r=Math.round(RB*q.k);ballPos={X:Math.round(q.X),Y:Math.round(q.Y)-(lane?r:0),r};c.globalAlpha=al('ball');ringPx(c,ballPos.X,ballPos.Y,r,r,o.edge);ringPx(c,ballPos.X,ballPos.Y,r-1,r-1,o.hi);c.globalAlpha=1;}
+  if(g.mode==='aim'&&act==='ball')ringPx(c,ballPos.X,ballPos.Y,ballPos.r+3,ballPos.r+3,o.hi);
+  // the burst: one ring where it went off
+  const bm=g.sim&&g.sim.boom;if(bm&&g.sim.t-bm.t<.22){const f=(g.sim.t-bm.t)/.22,q=cm.proj(bm.x,bm.y),e=cm.proj(bm.x+bm.r*f,bm.y),u=cm.proj(bm.x,bm.y-bm.r*f);ringPx(c,Math.round(q.X),Math.round(q.Y),Math.abs(e.X-q.X),Math.abs(u.Y-q.Y),'#ff9a30');}
+  if(g.mode==='aim'){const s=cm.proj(g.bx,HY.bend),X=Math.round(s.X),Y=Math.round(s.Y);
+    c.globalAlpha=al('bend');if(act==='bend')ringPx(c,X,Y,10,10,o.hi);
+    c.fillStyle=o.edge;for(let d=-7;d<=7;d++){const w=7-Math.abs(d);c.fillRect(X-w,Y+d,2*w+1,1);}
+    c.fillStyle=o.handle;for(let d=-6;d<=6;d++){const w=6-Math.abs(d);c.fillRect(X-w,Y+d,2*w+1,1);}
+    px(c,X-4,Y,2,1,o.hi);px(c,X-3,Y-1,1,3,o.hi);px(c,X+3,Y,2,1,o.hi);px(c,X+3,Y-1,1,3,o.hi);c.globalAlpha=1;
+    if(!thrown){label(o,'AIM',aimPos.X+aimPos.rx+8,aimPos.Y-2);label(o,'BEND',X+11,Y-2);label(o,'START',ballPos.X+ballPos.r+4,ballPos.Y-2);}
+  }
+  drawNeedle(o);
+}
+
+const toastEl=$('toast');
+let lastT=0,acc=0;
+function loop(ts){const dt=Math.min(.05,(ts-lastT)/1000||0);lastT=ts;
+  if(g.mode==='aim'&&g.ready)g.phase+=needleHz()*dt;
+  if(g.mode==='roll'){acc+=dt;while(acc>1/240){tick(g.sim);acc-=1/240;}
+    const b=g.sim.ball;if(!b.out)g.trail.push({x:b.x,y:b.y});
+    if(g.sim.done){g.mode='settle';g.wait=.55;}}
+  else if(g.mode==='settle'){g.wait-=dt;if(g.wait<=0)resolve();}
+  if(g.toastT>0)g.toastT-=dt;
+  toastEl.style.opacity=g.toast&&g.toastT>0?Math.min(1,g.toastT*2):0;
+  draw();requestAnimationFrame(loop);}
+newGame();fit();requestAnimationFrame(loop);
+</script>
+</body>
+</html>

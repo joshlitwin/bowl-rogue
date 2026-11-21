@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Four Blind Pitches</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Narrow:wght@600;700&family=Source+Sans+3:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  /* layout: one reading column. summary first (what the four agree on, then four jump cards), then each pitch in full */
+  --paper:#f4f6f3;
+  --panel:#e7ece8;
+  --ink:#17222b;
+  --soft:#4c5a61;
+  --rule:#c3cdc9;
+  --accent:#0e6b62;
+  --mark:#b3261e;
+  --display:"Archivo Narrow","Arial Narrow",Arial,sans-serif;
+  --body:"Source Sans 3",system-ui,-apple-system,"Segoe UI",sans-serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--paper:#10181c;--panel:#18242a;--ink:#e6ece9;--soft:#a3b1b3;--rule:#2c3b41;--accent:#5fd0c0;--mark:#ff8a7a;color-scheme:dark}}
+:root[data-theme="dark"]{--paper:#10181c;--panel:#18242a;--ink:#e6ece9;--soft:#a3b1b3;--rule:#2c3b41;--accent:#5fd0c0;--mark:#ff8a7a;color-scheme:dark}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--body);font-size:17px;line-height:1.5}
+main{max-width:66ch;margin:0 auto;padding:28px 18px 60px;display:flex;flex-direction:column;gap:28px}
+h1,h2,h3{font-family:var(--display);text-wrap:balance;margin:0;line-height:1.1}
+h1{font-size:38px;letter-spacing:.01em}
+h2{font-size:30px}
+h3{font-size:19px;color:var(--accent);margin-top:18px;text-transform:uppercase;letter-spacing:.04em}
+p,ul,ol{margin:8px 0}
+ul,ol{padding-left:22px}
+li{margin:4px 0}
+a{color:var(--accent)}
+a:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.lede{color:var(--soft);margin:8px 0 0}
+#agree{background:var(--panel);border-left:5px solid var(--accent);padding:14px 16px;border-radius:0 8px 8px 0}
+#agree h2{font-size:22px}
+nav{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+nav a{display:flex;flex-direction:column;gap:3px;padding:12px;border:2px solid var(--rule);border-radius:8px;text-decoration:none;color:var(--ink)}
+nav span,.lever{font-family:var(--display);font-size:13px;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);margin:0}
+nav strong{font-family:var(--display);font-size:21px;line-height:1.1}
+nav em{font-style:normal;font-size:14px;line-height:1.35;color:var(--soft)}
+section{border-top:3px solid var(--ink);padding-top:14px}
+.note{border:2px solid var(--mark);color:var(--mark);padding:8px 10px;border-radius:6px;font-size:15px}
+.top{font-size:14px;margin-top:16px}
+@media (max-width:480px){nav{grid-template-columns:1fr}h1{font-size:32px}}
+</style>
+</head>
+<body>
+<main>
+<header>
+<h1>Four blind pitches</h1>
+<p class="lede">Four designers were each given the same playtest findings and one lever to rethink. None saw the others' work or the labs. Pitches for the five-pin bowling game, 20 November 2026.</p>
+</header>
+<div id="agree">
+<h2>Where they agree</h2>
+<ul>
+<li><strong>Same risk, three times.</strong> The rack, balls and scoresheet pitches all depend on one thing: that the throw lets you hit a chosen partial result, not only the pocket, about two times in three.</li>
+<li><strong>Same cuts.</strong> None keeps a strike bonus that compounds. In three of them a clear either never resets the rack or costs you the setup you needed.</li>
+<li><strong>Something is taken from you.</strong> Each has the build lose a piece mid-run: a worn-out pin, a broken ball, a paved-over route, your best box.</li>
+</ul>
+</div>
+<nav aria-label="The four pitches"><a href="#rack"><span>The rack</span><strong>Stacked Spots</strong><em>Five spots, each a stack of pins. A fallen pin is replaced by the next in its stack, and nothing resets. Points come from pins that fall; the multiplier comes from pins left standing.</em></a><a href="#balls"><span>The balls</span><strong>The Bag</strong><em>Your build is a bag of balls. Each frame you draw four and throw three in the order you choose, and every multiplier lives on a ball.</em></a><a href="#field"><span>The field</span><strong>The House Lays the Lane</strong><em>The lane is a board of 15 tiles and each ball triggers the tiles its line crosses. The house re-lays part of the board every game on a posted schedule, and you buy tiles to pave over it.</em></a><a href="#wildcard"><span>Wildcard</span><strong>The Scoresheet</strong><em>Every ball must be written into one box of a three-by-three sheet. Each box takes one pin pattern, once a game; lines of three double; the house tears off your best box after every game.</em></a></nav>
+<section id="rack"><p class="lever">The rack</p><h2>Stacked Spots</h2><h3>1. The idea</h3>
+<p>Each of the five spots holds a stack of pins you own; when a pin falls, the next pin in that stack rises for the next ball, and when a stack is empty the spot stays bare for the rest of the game. Points come from pins that fall, the multiplier comes from pins left standing, so every ball is a choice about which pins to spend and which to keep.</p>
+<h3>2. The turn</h3>
+<p>A game is nine balls at one persistent board. Stacks start 3 deep (15 pins), so strikes alone run you dry after three balls. Before each throw you weigh points now against the multiplier you keep, what rises underneath, and how many pins and balls are left. The drawn line outlines the pins it will hit; the timing needle only decides whether you get that outcome or drift one pin wide.</p>
+<p><strong>Worked example, ball 5.</strong> Standing: headpin spot has a Ripening pin at 14; left 3 is a Fuse pin; right 3 is an Anchor pin; left corner is a Lone pin; right corner is plain.
+- Strike: 21 points x2 = 42, and five pins gone, Anchor included.
+- Hit the Fuse only: it knocks the Ripening and Lone pins at double, (28 + 4 + 3) x2 for the standing Anchor = 70.
+- Pick the Lone pin alone: 10 x2 = 20, but the Ripening pin grows to 17 and the same Fuse shot next ball pays 82. That is 102 over two balls against 70 plus whatever the fresh pins give, and it rests on the hardest shot on the lane.</p>
+<h3>3. Example pieces</h3>
+<p>Multiplier = 1 + bonuses from pins still standing after the ball. A strike is a flat x2.
+1. <strong>Plain pin</strong>: spot value (5/3/2).
+2. <strong>Anchor pin</strong>: while standing, +1 multiplier. Worth 0 when it falls.
+3. <strong>Ripening pin</strong>: +3 points each ball it stays up; pays the total when it falls.
+4. <strong>Fuse pin</strong>: when it falls it knocks both neighbours; pins it knocks score double.
+5. <strong>Lone pin</strong>: if it is the only pin that falls, scores x5.
+6. <strong>Last-standing pin</strong>: if it is the only pin left standing after a ball, +4 multiplier on that ball.
+7. <strong>Strike pin</strong>: +3 multiplier on a strike; scores 0 if it falls any other way.
+8. <strong>Deep pin</strong>: +2 points per pin still beneath it in its stack.
+9. <strong>Bare-spot pin</strong>: while standing, +1 multiplier per empty spot on the board.
+10. <strong>Spring pin</strong>: worth 1; returns to the bottom of its stack when it falls and never wears.
+11. <strong>Brittle gold pin</strong>: pays $4 when it falls, then is destroyed.
+12. <strong>Dead wood</strong> (added by the hall): worth 0; while standing, -1 multiplier (minimum x1).</p>
+<p>Fuse fights Anchor and Lone as neighbours; Deep wants full stacks, Bare-spot wants empty ones; Strike pin wants the clears everything else punishes.</p>
+<h3>4. Escalation and forced change</h3>
+<ul>
+<li><strong>Wear.</strong> Every pin breaks after falling four times (notches on the pin). Four or five break per game, so each shop you buy several cheap pins and re-order stacks.</li>
+<li><strong>Depth.</strong> Stack limit rises 3, 4, 5 across the run: more pins, longer sequences to plan.</li>
+<li><strong>The hall.</strong> From game 3 it slides one Dead wood into a stack each game and posts a house rule, shown one shop ahead (strikes pay x1; corner spots refill a ball late; standing bonuses halved).</li>
+</ul>
+<h3>5. Strikes</h3>
+<p>On a plain rack a strike is still best. But it spends five pins from a finite supply and leaves nothing standing to multiply, so a built board usually pays more for a chosen partial. Strike and Spring pins make a strike build possible; it is one build, not the default.</p>
+<h3>6. Riskiest assumption and test</h3>
+<p>That the light throw lets players hit the subset they chose often enough that choosing matters, without one subset becoming the new identical ball. Test: one screen, nine balls, the example board with pre-built stacks, no shop. Log outlined pins against pins that fell, and which subset was picked. Pass: outcome matches the outline on 70% of throws and no subset is chosen more than four times in nine. Otherwise kill it.</p>
+<h3>7. Cut</h3>
+<p>Frames and the reset on a clear. Nine balls, one board.</p><p class="top"><a href="#agree">Back to the summary</a></p></section><section id="balls"><p class="lever">The balls</p><h2>The Bag</h2><h3>1. The idea</h3>
+<p>Your build is a bag of balls, not a rack of pins: each frame you draw four balls, throw three in an order you choose, and every ball wants a different thing from the rack. Scoring multipliers live on the balls and nowhere else, so the question each throw is "which ball, at which pins, leaving what for the next one".</p>
+<h3>2. The turn</h3>
+<p>Before each throw you weigh three things: which ball in hand fits the pins standing now, what this throw leaves for the next ball, and which ball goes unthrown this frame.</p>
+<p>Worked example. Full rack (5, 3, 3, 2, 2 = 15 points). Hand: Plain, Marble, Glass, Closer.</p>
+<ul>
+<li><strong>Strike first.</strong> Plain strike, 15. Fresh rack. Marble takes the headpin alone, 5 x5 = 25. Closer must now clear four pins split into two pairs: 10 x3 = 30, or 0 if one pin stands. Total 70 or 40.</li>
+<li><strong>Carve it down.</strong> Marble takes a corner, 2 x5 = 10. Glass takes the headpin and both 3s, 11 x4 = 44, but if the last corner also falls the Glass ball is gone for the run. Closer picks off the corner, 2 x3 = 6. Total 60, with a permanent loss at stake.</li>
+</ul>
+<p>Neither line is obviously right, and the same line is never right twice because the hand changes.</p>
+<h3>3. The balls</h3>
+<p>Each ball scores (points of pins felled) x (its own multiplier).</p>
+<ol>
+<li><strong>Plain</strong> – x1.</li>
+<li><strong>Heavy</strong> – x1. Cannot bend; pins it hits fly further.</li>
+<li><strong>Marble</strong> – half width. x5 if it fells exactly one pin, otherwise x1.</li>
+<li><strong>Closer</strong> – x3 if this throw clears the rack, x0 if not.</li>
+<li><strong>Glass</strong> – x4. Destroyed for the run if it fells four or more pins.</li>
+<li><strong>Snowball</strong> – starts x1. Gains +1 permanently each throw that does not clear the rack; back to x1 when it does.</li>
+<li><strong>Chalk</strong> – scores nothing. If it fells at least one pin, every pin left standing is worth double until it falls.</li>
+<li><strong>Cash</strong> – scores nothing. Pays $1 per pin felled.</li>
+<li><strong>Echo</strong> – copies the rule of the ball thrown before it this frame.</li>
+<li><strong>Pair</strong> – x4 if the previous ball this frame was also a Pair, otherwise x1.</li>
+<li><strong>Spare</strong> – x1. If it clears the rack, throw your fourth ball this frame.</li>
+<li><strong>Stamp</strong> (one use) – the first pin it touches gets a pin type for the rest of the run (worth double, explodes, pays cash, and so on).</li>
+</ol>
+<p>Supporting rules: bag starts as ten Plain, caps at sixteen. The shop offers five cheap balls every visit and charges to remove one.</p>
+<h3>4. Escalation</h3>
+<p>Nine plain strikes score 135. The game 3 target sits above that, so a plain-strike bag is mathematically dead by mid-run. From game 3 each game has one house rule, shown before the shop, for example: the rack only resets at frame end; a ball type scores once per frame; corner pins are bolted until the headpin falls. Each one breaks a specific engine (strike chains, Pair, Marble), so you buy and remove against it. Glass breaking and Stamps being spent also change the bag under you.</p>
+<h3>5. Strikes</h3>
+<p>A strike has no bonus of its own. It scores 15 times the ball's multiplier and resets the rack. That is ideal for Closer, Spare and Cash, and bad for Marble, Glass, Snowball and Chalk. It stays the best outcome for some bags and the wrong one for others.</p>
+<h3>6. Riskiest assumption</h3>
+<p>That a light-skill throw is precise enough for "fell exactly this pin" to be a plan, not a lottery, yet loose enough that it is not a solved puzzle. Test: one screen, one game, no shop, a fixed bag containing one of each ball above, draw four and throw three, target 200. It passes if a player hits the leave they intended more than half the time and uses at least four clearly different lines. It dies if they throw the highest multiplier at the same line regardless.</p>
+<h3>7. The cut</h3>
+<p>The pin shop. Pins start plain and only change through Stamp balls; the shop sells balls only.</p><p class="top"><a href="#agree">Back to the summary</a></p></section><section id="field"><p class="lever">The field</p><h2>The House Lays the Lane</h2><h3>1. The idea</h3>
+<p>The lane becomes a board of 15 tiles (5 boards wide, 3 zones long), and every ball triggers each tile its drawn line crosses before it reaches the pins. The house re-lays part of that board every game on a schedule posted on the wall, and you buy tiles to pave over it, so the route is the hand you play and the hall is what you build against.</p>
+<h3>2. The decision before each throw</h3>
+<p>Tiles fire once per frame, so a line you have just thrown is worth much less the second time. As you drag, crossed tiles light up and a projected score shows. You weigh which tiles to spend now, which pins that route reaches, and what that leaves for the next ball. The line alone fixes which tiles you cross; the timing needle only affects how cleanly pins fall.</p>
+<p><strong>Worked example.</strong> Game 3, frame 2, ball 1. Your headpin is a Grower (+1 multiplier for the rest of the run per strike). You own Polish (x2) on the centre board and a Spare Lamp. The house has laid Neon (x3, once per game) on the left board.</p>
+<ul>
+<li><strong>Centre strike:</strong> 15 x 2 = 30, and the Grower grows. Polish is spent, so ball 2 meets a fresh rack with nothing on the centre.</li>
+<li><strong>Left side first:</strong> through Neon into the left corner and 3-pin, 5 x 3 = 15. Ball 2 takes the remaining 10 x 2 (Polish) x 4 (Spare Lamp) = 80. That is 95 against 30, but no permanent growth, and Neon is gone for frame 3.</li>
+</ul>
+<h3>3. Twelve elements</h3>
+<p>House-laid, by era:</p>
+<ol>
+<li><strong>Toll tile</strong> (league night): crossing costs $3; that ball's multiplier x2.</li>
+<li><strong>House ribbon</strong> (league night): one pin spot per frame wears it; knocking that pin adds 10 to this game's target. Every strike pays it.</li>
+<li><strong>Neon tile</strong> (After Close): x3, then burnt out for the rest of the game.</li>
+<li><strong>Pinsetter turn</strong> (After Close): after every strike your pin types move one spot clockwise, so a "first to fall" pin leaves the front.</li>
+<li><strong>Correction</strong> (computer): each frame the overhead screen swaps the point values of two spots, shown one frame ahead.</li>
+<li><strong>Audit</strong> (computer): the tile you triggered most last game is locked this game.</li>
+<li><strong>Beam</strong> (arrival): a column of light sits over one board and moves each frame. Pins inside it cannot be hit by the ball, only by other pins.</li>
+<li><strong>Collection</strong> (arrival): after each strike, the pin that scored most is taken up; its spot holds a plain pin for the rest of the game.</li>
+</ol>
+<p>Bought by you:</p>
+<ol>
+<li><strong>Polish:</strong> x2.</li>
+<li><strong>Rail</strong> (edge boards only): +2 points per pin left standing after this ball.</li>
+<li><strong>Spare Lamp:</strong> x4 if this ball clears a rack that was not full.</li>
+<li><strong>Chalk Line:</strong> +1 multiplier per different board the line crosses. Wide curves score more and hit the rack at worse angles.</li>
+</ol>
+<h3>4. Escalation and forced change</h3>
+<p>League night is games 1-2, After Close 3-4, the computer game 5, the arrival game 6. The house lays 2 tiles, then 4, then 6, starting on the route you used most last game and covering your tiles there. In the shop, the wall schedule shows next game's lane in full. Six cheap tiles are on offer; you buy two or three, each either adding an engine or paving over a house tile.</p>
+<p>A build must change because the house covers your favourite route, Audit locks your best tile, Pinsetter turn and Collection wear down strike-only racks, and Beam makes pin-on-pin racks strong late.</p>
+<h3>5. Strikes</h3>
+<p>A strike stays the best pin result on any given line. It stops being the best ball: score comes from the route, the strike route wears out for the frame, Rail and Spare Lamp pay for standing pins and partial clears, and the ribbon, Pinsetter turn and Collection charge for strikes.</p>
+<h3>6. Riskiest assumption and test</h3>
+<p>The assumption: choosing a route feels like a build decision, not a harder aiming test, and players do not settle on a fixed three-line sequence.</p>
+<p>Test: one screen, one game, nine balls. Plain pins; Toll, Neon and one ribbon from the house; Polish, Rail and Spare Lamp from the player; once-per-frame wear, live preview, no shop. Kill it if the owner throws the same three lines in the same order by frame 2, or if all-strikes still tops the score.</p>
+<h3>7. The cut</h3>
+<p>Passive items. Global modifiers now live on the lane, where the player can see them and the house can contest them.</p><p class="top"><a href="#agree">Back to the summary</a></p></section><section id="wildcard"><p class="lever">Wildcard</p><h2>The Scoresheet</h2><p class="note">Claude: the worked example in section 2 scores a strike as 13 points. A full rack is 15, so those sums are slightly off. The idea does not depend on them.</p><h3>1. The idea</h3>
+<p>Every ball must be written into one box of a 3x3 scoresheet, and each box accepts only one pin pattern (Strike, Headpin Only, Aces, and so on) and can be filled once per game. The sheet is the build: you stamp boxes with upgrades, chase lines of three, and after every game the house tears off your best box.</p>
+<h3>2. The decision each turn</h3>
+<p>Nine balls, nine boxes. Each box scores (pin points felled) x (its multiplier). A ball that fits no open box forces you to scratch one for zero. A line of three filled boxes doubles those boxes. Before each throw you pick which box to aim at given the pins standing; after it you choose where to write it.</p>
+<p>Starting sheet: Strike x3, Headpin Only x4, Aces (headpin and both 3s) x4, Chop (headpin, 3 and 2 on one side) x3, Side Pair (a 3 and its 2) x5, Single Corner x8, Clear-Up (finish a partial rack) x4, Exactly Two x4, Free (anything) x1.</p>
+<p>Worked dilemma: frame 2, fresh rack, Free already used. The middle row has Headpin Only filled (20) with Aces and Single Corner open. The strike line is safe: 13 x 3 = 39, but it resets the rack, so Single Corner has no setup. Aces is 11 x 4 = 44 and leaves both corners, setting up Single Corner (16) and finishing the row: 80 doubled to 160. But the Aces line is narrower; clip a corner and four pins fit nothing, so you scratch a box and the row is dead.</p>
+<h3>3. Example pieces</h3>
+<p>Stamps go on a box (one per box, buying over one destroys it). Rules are sheet-wide (three slots).</p>
+<ol>
+<li><strong>Double Ink</strong> (stamp): box multiplier x2; scratching this box costs $5.</li>
+<li><strong>Carbon Copy</strong> (stamp): box can be filled twice; the second fill scores half.</li>
+<li><strong>Pawn Ticket</strong> (stamp): scratching this box pays $8.</li>
+<li><strong>Loose Rule</strong> (stamp): box accepts one pin more or fewer than its pattern; multiplier -1.</li>
+<li><strong>Slow Burner</strong> (stamp): +1 multiplier permanently each game the box is filled; growth lost if scratched.</li>
+<li><strong>Late Entry</strong> (stamp): triple if this is the last box filled this game, half otherwise.</li>
+<li><strong>Corner Tax</strong> (rule): each pin standing at frame end pays $1; a cleared rack pays nothing.</li>
+<li><strong>League Night</strong> (rule): lines pay x3, but one scratch in a line zeroes the whole line.</li>
+<li><strong>Short Game</strong> (rule): games last seven balls; every multiplier +2.</li>
+<li><strong>Strike Bounty</strong> (rule): each strike adds +1 to the Strike box permanently; all other boxes -1 this game.</li>
+<li><strong>Side Bet</strong> (one use): name your target box before a throw; hit pays $6, miss costs $3.</li>
+<li><strong>Eraser</strong> (one use): empty a filled box to refill it; its lines cannot score this game.</li>
+</ol>
+<h3>4. Escalation and forced change</h3>
+<p>Targets rise about 1.6x per game. A small shop (three offers, $3 to $8) opens after every frame, so eighteen shops per run; income is $1 per filled box plus piece payouts. After each game the highest-scoring box is torn off with its stamp, and you pick its replacement from three stranger boxes (Headpin Falls Last, Same Pins As Last Ball, Only Pins Hit By Pins). Your engine keeps leaving, so you rebuild lines around new patterns, or deliberately keep a disposable box on top to protect a Slow Burner.</p>
+<h3>5. Why a strike is not automatically best</h3>
+<p>There is one Strike box. A second strike goes to Free or forces a scratch, and any strike resets the rack, removing the partial racks that Clear-Up, Single Corner and Side Pair need. A strike build exists (Carbon Copy plus Strike Bounty) but taxes every other box and gets torn off first.</p>
+<h3>6. Riskiest assumption and test</h3>
+<p>That a light-skill throw can hit a chosen pattern about two times in three. Much lower and the sheet is a lottery; much higher and it is a solved fill order. Test: one screen, lane plus the fixed starting sheet, no shop, one nine-ball game against a target. Kill it if the owner lands his intended pattern under half the time, or settles on one fill order by his third game.</p>
+<h3>7. The cut</h3>
+<p>The running per-ball multiplier and all strike compounding. Score is only what is written in the boxes.</p><p class="top"><a href="#agree">Back to the summary</a></p></section>
+</main>
+</body>
+</html>
