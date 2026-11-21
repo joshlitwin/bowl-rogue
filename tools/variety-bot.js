@@ -12,7 +12,7 @@ function strikes(layout,ball,n){run.ball=ball;applyKit();run.rack=Array.from({le
   return out;}
 `);
 const n=process.argv[2]?+process.argv[2]:5;
-const balls=['house','big','heavy'];
+const balls=['house','big','heavy','light','small'];
 const std={};for(const b of balls)std[b]=new Set(ev(`strikes('standard','${b}',${n})`));
 const layouts=ev('Object.keys(LAYOUTS)');
 console.log(`${n} pins. Lines tried: ${ev('LINES.length')}. Cells: strike lines / of those, how many also strike on the standard layout`);

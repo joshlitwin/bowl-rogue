@@ -78,6 +78,18 @@ What the bot found (`npm run variety-bot`, perfect release over 7,371 lines):
 - Big ball strikes on more lines than the house ball everywhere; Heavy on fewer (668 against 790 standard). Heavy is the weaker strike ball; not tuned.
 - Seven pins cut strike lines to about a quarter on the standard layout (191 against 790).
 
+### Josh's first run (21 November, log in `docs/playtest/`)
+Lost game 5. Game 1: 9 strikes on one line. Each new layout took one to three balls to find a new strike line, then he kept it (Shifted right: 7 strikes in a row from the other side of the lane). Game 4 (Headpin forward): his old line struck at once. Game 5 (Headpin left, seven pins, a newly bought Big ball): no strike in 12 balls. Feedback: THROW sits too low and he hits the iPhone home bar; sell balls, pins and gear separately so spending is a choice; let him buy the next rack layout.
+
+### Shop split (21 November, built on `lab/variety-shop`)
+- Pins: three, random, the only thing Reroll changes.
+- Balls: two on the shelf at $10; they stay until bought; a bought one is replaced next shop. Pool: Big, Heavy, Light (lighter), Small (narrower); physics only. Strike lines on the standard rack: Big 994, Light 846, house 790, Heavy 668, Small 625; none of Josh's own lines strike with any of them.
+- Gear: one per shop, new each shop, not refilled.
+- Next rack: one layout drawn free, two others at $3; the rack map previews the chosen one.
+- Extra pins: an empty dashed spot on the rack map, $6 then $8.
+- Cards show name, picture and price; tapping shows what it does in the strip, with Buy for balls, gear and spots (pins still go to a spot).
+- THROW and the sheets' bottom buttons sit at least 22 px above the screen edge (more if the phone reports a safe area). Not yet in `game/`.
+
 ## Next
 Josh plays Five-Pin Variety Lab and pastes the log. Questions: does re-finding the line each game feel like play or a chore; does a different ball or a bigger rack change what he does; if it's not fun, which of the three to switch off.
 
