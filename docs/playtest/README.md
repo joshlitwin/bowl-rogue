@@ -8,3 +8,4 @@ Each file is a Results log copied out of the game by Josh. The first line of eac
 
 The 21 November logs from the three labs were pasted into chat and are summarised in `../STATE.md`. Each lab also keeps its own log in the browser it was played in.
 - `2026-11-21-five-pin-variety-lab.csv`: Five-Pin Variety Lab (first version, before the shop split), one run lost at game 5 (about 362 of 450). New layouts took one to three balls to find a strike line, then he repeated it; game 5 (Headpin left, seven pins, a newly bought Big ball) never struck.
+- `2026-11-21-five-pin-boss-lab.csv`: Five-Pin Boss Lab, one run lost at the first boss (Centre post, 245 of 300). Five balls to find a line around the post, then four strikes. "I played well I thought but lost immediately."
