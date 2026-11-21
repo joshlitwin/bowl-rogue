@@ -47,6 +47,40 @@ body[data-stage="night"]{
   --pt:#f2f6ff;
   --mu:#ff4fa8;
 }
+body[data-stage="computer"]{
+  --ink:#000201;
+  --panel:#04140a;
+  --chalk:#c8ffd8;
+  --dim:#3a9a5e;
+  --accent:#3fd67a;
+  --go:#3fd67a;
+  --go-ink:#000201;
+  --paper:#020a05;
+  --paper-ink:#9affb8;
+  --paper-dim:#2a7a4e;
+  --now:#ffc83a;
+  --made:#ffc83a;
+  --coin:#ffd23f;
+  --pt:#c8ffd8;
+  --mu:#ffc83a;
+}
+body[data-stage="arrival"]{
+  --ink:#08060e;
+  --panel:#1c1630;
+  --chalk:#f0eeff;
+  --dim:#9a92c0;
+  --accent:#d4ff3a;
+  --go:#d4ff3a;
+  --go-ink:#08060e;
+  --paper:#141024;
+  --paper-ink:#f0eeff;
+  --paper-dim:#9a92c0;
+  --now:#d4ff3a;
+  --made:#b8b4ff;
+  --coin:#ffd23f;
+  --pt:#f0eeff;
+  --mu:#ff9a5a;
+}
 *{box-sizing:border-box}
 html,body{height:100%;margin:0}
 body{background:var(--ink);color:var(--chalk);font-family:var(--body);display:flex;flex-direction:column;overflow:hidden;-webkit-user-select:none;user-select:none;-webkit-tap-highlight-color:transparent;transition:background-color .6s,color .6s}
@@ -75,7 +109,7 @@ button:focus-visible,input:focus-visible{outline:3px solid var(--accent);outline
 .cell{flex:1;min-width:0;display:flex;justify-content:center;align-items:center;gap:4px;height:22px;background:transparent;color:var(--paper-ink);border:2px solid var(--panel);border-radius:2px;font:400 12px/1 var(--num);transition:background-color .6s,color .6s}
 .cell.done,.cell.now{background:var(--paper)}
 .cell.done{border-color:var(--paper)}
-body[data-stage="night"] .cell.done{border-color:var(--panel)}
+body[data-stage="night"] .cell.done,body[data-stage="computer"] .cell.done,body[data-stage="arrival"] .cell.done{border-color:var(--panel)}
 .cell.now{border-color:var(--now)}
 .cell span{min-width:8px;text-align:center}
 .cell span:empty::before{content:"";display:block;width:4px;height:4px;margin:auto;background:var(--dim)}
@@ -128,6 +162,8 @@ canvas{display:block;touch-action:none;border-radius:6px;image-rendering:pixelat
 /* ---------- overlay sheets: one screen, no scrolling ---------- */
 body{--deck:#c98f52;--deck-line:#b47a40;--deck-ink:#2a160e;--deck-dim:#6b3f1e;--spot:rgba(42,22,14,.5);--tag:#d83a2a;--tag-ink:#fff8e8}
 body[data-stage="night"]{--deck:#0c1030;--deck-line:#141a44;--deck-ink:#f2f6ff;--deck-dim:#9aa8de;--spot:rgba(63,224,255,.35);--tag:#ff4fa8;--tag-ink:#05071a}
+body[data-stage="computer"]{--deck:#020a05;--deck-line:#06180c;--deck-ink:#c8ffd8;--deck-dim:#3a9a5e;--spot:rgba(63,214,122,.3);--tag:#3fd67a;--tag-ink:#000201}
+body[data-stage="arrival"]{--deck:#141024;--deck-line:#1e1834;--deck-ink:#f0eeff;--deck-dim:#9a92c0;--spot:rgba(212,255,58,.22);--tag:#d4ff3a;--tag-ink:#08060e}
 .sheet{padding:max(8px,env(safe-area-inset-top)) 8px max(22px,calc(env(safe-area-inset-bottom) + 10px))}
 .sheet .box{max-width:380px;padding:10px;gap:8px;overflow:hidden;border:3px solid var(--ink);box-shadow:inset 0 0 0 2px rgba(255,255,255,.07)}
 #shop .box{height:100%;max-height:660px}
@@ -752,7 +788,7 @@ function shopTap(i){gsel=null;pick=null;
   showShop();}
 $('shopReroll').addEventListener('click',()=>{const rc=2+run.rerolls;if(run.cash<rc)return;run.cash-=rc;run.rerolls++;pending=null;pick=null;topBar();rollPins();showShop();});
 let skipAsk=false;
-$('shopNext').addEventListener('click',e=>{if(!skipAsk&&!run.bought&&run.offers.some(o=>run.cash>=o.cost)){skipAsk=true;e.currentTarget.textContent='Leave with nothing?';$('shop').firstElementChild.classList.add('nudge');return;}if(OPT.layout)run.seen.push('chose rack: '+LAYOUTS[run.nextLayout].name);if(!run.bought)run.seen.push('bought nothing');pending=null;pick=null;sel=null;gsel=null;run.game++;startGame();if(run.game%3===0&&run.game>0&&THEME[stageOf(run.game)])startFx(stageOf(run.game));});
+$('shopNext').addEventListener('click',e=>{if(!skipAsk&&!run.bought&&run.offers.some(o=>run.cash>=o.cost)){skipAsk=true;e.currentTarget.textContent='Leave with nothing?';$('shop').firstElementChild.classList.add('nudge');return;}if(OPT.layout)run.seen.push('chose rack: '+LAYOUTS[run.nextLayout].name);if(!run.bought)run.seen.push('bought nothing');pending=null;pick=null;sel=null;gsel=null;run.game++;startGame();if(run.game%3===0&&run.game>0)startFx(stageOf(run.game));});
 let rsel=null,rgsel=null;
 function showRack(){const m=$('rackMsg');$('rackCash').textContent='$'+run.cash;
   drawMap($('rackMap'),i=>{rsel=rsel===i?null:i;rgsel=null;showRack();},rsel,null,run.layout);
@@ -840,12 +876,39 @@ night:{wood:['#10142e','#1c2550','#2c3a74','#445a9e','#7c93d6'],gutter:['#05071a
     px(k,0,52,180,16,'#04050f');px(k,54,52,72,16,'#020308');px(k,52,54,2,14,'#141a44');px(k,126,54,2,14,'#141a44');
     px(k,90,0,1,5,'#020308');px(k,86,5,9,3,'#1d2558');
     for(let i=0;i<14;i++)for(let j=-i-3;j<=i+3;j++)if(((i+j)&1)&&((i*5+j*3)%7+7)%7<2)px(k,90+j,52+i,1,1,'#1d2558');},
-  strip(k){px(k,0,0,180,5,'#0c1030');px(k,0,5,180,1,'#3fe0ff');}}
+  strip(k){px(k,0,0,180,5,'#0c1030');px(k,0,5,180,1,'#3fe0ff');}},
+// the scoring computer owns the hall: phosphor on black, the lane drawn as its readout of a lane
+computer:{wood:['#020a05','#05140b','#082011','#0d2e19','#143f23'],gutter:['#000201','#010503','#03100a'],line:'#3fd67a',arrow:'#1f8a4a',cap:'#000201',pit:'#000000',wallBase:'#010603',neon:null,
+  pin:{o:'#000201',w:'#f0fff4',l:'#b4f0c8',m:'#62c08a',d:'#2a7a4e'},band:{5:['#ff5a36','#a82a14'],3:['#ffc83a','#a87e10'],2:['#38c8ff','#1478a8']},
+  ball:['#000201','#0c5a2a','#169a48','#3fd67a','#a8ffc8','#ffffff'],bowl:{o:'#000201',h:'#04140a',H:'#0d2e19',s:'#62c08a',A:'#3fd67a',a:'#1f8a4a',B:'#c8ffd8',p:'#05140b',q:'#020a05',k:'#c8ffd8'},
+  ui:['#000201','#05140b','#3fd67a','#ffc83a'],plate:'#000201',label:'#62c08a',dot:'#f0fff4',dotSh:'#000201',dim:'#2a7a4e',trail:'#f0fff4',shadow:'#000201',handle:'#ffc83a',edge:'#000201',hi:'#ffffff',ink:'#f0fff4',mark:'#000201',
+  dispL:[36,16,14,9,'#000201','#3fd67a'],dispR:[50,25,80,14,'#000201','#3fd67a'],
+  wall(k){px(k,0,0,180,10,'#000201');for(let x=4;x<180;x+=9)px(k,x,9,1,1,'#0a2a16');
+    px(k,0,10,180,42,'#010603');for(let x=4;x<180;x+=9)px(k,x,10,1,42,'#03100a');
+    px(k,30,12,120,38,'#0d2e19');px(k,31,13,118,36,'#000201');px(k,31,13,118,1,'#082011');
+    [[33,14],[146,14],[33,47],[146,47]].forEach(([x,y])=>px(k,x,y,1,1,'#1f8a4a'));
+    for(let x=54;x<146;x+=4)px(k,x,19,2,1,'#082011');
+    px(k,36,43,108,3,'#05140b');px(k,36,43,1,3,'#1f8a4a');px(k,143,43,1,3,'#1f8a4a');
+    px(k,0,52,180,16,'#000201');px(k,54,52,72,16,'#000000');px(k,0,52,180,2,'#010603');px(k,52,54,2,14,'#0d2e19');px(k,126,54,2,14,'#0d2e19');},
+  strip(k){px(k,0,0,180,5,'#000201');for(let x=4;x<180;x+=9)px(k,x,2,1,1,'#0a2a16');px(k,0,5,180,1,'#1f8a4a');}},
+// something has arrived above the hall: cold light down through the ceiling, the colours bleached toward violet
+arrival:{wood:['#1c1530','#2c2348','#403664','#5a4e80','#7c70a4'],gutter:['#06040c','#0e0a18','#181228'],line:'#d4ff3a',arrow:'#a8a0d4',cap:'#0e0a18',pit:'#040208',wallBase:'#120c22',neon:null,
+  pin:{o:'#0c0818',w:'#f6f4ff',l:'#d4d0ec',m:'#a49ec8',d:'#6c6694'},band:{5:['#d4ff3a','#7e9c10'],3:['#ff9a5a','#b0562a'],2:['#7aa8ff','#3a5eb8']},
+  ball:['#0c0818','#2a2050','#4a3c84','#7a6cc0','#c0b8f0','#ffffff'],bowl:{o:'#08060e',h:'#1c1630',H:'#2c2440',s:'#a49ec8',A:'#d4d0ec',a:'#a49ec8',B:'#d4ff3a',p:'#1c1630',q:'#120c22',k:'#f0eeff'},
+  ui:['#08060e','#1c1630','#d4ff3a','#f6f4ff'],plate:'#08060e',label:'#9a92c0',dot:'#f6f4ff',dotSh:'#08060e',dim:'#6c6694',trail:'#f6f4ff',shadow:'#08060e',handle:'#d4ff3a',edge:'#08060e',hi:'#ffffff',ink:'#f6f4ff',mark:'#08060e',
+  dispL:[39,37,18,9,'#0c0818','#a8a0d4'],dispR:[119,37,28,9,'#0c0818','#a8a0d4'],
+  wall(k){px(k,0,0,180,10,'#06040c');px(k,0,10,180,42,'#120c22');for(let x=4;x<180;x+=9)px(k,x,10,1,42,'#0c0818');
+    px(k,35,13,110,36,'#181030');px(k,35,13,110,1,'#20163c');txt(k,'5 PIN',61,24,'#211838',3);
+    px(k,0,52,180,16,'#06040c');px(k,54,52,72,16,'#040208');px(k,0,52,180,2,'#0c0818');px(k,52,54,2,14,'#181030');px(k,126,54,2,14,'#181030');
+    hallShaft(k,90,0,3,9,68,['#3a3264','#8a84c0'],.5);px(k,86,0,9,1,'#d8d4f4');px(k,88,1,5,1,'#8a84c0');},
+  strip(k){px(k,0,0,180,5,'#0c0818');px(k,0,5,180,1,'#3a3264');px(k,86,0,9,5,'#3a3264');px(k,88,0,5,5,'#8a84c0');}}
 };
 const GOLD={o:'#5a2f1a',w:'#fff2b0',l:'#ffd866',m:'#e8a020',d:'#b06c10'};
 const HEAVY=['#0c0a10','#1e1a26','#34304a','#544e78','#8a84b0','#e0dcff'],BIGP=['#08221a','#12503a','#1f7a56','#3fae7c','#8fe0b4','#ffffff'],LIGHTP=['#14304a','#2a5f86','#4a90c0','#80c0e8','#c4e6fa','#ffffff'],SMALLP=['#2a1606','#6a3a0c','#a8641a','#e0a040','#f6d890','#ffffff'];
 THEME.rec.ballPal={house:THEME.rec.ball,heavy:HEAVY,big:BIGP,light:LIGHTP,small:SMALLP};THEME.rec.bandC=['#2c6fb0','#1c4a7a'];
 THEME.night.ballPal={house:THEME.night.ball,heavy:HEAVY,big:BIGP,light:LIGHTP,small:SMALLP};THEME.night.bandC=['#f2f6ff','#9aa8de'];
+THEME.computer.ballPal={house:THEME.computer.ball,heavy:HEAVY,big:BIGP,light:LIGHTP,small:SMALLP};THEME.computer.bandC=['#3fd67a','#1f8a4a'];
+THEME.arrival.ballPal={house:THEME.arrival.ball,heavy:HEAVY,big:BIGP,light:LIGHTP,small:SMALLP};THEME.arrival.bandC=['#d4ff3a','#7e9c10'];
 function buildTheme(o){if(o.built)return o;o.built=1;
   o._wood=o.wood.map(hex);o._gut=o.gutter.map(hex);o._line=hex(o.line);o._arrow=hex(o.arrow);o._cap=hex(o.cap);o._pit=hex(o.pit);o._wall=hex(o.wallBase);o._neon=o.neon&&o.neon.map(hex);
   o.pins={};const mkPin=(key,band,body)=>{const s=sprite(PIN,Object.assign({R:band[0],r:band[1]},body||o.pin));o.pins[key]=s;o.pins[key+'r']=turned(s,false);o.pins[key+'l']=turned(s,true);};
@@ -882,12 +945,12 @@ function getBg(o,cm){return o.bg[cm.id]||(o.bg[cm.id]=buildBg(o,cm));}
 // ---------- the hall changes a little every game (wall, neighbouring lanes and pit only: never the lane you bowl on) ----------
 const HALL={game:-1,t0:0};
 const HGLYPH=['101010111010101','010111101111010','111101000101111','100110111011001','001011111110100'];
-// which step of the evening a theme shows: rec covers games 1-3, night 4-6
-function hallIdx(o){return o===THEME.night?Math.max(run.game,NIGHT_FROM):Math.min(run.game,NIGHT_FROM-1);}
+// which step of the evening a theme shows: rec covers games 1-3, night 4-6, computer 7-9, arrival 10-12
+function hallIdx(o){const b=o===THEME.night?NIGHT_FROM:o===THEME.computer?6:o===THEME.arrival?9:0;return b+clamp(run.game-b,0,2);}
 // the step to draw this frame; for the first moments of a game the previous step flickers out
 function hallStep(o){const now=lastT;if(HALL.game!==run.game){HALL.game=run.game;HALL.t0=now;}
   const gi=hallIdx(o),t=(now-HALL.t0)/1000;
-  if(still||fx||gi===0||gi===NIGHT_FROM||gi!==run.game)return gi;
+  if(still||fx||gi%3===0||gi!==run.game)return gi;
   return t<.3||(t<.85&&Math.floor(t*17)%3===0)?gi-1:gi;}
 // the neighbouring lanes and the dividers beside them (side -1 left, 1 right, 0 both) drop one step down the floor's own colours, so the boards keep their grain
 function hallNb(d,cm,o,side){const G=o.gutter,W=o.wood,to={},key=v=>v[0]<<16|v[1]<<8|v[2],set=(a,b)=>to[key(hex(a))]=hex(b);
@@ -899,7 +962,8 @@ function hallLampOff(k,x){px(k,x-4,5,9,3,'#6b3f2a');px(k,x-4,7,9,1,'#3a2016');px
 function hallN(k,body,halo){[[-1,0],[1,0],[0,-1],[0,1],[-1,-1],[1,1],[1,-1],[-1,1]].forEach(([a,b])=>txt(k,'N',109+a,24+b,halo,3));txt(k,'N',109,24,body,3);}
 // the still part of each step, painted once over a copy of the cached background
 function hallPanelDim(k,x){px(k,x,10,35,42,'#3a2016');for(let i=4;i<180;i+=9)if(i>=x&&i<x+35)px(k,i,10,1,42,'#2a160e');}
-function hallPaint(q,o,cm,gi){const lane=cm.id==='lane',im=q.getImageData(0,0,LW,LH);
+function hallPaint(q,o,cm,gi){if(gi>=9)return hallArr(q,o,cm,gi-9);if(gi>=6)return hallComp(q,o,cm,gi-6);
+  const lane=cm.id==='lane',im=q.getImageData(0,0,LW,LH);
   hallNb(im.data,cm,o,gi===1?-1:0);q.putImageData(im,0,0);
   if(gi<NIGHT_FROM){const last=gi===2;
     if(lane){hallLampOff(q,36);hallPanelDim(q,0);
@@ -918,7 +982,8 @@ function hallBg(o,cm,gi){const base=getBg(o,cm);if(gi<=0||gi===NIGHT_FROM)return
   const k=mk(LW,LH),q=k.getContext('2d');q.drawImage(base.cv,0,0);hallPaint(q,o,cm,gi);
   return o.bg[key]={cv:k,data:q.getImageData(0,0,LW,LH).data};}
 // the few things that move, all on the back wall: slow and far apart
-function hallLive(o,cm,gi,t){if(gi<=NIGHT_FROM||o!==THEME.night)return;const lane=cm.id==='lane',L=o.dispL,R=o.dispR;
+function hallLive(o,cm,gi,t){if(o===THEME.computer)return liveComp(o,cm,gi-6,t);if(o===THEME.arrival)return liveArr(o,cm,gi-9,t);
+  if(gi<=NIGHT_FROM||o!==THEME.night)return;const lane=cm.id==='lane',L=o.dispL,R=o.dispR;
   const glyphs=(n,col)=>{c.fillStyle=col;for(let a=0;a<2;a++){const f=HGLYPH[(n+a*3)%HGLYPH.length];for(let i=0;i<15;i++)if(f[i]==='1')c.fillRect(L[0]+5+a*4+i%3,L[1]+2+((i/3)|0),1,1);}};
   if(gi===4){if(still||!lane)return;
     const u=t%8.3;if((u>6&&u<6.07)||(u>6.22&&u<6.36))hallN(c,'#ff4fa8','#7a1f5c');   // the N catches for a moment
@@ -931,13 +996,72 @@ function hallLive(o,cm,gi,t){if(gi<=NIGHT_FROM||o!==THEME.night)return;const lan
   const w=t%14;if(w<5){const cx=-30+w*48,H=lane?9:5;   // something passes over the roof: light falls through the ceiling seams
     for(let x=4;x<LW;x+=9){const a=1-Math.abs(x-cx)/32;if(a<=0)continue;const h=Math.ceil(a*H);px(c,x,0,1,h,'#1f7a56');if(a>.55)px(c,x,0,1,Math.ceil(h/3),'#8fe0b4');}}}
 
+// ---------- computer (games 7-9): the scoring computer redraws the hall as its own readout ----------
+// every floor pixel of a background with its flat lane position; fn(i,p,sx,sy)
+function hallFloor(cm,fn){for(let sy=cm.horizon;sy<LH;sy++)for(let sx=0;sx<LW;sx++){const p=cm.inv(sx,sy);if(p.y>=30)fn((sy*LW+sx)*4,p,sx,sy);}}
+// true where a grid line of spacing n falls between this pixel and the next one right (dx) or down; f reads the measured value from a lane position
+function hallGrid(cm,sx,sy,f,n,dx){const a=f(cm.inv(sx,sy)),b=f(dx?cm.inv(sx+1,sy):cm.inv(sx,sy+1));return Math.floor(a/n)!==Math.floor(b/n);}
+const HX=p=>p.x-60,HY0=p=>p.y,HN=p=>Math.abs(p.x-180)-176;
+function hallComp(q,o,cm,s){const lane=cm.id==='lane',im=q.getImageData(0,0,LW,LH),d=im.data,W=o._wood,key=v=>v[0]<<16|v[1]<<8|v[2],wi={};W.forEach((v,i)=>wi[key(v)]=i);
+  const put=(i,col)=>{d[i]=col[0];d[i+1]=col[1];d[i+2]=col[2];},SEAM=hex('#145a30'),NBS=hex(s>1?'#0d3a20':'#0a2a16'),BLK=hex('#000201'),TICK=hex('#1f8a4a');
+  hallFloor(cm,(i,p,sx,sy)=>{const ax=Math.abs(p.x-180);
+    if(ax<120){const k0=wi[key([d[i],d[i+1],d[i+2]])];if(k0===undefined)return;   // the lane: boards become scan lines, nothing moves
+      if(hallGrid(cm,sx,sy,HX,BOARD,1))put(i,SEAM);else if(sy%3===2&&k0>0)put(i,W[k0-1]);return;}
+    if(s>=2&&ax>=124&&ax<138&&p.y<540&&hallGrid(cm,sx,sy,HY0,40,0)){put(i,TICK);return;}   // the gutters get a ruler
+    if(s>=1&&ax>=154){const sl=ax-296,u=Math.abs(sl);   // the neighbouring lanes are only wireframe now
+      put(i,u<120&&(hallGrid(cm,sx,sy,HN,BOARD,1)||hallGrid(cm,sx,sy,HY0,60,0))?NBS:BLK);}});
+  q.putImageData(im,0,0);
+  if(lane){if(s>=1)[[2,26],[155,178]].forEach(([a,b])=>{for(let x=a;x<b;x+=3)for(let y=14;y<49;y+=3)px(q,x,y,1,1,hash(x,y)<(s>1?.5:.3)?(s>1&&hash(y,x)<.25?'#1f8a4a':'#0d2e19'):'#04120a');});
+    if(s>=2){px(q,0,9,180,1,'#082011');px(q,30,12,120,1,'#1f8a4a');px(q,30,49,120,1,'#1f8a4a');
+      for(let i=0;i<=6;i++)plotLine(q,56+i*11,67,78+i*4,55,'#06200f');for(const y of [55,59,63,67])px(q,56+(67-y)*.3|0,y,68-(67-y)*.6|0,1,'#06200f');}}
+  else{if(s>=1)for(let x=1;x<180;x+=3)px(q,x,2,1,1,'#0d2e19');if(s>=2)px(q,0,5,180,1,'#3fd67a');}}
+// what moves: the big score, its bar, a cursor, one cell of memory lighting at a time; in game 9 something from above gets into the signal
+function liveComp(o,cm,s,t){if(cm.id!=='lane')return;const R=o.dispR,str=total()+'/'+run.target,big=str.length*8-2<=R[2]-4,f=Math.min(1,total()/run.target);
+  px(c,R[0],R[1],R[2],R[3],'#000201');const tw=big?str.length*8-2:str.length*4-1,tx=R[0]+Math.floor((R[2]-tw)/2);txt(c,str,tx,R[1]+(big?2:4),'#3fd67a',big?2:1);
+  px(c,37,44,Math.round(106*f),1,f>=1?'#ffc83a':'#3fd67a');
+  if(still)return;
+  if(t%1.4<.7)px(c,tx+tw+3,R[1]+(big?11:9),big?6:3,big?1:1,'#3fd67a');
+  if(s>=1){const n=Math.floor(t/1.6);px(c,2+3*Math.floor(hash(n,1)*8),14+3*Math.floor(hash(n,2)*12),1,1,'#3fd67a');px(c,155+3*Math.floor(hash(n,3)*8),14+3*Math.floor(hash(n,4)*12),1,1,'#3fd67a');}
+  if(s>=2){const u=t%9;if(u<1.4)px(c,31,13+Math.floor(u/1.4*36),118,1,'#0d2e19');   // a slow refresh line down the console
+    const w=t%17;if(w>12&&w<12.5){for(let y=13;y<49;y++)for(let x=31;x<149;x++)if(thr(x,y+Math.floor(w*40))<.18)px(c,x,y,1,1,'#3a3264');   // interference: something else on the line
+      for(let y=0;y<68;y+=2)px(c,90,y,1,1,'#8a84c0');}}}
+
+// ---------- arrival (games 10-12): something huge above the roof; only its underside and its light are ever seen ----------
+// a cone of cold light, dithered: core cols[1], edge cols[0]
+function hallShaft(k,cx,y0,w0,w1,y1,cols,dens){for(let y=y0;y<y1;y++){const f=(y-y0)/(y1-y0),hw=w0+(w1-w0)*f;
+  for(let x=Math.floor(cx-hw);x<=Math.ceil(cx+hw);x++){const e=Math.abs(x-cx)/hw;if(e>1)continue;const a=dens*(1-e*e)*(1-.45*f),b=thr(x,y);if(b<a*.4)px(k,x,y,1,1,cols[1]);else if(b<a)px(k,x,y,1,1,cols[0]);}}}
+// the underside's lower edge across the ceiling, per step (it comes lower and wider)
+function hullY(x,s){const hw=s>1?84:34,e=(x-90)/hw;return Math.abs(e)>1?-1:Math.round((s>1?21:6)*(1-e*e*.6));}
+function hallArr(q,o,cm,s){const lane=cm.id==='lane';
+  if(s>=1){const im=q.getImageData(0,0,LW,LH),d=im.data,A=hex('#3a3264'),B=hex('#6a62a0');   // light pools on the neighbouring lanes, the left first
+    hallFloor(cm,(i,p,sx,sy)=>{const ax=Math.abs(p.x-180);if(ax<142||(s<2&&p.x>180))return;const a=Math.max(0,1-Math.abs(ax-296)/120)*clamp((330-p.y)/260,0,1)*(s>1?.6:.42),b=thr(sx,sy);
+      const col=b<a*.3?B:b<a?A:null;if(col){d[i]=col[0];d[i+1]=col[1];d[i+2]=col[2];}});q.putImageData(im,0,0);}
+  if(!lane){if(s>=1){px(q,60,0,60,5,'#3a3264');px(q,70,0,40,5,'#8a84c0');px(q,70,0,40,1,'#05030c');}if(s>=2){px(q,0,0,180,2,'#05030c');for(let x=14;x<170;x+=22)px(q,x,2,2,1,'#3a3264');}return;}
+  if(s>=1){for(let x=0;x<180;x++){const h=hullY(x,s);if(h<0)continue;   // the ceiling is open; the underside fills the gap, lit only at its rim
+      for(let y=0;y<Math.max(10,h+4);y++)if(y>h){const a=1-(y-h)/5;px(q,x,y,1,1,thr(x,y)<a*.5?'#8a84c0':thr(x,y)<a?'#3a3264':y<10?'#0c0818':null||'#0c0818');}
+      for(let y=0;y<h;y++)px(q,x,y,1,1,(y===Math.round(h*.45)||y===Math.round(h*.8))&&x%2?'#0e0a1a':'#05030c');
+      px(q,x,h,1,1,'#d8d4f4');}
+    hallShaft(q,90,hullY(90,s)+1,s>1?20:12,s>1?42:26,68,['#3a3264','#6a62a0'],s>1?.55:.45);
+    for(let y=60;y<68;y++)for(let x=60;x<121;x++){const a=(1-Math.abs(x-90)/31)*.5;if(thr(x,y)<a*.3)px(q,x,y,1,1,'#8a84c0');}}
+  if(s>=2){[[24,14],[156,14]].forEach(([x])=>{px(q,x-3,10,7,2,'#a8a0d4');hallShaft(q,x,12,3,12,68,['#2a2450','#5a5290'],.4);});   // slats gone, more light in at the sides
+    let x=124;for(let y=hullY(124,s)+1;y<52;y++){x+=Math.round((hash(3,y>>1)-.5)*1.6);const w=2+Math.floor(hash(y>>2,9)*3);px(q,x-1,y,w+2,1,'#3a3264');px(q,x,y,w,1,'#d8d4f4');}}}   // the back wall split open
+// what moves: a couple of motes rising in the light; under it, one point of the strange colour at a time
+function liveArr(o,cm,s,t){if(cm.id!=='lane'||still)return;
+  for(let m=0;m<2;m++){const u=((t+m*5)%10)/10,x=88+m*5+Math.round(Math.sin(t*.5+m*2)*2),y=Math.round(66-u*52);px(c,x,y,1,1,u<.85?'#d8d4f4':'#8a84c0');}
+  if(s>=1){const xs=[];for(let x=s>1?16:66;x<=(s>1?164:114);x+=s>1?21:16)xs.push(x);const n=Math.floor(t/2.2),x=xs[(n*3)%xs.length];if(t%2.2<1.4)px(c,x,hullY(x,s)-1,2,1,'#d4ff3a');}
+  if(s>=2){const w=t%12;if(w>8&&w<8.8)hallShaft(c,90,hullY(90,s)+1,20,42,68,['#6a62a0','#d8d4f4'],.35);}}
+
 // the lights going down: old hall flickers, new hall dithers in from the far wall toward you, then the sign catches
 const MIX=new Float32Array(LW*LH);for(let y=0;y<LH;y++)for(let x=0;x<LW;x++)MIX[y*LW+x]=y/LH*.78+thr(x,y)*.22;
 const mixIm=c.createImageData(LW,LH);
 function drawFx(cm){const oa=buildTheme(THEME[fx.from]),ob=buildTheme(THEME[fx.to]),A=hallBg(oa,cm,hallIdx(oa)),B=hallBg(ob,cm,hallIdx(ob)),t=fx.t;
   if(t<.5){c.drawImage(A.cv,0,0);if(Math.floor(t*20)%3===0){c.fillStyle='rgba(0,0,0,.42)';c.fillRect(0,0,LW,LH);}}
   else if(t<1.9){const p=(t-.5)/1.4,out=mixIm.data,a=A.data,b=B.data;for(let i=0,j=0;i<MIX.length;i++,j+=4){const s=MIX[i]<p?b:a;out[j]=s[j];out[j+1]=s[j+1];out[j+2]=s[j+2];out[j+3]=255;}c.putImageData(mixIm,0,0);}
-  else{c.drawImage(B.cv,0,0);if(!still&&Math.floor(t*22)%4===0){if(fx.to==='night'){if(cm.id==='lane')px(c,57,20,66,27,'#141a44');}else{c.fillStyle='rgba(0,0,0,.3)';c.fillRect(0,0,LW,LH);}}}}
+  else{c.drawImage(B.cv,0,0);const lane=cm.id==='lane',p=Math.min(1,(t-1.9)/.8);
+    if(still)return;
+    if(fx.to==='computer'){if(lane){const y=13+Math.floor(p*36);px(c,31,y,118,49-y,'#000201');px(c,31,y,118,1,'#3fd67a');}else px(c,Math.floor(p*180),5,180,1,'#000201');return;}   // the console boots, top to bottom
+    if(fx.to==='arrival'){if(lane){const y1=Math.min(68,10+Math.floor(p*140));if(p<.6)hallShaft(c,90,0,4,6+p*30,y1,['#8a84c0','#ffffff'],.9);else if(Math.floor(t*14)%2)hallShaft(c,90,0,6,26,68,['#6a62a0','#d8d4f4'],.6);}else if(p<.6)px(c,80,0,20,5,'#f0eeff');return;}   // the light comes down
+    if(Math.floor(t*22)%4===0){if(fx.to==='night'){if(lane)px(c,57,20,66,27,'#141a44');}else{c.fillStyle='rgba(0,0,0,.3)';c.fillRect(0,0,LW,LH);}}}}
 
 // ---------- drawing ----------
 function drawPost(o,cm,p){const q=cm.proj(p.x,p.y),X=Math.round(q.X),Y=Math.round(q.Y),r=Math.max(3,Math.round(p.r*q.k));

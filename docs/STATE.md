@@ -98,7 +98,10 @@ Josh: "I basically just find what works for a strike and hit that every time. We
 - **Four levels of three games:** small, big, boss (12 games). Targets 150, 220, 300 / 450, 650, 850 / 1100, 1450, 1800 / 2100, 2600, 3100, pegged to `npm run boss-bot` (aims the best line every ball with a 60 ms timing spread, buys pins by preference); guesses for a human. Pay $4 / $5 / $7 per win plus up to $4 for going over.
 - **Bosses**, four of six drawn per run, one per level, named on the shop's leave button and at the start of the game: Bolted 3-pins and Bolted corners (fall to the ball, or only to a very hard pin hit), Centre post and Twin posts (stop the ball; pins bounce off; the drawn line stops at the post), Left-side start and Right-side start (the other half of the approach hatched and closed). Each leaves about 240 to 500 of 1,014 strike lines on the standard rack, against 1,014 with no boss.
 - **Trophy** capped at +12 per level of the pin.
-- **Looks:** Rec Room (level 1), After Close (level 2), then two new looks for levels 3 and 4 (the scoring computer's hall, then the arrival).
+- **Looks:** Rec Room (level 1), After Close (level 2), then two new looks made by a designer pass:
+  - **Computer** (level 3): phosphor green on black; the lane as scan lines, the back wall a score console. Game 8 adds wireframe neighbouring lanes and memory-bank walls; game 9 a ruler, a wireframe pit and brief violet interference foreshadowing level 4. The switch boots the console top to bottom.
+  - **Arrival** (level 4): bleached violet and indigo with chartreuse as the one strange colour. A crack of cold light in the ceiling (game 10), an open ceiling with a dark underside (game 11), the underside hanging into the hall with light pouring in (game 12). Presence implied, nothing drawn in detail. The switch drops a column of light.
+  - Rec and After Close are pixel-identical to before in games 1 to 6.
 - Small and big games still reward finding one strike line and repeating it; bosses force a new line once a level.
 
 ## Next
