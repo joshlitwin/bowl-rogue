@@ -6,7 +6,9 @@
     "test": "node tools/flow.js",
     "bot": "node tools/bot.js",
     "combined-bot": "node tools/combined-bot.js --fine",
-    "combined-flow": "node tools/combined-flow.js"
+    "combined-flow": "node tools/combined-flow.js",
+    "rules-bot": "node tools/rules-bot.js",
+    "rules-flow": "PAGE=labs/five-pin-rules/index.html node tools/flow.js"
   },
   "devDependencies": {
     "@napi-rs/canvas": "^1.1.1",

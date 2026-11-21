@@ -4,7 +4,7 @@ Last updated 21 November 2026.
 
 ## What exists
 - **Five-Pin Run** (`game/`): six games of three frames, three balls a frame. The rack of five pins is the build: each spot holds a pin type with a trigger effect, and a ball scores (points of pins that fell) × Mult. A shop after each won game sells pins and gear. The hall changes a little every game and goes "After Close" at game 4.
-- **Throw Lab**, **Big Rack Lab**, **Ball Bag Lab**, **Changing Field Lab**, **Combined Lab** (`labs/`).
+- **Throw Lab**, **Big Rack Lab**, **Ball Bag Lab**, **Changing Field Lab**, **Combined Lab**, **Five-Pin Rules Lab** (`labs/`).
 - Everything is playable from https://joshlitwin.github.io/bowl-rogue/ (GitHub Pages, `main` at the root, switched on 21 November).
 - **Four blind pitches** (`docs/pitches/`): Stacked Spots, The Bag, The House Lays the Lane, The Scoresheet.
 
@@ -33,8 +33,11 @@ Root cause: the rack resets every time it is cleared, so there is never a board 
 - More pins than five is worth pursuing, spaced wider.
 - Different rack shapes and obstacles are worth pursuing.
 
-## Combined Lab (built 21 November, not yet played by Josh)
-`labs/combined/`, on branch `lab/combined`. One game of five frames, three balls a frame, no shop.
+## Combined Lab: rejected (21 November)
+Josh played it: "unplayable and way too big plus not fun". The size and feel were off; the outline took away finding the right shot; the balls behaved super weirdly; no spark of fun. Five-Pin Run is the base to build on. Traps to avoid from here: changing size, camera or feel; showing the result before the throw; balls that behave strangely.
+
+### What Combined Lab was
+`labs/combined/`, merged to `main` and live at https://joshlitwin.github.io/bowl-rogue/labs/combined/. One game of five frames, three balls a frame, no shop.
 - **Racks:** ten shapes, two each of 6, 7, 8, 9 and 10 pins; a game deals one of each count in a random order. Three have posts (Ring Round a Post, Gate Posts, Ten Behind a Post), two have a rail and come left- or right-handed. Pins stand at least 77 lane units apart (Big Rack: 68). Pins are worth 2, 3 or 5. The camera is pulled in: a short wall strip and a flatter view, so the deck gets more of the screen. The aim ring sits just in front of the front row (`G.EY` = 285).
 - **Hand:** the bag starts with two each of Wide, Heavy, Dart, Burst and Ghost. Three are dealt each frame; pick one per throw. Heavy is now big as well as heavy (radius 13, weight 9; in Ball Bag it was radius 10, weight 7), and Burst's reach is 100: the bot found that was needed for every rack to have a first-ball clear. Dart no longer triples its pin, and Heavy no longer bends half as far (the throw is unchanged).
 - **Outline:** while aiming, the pins the drawn line takes with the selected ball and a perfect release are outlined, and the info strip shows what that ball would score. It runs the same sim on a copy of the rack.
@@ -46,8 +49,21 @@ What the bots found (`npm run combined-bot`, `npm run combined-flow`):
 - No single line clears more than 2 of the 12 rack layouts.
 - Outline against pinfall: with the needle in the green, 180 of 180 bot balls fell exactly as outlined. With a 100 ms timing spread, about two thirds matched (64% and 66% over two runs); every mismatch was a release outside the green.
 
+## Five-Pin Rules Lab (built 21 November, not yet played by Josh)
+`labs/five-pin-rules/`, a copy of Five-Pin Run with one rule change and new targets. Throw, camera, balls, pins, shop and hall are untouched.
+- **A clear ends the frame** (as in real five-pin): a strike is the whole frame, a spare ends it on ball two. The rack no longer resets mid-frame.
+- **No Mult for strikes or clears** (was +1 and +0.5). Lane bell now reads "Strikes get +1 Mult"; Crown is unchanged.
+- **Targets** 35, 60, 100, 160, 250, 400 (were 50 to 650), set from `npm run rules-bot` medians at a 100 ms timing spread.
+- No outline, no new balls, no new pins.
+
+What the bot found (`npm run rules-bot`: perfect release over 1,071 lines, standing pins put back on their spots between balls):
+- Plain rack: every way of clearing a frame scores 15, so striking is no longer better, only quicker.
+- Builds now pull different ways. Wallflower, Buddy and Sweeper want the pins spread over two or three balls (Wallflower L1 on a corner: 28 a frame against 15 for a strike; gold head, two Wallflowers and a Buddy: 70 against 20). Leader, Picket, Crown and Bell still want strikes.
+- Late on, a strike build with grown Trophies runs away (leader 2, gold 2, crown 2, two Trophies at +20, Bell: about 488 a frame against 197 for a matching picking build). Trophy's unlimited growth is the cause; not changed yet.
+- A whole game can now be as short as three balls.
+
 ## Next
-Josh plays Combined Lab and pastes the log. Questions it should answer: does picking a ball and a line between visible outcomes feel like a decision; does one rule arriving per frame read; is the spacing and camera right. If it is fun, the shop comes back on top of it.
+Josh plays Five-Pin Rules Lab and pastes the log. Questions: does choosing between striking and picking pins off feel like a decision; do games feel too short when you strike; are the targets right.
 
 ## The plan the Combined Lab came from
 - Each frame is a new rack: a different shape and pin count (six to ten), sometimes posts or a rail.

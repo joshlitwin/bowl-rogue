@@ -1,5 +1,5 @@
 const {JSDOM,VirtualConsole}=require('jsdom');const fs=require('fs');
-const html=fs.readFileSync(require('path').join(__dirname,'../game/index.html'),'utf8');const errs=[];
+const html=fs.readFileSync(require('path').join(__dirname,'..',process.env.PAGE||'game/index.html'),'utf8');const errs=[];
 const vc=new VirtualConsole();vc.on('jsdomError',e=>errs.push(String(e.stack||e).slice(0,700)));
 const dom=new JSDOM(html,{runScripts:'dangerously',pretendToBeVisual:true,virtualConsole:vc,url:'https://x.test/'});const ev=s=>dom.window.eval(s);
 setTimeout(()=>{if(errs.length){console.log(errs.join('\n'));process.exit(1);}
