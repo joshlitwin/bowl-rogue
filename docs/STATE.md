@@ -4,7 +4,8 @@ Last updated 21 November 2026.
 
 ## What exists
 - **Five-Pin Run** (`game/`): six games of three frames, three balls a frame. The rack of five pins is the build: each spot holds a pin type with a trigger effect, and a ball scores (points of pins that fell) × Mult. A shop after each won game sells pins and gear. The hall changes a little every game and goes "After Close" at game 4.
-- **Throw Lab**, **Big Rack Lab**, **Ball Bag Lab**, **Changing Field Lab** (`labs/`).
+- **Throw Lab**, **Big Rack Lab**, **Ball Bag Lab**, **Changing Field Lab**, **Combined Lab** (`labs/`).
+- Everything is playable from https://joshlitwin.github.io/bowl-rogue/ (GitHub Pages, `main` at the root, switched on 21 November).
 - **Four blind pitches** (`docs/pitches/`): Stacked Spots, The Bag, The House Lays the Lane, The Scoresheet.
 
 ## Decided
@@ -32,7 +33,23 @@ Root cause: the rack resets every time it is cleared, so there is never a board 
 - More pins than five is worth pursuing, spaced wider.
 - Different rack shapes and obstacles are worth pursuing.
 
-## Next: one combined lab
+## Combined Lab (built 21 November, not yet played by Josh)
+`labs/combined/`, on branch `lab/combined`. One game of five frames, three balls a frame, no shop.
+- **Racks:** ten shapes, two each of 6, 7, 8, 9 and 10 pins; a game deals one of each count in a random order. Three have posts (Ring Round a Post, Gate Posts, Ten Behind a Post), two have a rail and come left- or right-handed. Pins stand at least 77 lane units apart (Big Rack: 68). Pins are worth 2, 3 or 5. The camera is pulled in: a short wall strip and a flatter view, so the deck gets more of the screen. The aim ring sits just in front of the front row (`G.EY` = 285).
+- **Hand:** the bag starts with two each of Wide, Heavy, Dart, Burst and Ghost. Three are dealt each frame; pick one per throw. Heavy is now big as well as heavy (radius 13, weight 9; in Ball Bag it was radius 10, weight 7), and Burst's reach is 100: the bot found that was needed for every rack to have a first-ball clear. Dart no longer triples its pin, and Heavy no longer bends half as far (the throw is unchanged).
+- **Outline:** while aiming, the pins the drawn line takes with the selected ball and a perfect release are outlined, and the info strip shows what that ball would score. It runs the same sim on a copy of the rack.
+- **Between frames:** three pieces offered (at least one pin and one ball when available), take one or nothing. Pins: Lone (×3 if it falls alone), Domino (+6 if a pin knocks it), Wallflower (+1 Mult while it stands), Closer (×2 on the clearing ball), Anchor (+8 on the frame's last ball). Each takes a set spot in every later rack; the offer shows the next rack with the pin in its spot. Balls: Sweep (×3 if it clears), Pick (×4 if exactly one pin), Chain (+1 Mult per pin knocked by a pin); a taken ball is first in the next hand, then joins the bag.
+- **Scoring:** points of pins that fell × Mult. No strike bonus. A cleared rack is set again for the frame's remaining balls.
+
+What the bots found (`npm run combined-bot`, `npm run combined-flow`):
+- Every rack layout has a first-ball clear, but only with Heavy (or a conditional ball, which rolls like the house ball). Wide, Dart, Burst and Ghost never clear a full rack. A hand has a Heavy about half the time. Gate Posts is the hardest: 2 clearing lines out of about 8,900 tried.
+- No single line clears more than 2 of the 12 rack layouts.
+- Outline against pinfall: with the needle in the green, 180 of 180 bot balls fell exactly as outlined. With a 100 ms timing spread, about two thirds matched (64% and 66% over two runs); every mismatch was a release outside the green.
+
+## Next
+Josh plays Combined Lab and pastes the log. Questions it should answer: does picking a ball and a line between visible outcomes feel like a decision; does one rule arriving per frame read; is the spacing and camera right. If it is fun, the shop comes back on top of it.
+
+## The plan the Combined Lab came from
 - Each frame is a new rack: a different shape and pin count (six to ten), sometimes posts or a rail.
 - A hand of three balls dealt from a small bag.
 - While dragging, the pins the line will take are outlined for the selected ball, so choices are between visible outcomes.

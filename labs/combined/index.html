@@ -1,0 +1,619 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<title>Combined Lab</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@500;700&family=Silkscreen&display=swap" rel="stylesheet">
+<style>
+:root{
+  /* one screen: score and frames on top, the selected ball and what its line scores, the lane, the hand, the throw button */
+  --ink:#1d100a;--panel:#3a2016;--chalk:#f3e2b8;--dim:#c9a878;--accent:#d86a28;--go:#d83a2a;--go-ink:#fff8e8;
+  --paper:#f3e2b8;--paper-ink:#2a160e;--paper-dim:#7a4a2c;--now:#d83a2a;--pt:#f3e2b8;--mu:#ff8a4a;--out:#ffd23a;
+  --body:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;--display:"Pixelify Sans",system-ui,sans-serif;--num:"Silkscreen",ui-monospace,Menlo,monospace;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0}
+body{background:var(--ink);color:var(--chalk);font-family:var(--body);display:flex;flex-direction:column;overflow:hidden;-webkit-user-select:none;user-select:none;-webkit-tap-highlight-color:transparent}
+button{font-family:inherit;color:inherit}
+button:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+img{image-rendering:pixelated}
+.hud{display:flex;gap:6px;padding:6px 10px 0;align-items:center}
+#tot{font:400 20px/1 var(--num);min-width:44px;font-variant-numeric:tabular-nums}
+.board{flex:1;min-width:0;display:flex;gap:3px}
+.cell{flex:1;min-width:0;display:flex;justify-content:center;align-items:center;gap:2px;height:24px;color:var(--paper-ink);border:2px solid var(--panel);border-radius:2px;font:400 12px/1 var(--num)}
+.cell.done,.cell.now{background:var(--paper)}
+.cell.done{border-color:var(--paper)}
+.cell.now{border-color:var(--now)}
+.cell span{min-width:8px;text-align:center}
+.cell span:empty::before{content:"";display:block;width:4px;height:4px;margin:auto;background:var(--dim)}
+.cell.now span:empty::before{background:var(--paper-dim)}
+.hud button{flex:none;height:24px;padding:0;background:transparent;border:2px solid var(--dim);border-radius:3px}
+#logBtn{padding:0 5px;font:400 10px/1 var(--num)}
+#camBtn{width:30px;display:grid;place-items:center}
+#camBtn i{width:12px;height:10px;background:var(--chalk);clip-path:polygon(32% 0,68% 0,100% 100%,0 100%)}
+#camBtn[data-cam="top"] i{width:8px;clip-path:none}
+/* the selected ball (or a tapped piece) and what the drawn line scores with it */
+.info{flex:none;display:flex;align-items:center;gap:7px;height:30px;margin:6px 10px 4px;padding:0 4px 0 8px;background:var(--panel);border-radius:3px;font-size:12px;line-height:1.1;color:var(--dim);overflow:hidden}
+.info img{flex:none}
+.info b{flex:none;font-family:var(--display);font-size:14px;font-weight:700;color:var(--chalk);white-space:nowrap}
+.info span{flex:1;min-width:0;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+.info output{flex:none;margin-left:auto;display:flex;align-items:baseline;gap:4px;padding:3px 6px 4px;border:2px solid var(--out);border-radius:3px;background:var(--ink);font:400 16px/1 var(--num);color:var(--out);white-space:nowrap}
+.info output small{font-size:10px;color:var(--dim)}
+.info output:empty{display:none}
+.stage{flex:1;min-height:0;display:flex;align-items:center;justify-content:center;position:relative;padding:0 8px}
+canvas{display:block;touch-action:none;border-radius:6px;image-rendering:pixelated}
+.toast{position:absolute;left:0;right:0;top:40%;margin:0 auto;width:max-content;max-width:96%;transform:translateY(-50%);display:grid;grid-template-columns:auto auto;align-items:center;justify-content:center;gap:2px 10px;padding:6px 12px 7px;background:var(--ink);color:var(--chalk);border:3px solid var(--accent);border-radius:3px;box-shadow:0 4px 0 rgba(0,0,0,.5);font-family:var(--num);white-space:nowrap;pointer-events:none;opacity:0}
+.toast em{grid-row:span 2;font-style:normal;font-size:40px;line-height:40px;color:var(--accent)}
+.toast strong{font-weight:400;font-size:30px;line-height:30px}
+.toast em+strong{text-align:left}
+.toast b{font-weight:400;font-size:13px;line-height:14px;color:var(--dim);display:flex;gap:5px;justify-content:center}
+.toast em~b{justify-content:flex-start}
+.toast strong:first-child,.toast strong:first-child+b{grid-column:1/-1;text-align:center}
+.toast .pt{color:var(--pt)}.toast .mu{color:var(--mu)}
+.toast p{grid-column:1/-1;margin:4px 0 0;padding-top:5px;border-top:2px solid var(--panel);display:flex;flex-wrap:wrap;justify-content:center;gap:4px 9px;font-size:12px;line-height:1}
+.toast p span{display:flex;align-items:center;gap:3px}
+.fname{position:absolute;left:0;right:0;top:50%;margin:0 auto;width:max-content;padding:5px 10px 6px;background:var(--ink);color:var(--chalk);border:2px solid var(--dim);border-radius:3px;font:400 15px/1 var(--num);letter-spacing:.06em;white-space:nowrap;pointer-events:none;opacity:0}
+.hint{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);margin:0}
+/* the hand: three balls for this frame, then the pieces taken so far */
+.hand{flex:none;display:flex;gap:5px;padding:6px 10px 0;height:58px}
+.hand button{flex:1;min-width:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;padding:2px;background:var(--panel);border:2px solid var(--panel);border-radius:4px;font:700 12px/1 var(--display);color:var(--chalk);white-space:nowrap;overflow:hidden}
+.hand button.sel{border-color:var(--chalk);background:#5a3422}
+.hand button.used{opacity:.18}
+.hand button.pc{flex:none;width:30px;background:transparent;border-color:var(--panel)}
+.hand button.pc.sel{border-color:var(--chalk)}
+.hand button.pc img{width:9px;height:18px}
+.controls{display:flex;padding:6px 10px 10px}
+#throw{flex:1;border:3px solid var(--go);border-radius:4px;background:transparent;color:var(--chalk);font-family:var(--display);font-size:24px;font-weight:700;letter-spacing:.08em;min-height:52px;box-shadow:0 4px 0 rgba(0,0,0,.45)}
+#throw.live{background:var(--go);color:var(--go-ink)}
+#throw:disabled{background:transparent;border-color:var(--panel);color:transparent;box-shadow:none}
+@media (max-height:640px){.hand{height:52px}.hand button{gap:2px}.hand button img{max-width:24px;max-height:24px}.info{margin:4px 10px 2px}#throw{min-height:46px}.controls{padding:5px 10px 8px}}
+/* sheets: one screen, no scrolling */
+.sheet{position:fixed;inset:0;background:rgba(0,0,0,.78);display:flex;align-items:center;justify-content:center;padding:8px;z-index:2}
+.sheet[hidden]{display:none}
+.sheet .box{background:var(--panel);border-radius:10px;padding:10px;width:100%;max-width:380px;max-height:100%;overflow:hidden;display:flex;flex-direction:column;gap:8px;border:3px solid var(--ink);box-shadow:inset 0 0 0 2px rgba(255,255,255,.07)}
+.shead{display:flex;align-items:center;justify-content:space-between;gap:8px;min-height:30px}
+.sheet h2{margin:0;font-family:var(--display);font-size:20px;text-transform:uppercase;letter-spacing:.05em;white-space:nowrap}
+.shead small{display:flex;align-items:center;gap:6px;font:400 11px/1.2 var(--num);color:var(--dim);text-align:right}
+.chip{font-family:var(--num);font-weight:400;font-size:26px;line-height:1;color:var(--ink);background:var(--accent);padding:5px 10px 7px;border-radius:5px;box-shadow:0 3px 0 rgba(0,0,0,.4)}
+.row{display:flex;gap:8px}
+.row button{flex:1;min-width:0;padding:11px 8px;border-radius:8px;border:2px solid var(--dim);background:transparent;font-family:var(--display);font-size:15px;font-weight:700;white-space:nowrap}
+.row button.main{flex:1.7;background:var(--accent);border-color:var(--accent);color:var(--ink);box-shadow:0 3px 0 rgba(0,0,0,.4)}
+.row button:disabled{opacity:.35;box-shadow:none}
+/* the offer: the next rack with the piece in place, and three pieces to pick from */
+.next{position:relative;height:118px;border-radius:6px;border:2px solid var(--ink);background:repeating-linear-gradient(90deg,#c98f52 0 25px,#b47a40 25px 26px);overflow:hidden}
+.next img{position:absolute;width:13px;height:26px}
+.next i{position:absolute;border-radius:50%;background:#d83a2a;box-shadow:inset 0 0 0 2px #2a160e}
+.next .at{filter:drop-shadow(2px 0 0 var(--out)) drop-shadow(-2px 0 0 var(--out)) drop-shadow(0 2px 0 var(--out)) drop-shadow(0 -2px 0 var(--out))}
+.next u{position:absolute;top:0;bottom:0;width:6px;background:repeating-linear-gradient(#f3e2b8 0 12px,#d86a28 12px 24px);text-decoration:none}
+.next figcaption{position:absolute;left:6px;top:5px;font:400 11px/1 var(--num);color:var(--paper-ink)}
+.offers{display:flex;flex-direction:column;gap:6px}
+.offer{display:flex;align-items:center;gap:10px;min-height:54px;padding:6px 10px;text-align:left;border:2px solid var(--paper-dim);border-radius:6px;background:var(--paper);color:var(--paper-ink);box-shadow:0 3px 0 rgba(0,0,0,.4)}
+.offer.sel{border-color:var(--accent);box-shadow:0 0 0 2px var(--accent),0 3px 0 rgba(0,0,0,.4)}
+.offer .ic{flex:none;width:26px;display:grid;place-items:center}
+.offer p{margin:0;font-size:12.5px;line-height:1.25;color:var(--paper-dim)}
+.offer p strong{display:block;font:700 15px/1.15 var(--display);color:var(--paper-ink)}
+.recap{display:flex;flex-direction:column;gap:4px}
+.recap div{display:flex;align-items:center;gap:8px;height:34px;padding:0 9px;border-radius:5px;background:var(--paper);color:var(--paper-ink);font:400 12px/1 var(--num)}
+.recap div>span:first-child{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.recap i{display:flex;gap:6px;font-style:normal}
+.recap i span{display:flex;align-items:center;gap:2px}
+.recap b{font-weight:400;font-size:15px;min-width:34px;text-align:right}
+.took{display:flex;flex-wrap:wrap;gap:6px;align-items:center;min-height:22px;font:400 11px/1 var(--num);color:var(--dim)}
+.took span{display:flex;align-items:center;gap:3px;color:var(--chalk)}
+#logText{flex:1 1 auto;min-height:60px;width:100%;font:11px ui-monospace,Menlo,monospace;background:var(--ink);color:var(--chalk);border:1px solid var(--dim);border-radius:8px;padding:8px;-webkit-user-select:text;user-select:text;white-space:pre;overflow:auto}
+</style>
+</head>
+<body>
+<div class="hud">
+  <b id="tot" aria-label="Score">0</b>
+  <div class="board" id="board"></div>
+  <button id="logBtn" type="button" aria-label="Results log">LOG</button>
+  <button id="camBtn" type="button" aria-label="Change view"><i></i></button>
+</div>
+<div class="info" id="info" aria-live="polite"></div>
+<div class="stage">
+  <canvas id="lane" width="180" height="300" aria-label="Bowling lane. Drag the ball, the bend handle and the aim ring. Outlined pins are the ones the line takes."></canvas>
+  <div class="toast" id="toast" aria-live="polite"></div>
+  <div class="fname" id="fname"></div>
+</div>
+<p class="hint" id="hint"></p>
+<div class="hand" id="hand" aria-label="Your hand"></div>
+<div class="controls">
+  <button id="throw" type="button">READY</button>
+</div>
+<div class="sheet" id="offer" hidden><div class="box">
+  <div class="shead"><h2>Add one</h2><small id="offerInfo"></small></div>
+  <figure class="next" id="offerRack" style="margin:0"></figure>
+  <div class="offers" id="offerList"></div>
+  <div class="row"><button id="offerSkip" type="button">Take nothing</button><button class="main" id="offerTake" type="button" disabled>Take it</button></div>
+</div></div>
+<div class="sheet" id="over" hidden><div class="box">
+  <div class="shead"><h2 id="overTitle"></h2><b class="chip" id="overTot"></b></div>
+  <div class="recap" id="overRecap"></div>
+  <div class="took" id="overTook"></div>
+  <div class="row"><button id="overLog" type="button">Results log</button><button class="main" id="again" type="button">New game</button></div>
+</div></div>
+<div class="sheet" id="log" hidden><div class="box">
+  <h2>Results log</h2>
+  <textarea id="logText" readonly rows="14" aria-label="Results log"></textarea>
+  <div class="row"><button id="logClear" type="button">Clear</button><button id="logCopy" type="button">Copy log</button><button class="main" id="logClose" type="button">Done</button></div>
+</div></div>
+
+<script>
+//SIM-START
+// Changing Field Lab's sim (posts, a rail, the line through the field) with Ball Bag Lab's ball kinds. No lane surfaces.
+const G={L:60,R:300,BACK:30,FOUL:540,SY:520,EY:160,WL:38,WR:322};
+let FIELD={pins:[]};
+let RB=12,MB=2.2,FRIC=1.5;const RP=11,RT=21,MP=1,REST=.78,KNOCK=45,RAILB=.85;
+let CARRY=1.5,KICK=-.9,DRIVE=0,MESS=.8;
+const POW=[{speed:400,needle:.85},{speed:500,needle:1},{speed:620,needle:1.3}];
+// The ball's line through the current rack: the same curve as every lab (start, bend, aim), carried on straight past the aim row
+// to the back of the deck. A rail banks it, a post stops it. br is the ball's radius. The preview and the roll both use this.
+function makePath(sx,ex,bend,br){br=br||RB;
+  const N=90,h=1/N,dy=(G.SY-G.EY)/N,pts=[{x:sx,y:G.SY}],F=FIELD;let x=sx,y=G.SY,v=ex-sx+2*bend,stop=false,bank=0;
+  for(let i=0;(i<N||y>G.BACK-24)&&i<600&&!stop;i++){const a=i<N?-4*bend:0;
+    x+=v*h+.5*a*h*h;v+=a*h;y-=dy;
+    if(F.rail&&y>G.BACK&&(x-180)*F.rail>120-br){x=180+F.rail*(120-br)*2-(x-180);v=-v*RAILB;bank++;}
+    if(F.posts)for(const p of F.posts)if(Math.hypot(x-p.x,y-p.y)<p.r+br)stop=true;
+    pts.push({x,y});}
+  const len=[0];for(let i=1;i<pts.length;i++)len.push(len[i-1]+Math.hypot(pts[i].x-pts[i-1].x,pts[i].y-pts[i-1].y));
+  return{S:pts[0],pts,len,stop,bank};
+}
+function pathAt(p,d){
+  const n=p.pts.length;if(d>=p.len[n-1]){const a=p.pts[n-2],b=p.pts[n-1],l=Math.hypot(b.x-a.x,b.y-a.y);return{x:b.x,y:b.y,dx:(b.x-a.x)/l,dy:(b.y-a.y)/l,end:true};}
+  let i=1;while(p.len[i]<d)i++;
+  const a=p.pts[i-1],b=p.pts[i],seg=p.len[i]-p.len[i-1],f=(d-p.len[i-1])/seg;
+  return{x:a.x+(b.x-a.x)*f,y:a.y+(b.y-a.y)*f,dx:(b.x-a.x)/seg,dy:(b.y-a.y)/seg,end:false};
+}
+function pinR(p,rt){if(!p.down)return RP;return RP+(rt-RP)*Math.min(1,p.age/0.1);}
+// k: the ball kind (see BALLS). r radius, m weight; pass: goes through pins; stop: halts at the first pin; burst: blast radius at first touch; soft: share of the knock a pin gets
+function newSim(pins,path,power,spin,k){k=k||{};return{pins,path,t:0,done:false,ball:{r:k.r||RB,m:k.m||MB,pass:k.pass||0,soft:k.soft||1,stop:!!k.stop,burst:k.burst||0,dead:false,spin:spin||0,x:path.S.x,y:path.S.y,vx:0,vy:0,d:0,speed:POW[power].speed,free:false,gutter:false,out:false,stuck:false}};}
+// dart: the touched pin tips over and the ball stops dead. burst: every standing pin within reach drops where it stands and the ball is spent
+function firstTouch(s,p,nx,ny){const b=s.ball,hit=(q,vx,vy)=>{if(q.down)return;q.by='ball';q.ord=s.ord=(s.ord||0)+1;q.down=true;q.vx=vx;q.vy=vy;};
+  if(b.stop){hit(p,nx*30,ny*30);b.dead=b.free=true;b.vx=b.vy=0;return;}
+  hit(p,nx*40,ny*40);for(const q of s.pins){if(q.gone||q.down)continue;const dx=q.x-b.x,dy=q.y-b.y,d=Math.hypot(dx,dy);if(d<b.burst)hit(q,dx/d*40,dy/d*40);}
+  s.boom={x:b.x,y:b.y,r:b.burst,t:s.t};b.out=true;}
+function stepSim(s,dt){
+  const b=s.ball,F=FIELD;s.t+=dt;
+  if(!b.out&&!b.dead){
+    if(b.gutter){b.y-=b.speed*.8*dt;}
+    else if(!b.free){b.d+=b.speed*dt;const q=pathAt(s.path,b.d);b.x=q.x;b.y=q.y;b.vx=q.dx*b.speed;b.vy=q.dy*b.speed;
+      if(q.end){if(s.path.stop){b.stuck=b.out=true;b.vx=b.vy=0;}else b.free=true;}
+      if(b.x<G.L||b.x>G.R){b.gutter=true;b.x=b.x<G.L?G.L-11:G.R+11;}}
+    else{b.x+=b.vx*dt;b.y+=b.vy*dt;
+      if(b.x<G.WL+b.r){b.x=G.WL+b.r;b.vx=Math.abs(b.vx)*.4;}if(b.x>G.WR-b.r){b.x=G.WR-b.r;b.vx=-Math.abs(b.vx)*.4;}
+      if(F.rail&&(b.x-180)*F.rail>120-b.r){b.x=180+F.rail*(120-b.r);b.vx=-F.rail*Math.abs(b.vx)*RAILB;}
+      if(b.vy>-40)b.vy-=300*dt;
+      if(b.spin&&b.y>G.BACK+20)b.vx+=-Math.sign(b.spin)*Math.abs(b.spin)*DRIVE*dt;}
+    if(b.y<G.BACK-16)b.out=true;
+  }
+  const P=s.pins,rt=RT*(1+MESS*Math.abs(b.spin));
+  if(!b.out&&!b.gutter&&!b.dead)for(const p of P){if(p.gone)continue;const r=b.r+RP;
+    let nx=p.x-b.x,ny=p.y-b.y;const d=Math.hypot(nx,ny);if(d>=r||d===0)continue;nx/=d;ny/=d;
+    if(b.pass){if(!p.down){p.by='ball';p.ord=s.ord=(s.ord||0)+1;p.down=true;p.vx=b.vx*.06;p.vy=b.vy*.06;}continue;}   // ghost: the pin drops where it stands, the ball is not turned
+    if(b.stop||b.burst){firstTouch(s,p,nx,ny);break;}
+    const vr=(b.vx-p.vx)*nx+(b.vy-p.vy)*ny;
+    if(vr>0){const sp=Math.abs(b.spin),mb=b.m*(1+CARRY*sp);const j=(1+REST)*vr/(1/mb+1/MP);b.vx-=j/mb*nx;b.vy-=j/mb*ny;p.vx+=j/MP*nx*b.soft;p.vy+=j/MP*ny*b.soft;
+      if(sp){const hd=-Math.sign(b.spin),tx=-ny,ty=nx,sg=tx*hd>=0?1:-1,k=KICK*sp*vr;p.vx+=sg*tx*k*b.soft;p.vy+=sg*ty*k*b.soft;}
+      if(!p.down){p.by='ball';p.ord=s.ord=(s.ord||0)+1;}p.down=true;b.free=true;}
+    p.x=b.x+nx*r;p.y=b.y+ny*r;}
+  for(let i=0;i<P.length;i++){const a=P[i];if(a.gone)continue;for(let k=i+1;k<P.length;k++){const c=P[k];if(c.gone)continue;
+    const am=a.down&&(a.vx||a.vy),cm=c.down&&(c.vx||c.vy);if(!am&&!cm)continue;
+    const r=pinR(a,rt)+pinR(c,rt);let nx=c.x-a.x,ny=c.y-a.y;const d=Math.hypot(nx,ny);if(d>=r||d===0)continue;nx/=d;ny/=d;
+    const vr=(a.vx-c.vx)*nx+(a.vy-c.vy)*ny;
+    if(vr>0){
+      const aFixed=!a.down&&vr<KNOCK,cFixed=!c.down&&vr<KNOCK;
+      if(aFixed){c.vx+=(1+.5)*vr*nx;c.vy+=(1+.5)*vr*ny;}
+      else if(cFixed){a.vx-=(1+.5)*vr*nx;a.vy-=(1+.5)*vr*ny;}
+      else{const j=(1+REST)*vr/2;a.vx-=j*nx;a.vy-=j*ny;c.vx+=j*nx;c.vy+=j*ny;if(!a.down){a.by='pin';a.ord=s.ord=(s.ord||0)+1;}if(!c.down){c.by='pin';c.ord=s.ord=(s.ord||0)+1;}a.down=true;c.down=true;}
+    }
+    const ov=r-d;const aStill=!a.down,cStill=!c.down;
+    if(aStill&&!cStill){c.x+=nx*ov;c.y+=ny*ov;}else if(cStill&&!aStill){a.x-=nx*ov;a.y-=ny*ov;}else if(!aStill&&!cStill){a.x-=nx*ov/2;a.y-=ny*ov/2;c.x+=nx*ov/2;c.y+=ny*ov/2;}
+  }}
+  let moving=false;const fr=Math.exp(-FRIC*dt);
+  for(const p of P){if(p.gone||!p.down)continue;p.age+=dt;
+    p.x+=p.vx*dt;p.y+=p.vy*dt;p.vx*=fr;p.vy*=fr;
+    const r=RP;if(p.x<G.WL+r){p.x=G.WL+r;p.vx=Math.abs(p.vx)*.5;}if(p.x>G.WR-r){p.x=G.WR-r;p.vx=-Math.abs(p.vx)*.5;}
+    if(F.posts)for(const o of F.posts){let nx=p.x-o.x,ny=p.y-o.y;const d=Math.hypot(nx,ny),rr=o.r+r;if(d>=rr||d===0)continue;nx/=d;ny/=d;p.x=o.x+nx*rr;p.y=o.y+ny*rr;const vn=p.vx*nx+p.vy*ny;if(vn<0){p.vx-=1.5*vn*nx;p.vy-=1.5*vn*ny;}}
+    if(p.y<G.BACK){p.gone=true;p.vx=p.vy=0;continue;}
+    const sp=Math.hypot(p.vx,p.vy);if(sp>1)p.ang=Math.atan2(p.vy,p.vx);
+    if(sp<14){p.vx=p.vy=0;}else moving=true;}
+  if((b.out||b.dead||s.t>1.2&&b.free&&Math.hypot(b.vx,b.vy)<10)&&!moving)s.done=true;
+  if(s.t>6)s.done=true;
+}
+//SIM-END
+
+// ---------- the lab: five frames, a new rack each frame, a hand of three balls, one new piece between frames ----------
+const FRAMES=5,PER=3,SET=.5;
+G.EY=285;   // the aim ring sits just in front of the rack's front row, as it does at the headpin row in the other labs
+// Racks in lane units: [x, y, points]. Pins are listed front to back, left to right; that order is the spot number in the log.
+// Pins stand at least 77 apart (Big Rack Lab stood them 68 apart). sp: the spots that conditional pins take, in the order you add them.
+const RACKS=[
+  {id:'two-rows',name:'TWO ROWS',pins:[[100,270,2],[180,270,3],[260,270,2],[100,170,3],[180,170,5],[260,170,3]],sp:[4,1,3,5]},
+  {id:'post-ring',name:'RING ROUND A POST',posts:[{x:180,y:180,r:16}],pins:[[135,258,2],[225,258,2],[90,180,3],[270,180,3],[135,102,5],[225,102,3]],sp:[4,0,3,5]},
+  {id:'arrow',name:'ARROWHEAD',pins:[[180,285,2],[135,210,3],[225,210,3],[96,135,2],[180,135,5],[264,135,2],[180,60,3]],sp:[4,0,6,2]},
+  {id:'rail-slant',name:'RIGHT RAIL',nameM:'LEFT RAIL',rail:1,pins:[[96,280,2],[180,260,2],[264,240,3],[138,170,3],[222,150,3],[264,80,5],[180,60,2]],sp:[5,1,4,3]},
+  {id:'columns',name:'TWO COLUMNS',pins:[[105,285,2],[255,285,2],[105,205,3],[255,205,3],[105,125,3],[255,125,3],[105,45,5],[255,45,2]],sp:[6,0,5,3]},
+  {id:'gate',name:'GATE POSTS',posts:[{x:96,y:335,r:14},{x:264,y:335,r:14}],pins:[[96,250,2],[180,250,3],[264,250,2],[138,175,3],[222,175,3],[96,100,2],[180,100,5],[264,100,2]],sp:[6,1,3,7]},
+  {id:'diamond',name:'DIAMOND',pins:[[180,290,2],[134,228,3],[226,228,3],[88,166,2],[180,166,5],[272,166,2],[134,104,3],[226,104,3],[180,42,2]],sp:[4,0,8,6]},
+  {id:'rail-grid',name:'GRID, LEFT RAIL',nameM:'GRID, RIGHT RAIL',rail:-1,pins:[[96,280,2],[180,280,2],[264,280,2],[96,190,3],[180,190,5],[264,190,3],[96,100,3],[180,100,2],[264,100,3]],sp:[4,0,6,8]},
+  {id:'stagger',name:'STAGGERED TEN',pins:[[96,285,2],[180,285,2],[264,285,2],[138,215,3],[222,215,3],[96,145,3],[180,145,5],[264,145,3],[138,75,2],[222,75,2]],sp:[6,1,8,3]},
+  {id:'post-ten',name:'TEN BEHIND A POST',posts:[{x:180,y:345,r:15}],pins:[[138,290,3],[222,290,3],[96,220,2],[180,220,5],[264,220,2],[138,150,2],[222,150,2],[96,80,3],[180,80,2],[264,80,3]],sp:[3,0,7,1]}
+];
+// one-sided racks come left- or right-handed at random; the spots are renumbered front to back, left to right after mirroring
+function rackDef(base,flip){const m=x=>flip?360-x:x,o={id:base.id,name:flip&&base.nameM?base.nameM:base.name,flip:!!flip,count:base.pins.length};
+  const order=base.pins.map((p,i)=>({x:m(p[0]),y:p[1],v:p[2],i})).sort((a,b)=>b.y-a.y||a.x-b.x);
+  o.pins=order.map(p=>[p.x,p.y,p.v]);o.sp=base.sp.map(i=>order.findIndex(p=>p.i===i));
+  if(base.posts)o.posts=base.posts.map(p=>({x:m(p.x),y:p.y,r:p.r}));if(base.rail)o.rail=flip?-base.rail:base.rail;return o;}
+const oneSided=b=>!!b.rail||b.pins.some(p=>!b.pins.some(q=>q[1]===p[1]&&q[0]===360-p[0]));
+// the balls. The five physical kinds start in the bag, two of each. The conditional ones are only ever added between frames; they roll like the house ball.
+const BALLS={
+  wide:{name:'Wide',text:'Wide and soft. Pins it touches tip over where they stand.',r:17,m:.8,soft:.04,pal:['#08221a','#12503a','#1f7a56','#3fae7c','#8fe0b4','#ffffff']},
+  heavy:{name:'Heavy',text:'Big and heavy. Pins it hits fly into others.',r:13,m:9,pal:['#0c0a10','#1e1a26','#34304a','#544e78','#8a84b0','#e0dcff']},
+  dart:{name:'Dart',text:'Stops at the first pin it touches. Only that pin falls.',r:6,m:2.2,stop:true,pal:['#3a2a04','#7a5a08','#b88a10','#e8c020','#fff08a','#ffffff']},
+  burst:{name:'Burst',text:'Bursts at the first pin. Pins near it drop.',r:12,m:2.2,burst:100,pal:['#000000','#1a1a20','#2a2a34','#3e3e4c','#ff9a30','#ffe880']},
+  ghost:{name:'Ghost',text:'Passes through. Drops only the pins its line crosses.',r:12,m:2.2,pass:1,pal:['#5a6470','#8e98a4','#b8c2cc','#d8e0e8','#f0f4f8','#ffffff']},
+  sweep:{name:'Sweep',text:'Score ×3 if it clears the rack.',r:12,m:2.2,pal:['#3a0a24','#7a1a4a','#b82a72','#e85a9a','#ffa8cc','#ffffff']},
+  pick:{name:'Pick',text:'Score ×4 if it drops exactly one pin.',r:12,m:2.2,pal:['#062a2a','#0e5a5a','#1a8a8a','#3ac0c0','#9aeaea','#ffffff']},
+  chain:{name:'Chain',text:'+1 Mult for each pin another pin knocks down.',r:12,m:2.2,pal:['#081a33','#123a6e','#1f5ea8','#3f8ed8','#8cc4f4','#ffffff']}
+};
+const BAG0=['wide','wide','heavy','heavy','dart','dart','burst','burst','ghost','ghost'];
+// conditional pins: each keeps the points of the spot it takes
+const PINS={
+  lone:{name:'Lone pin',text:'Score ×3 when it is the only pin a ball drops.'},
+  domino:{name:'Domino pin',text:'+6 points when another pin knocks it down.'},
+  wall:{name:'Wallflower pin',text:'+1 Mult on any ball that drops pins and leaves it standing.'},
+  closer:{name:'Closer pin',text:'Score ×2 when it falls on the ball that clears the rack.'},
+  anchor:{name:'Anchor pin',text:'+8 points when it falls on the frame\'s last ball.'}
+};
+const PAL={
+  lone:{w:'#ffd8e0',l:'#ff9eb4',m:'#e0607e',d:'#a8344e',R:'#fff8e8',r:'#d2bf9a'},
+  domino:{w:'#fff8e8',l:'#efe2c4',m:'#d2bf9a',d:'#a58f6e',R:'#1a1a1a',r:'#000000'},
+  wall:{w:'#ecd8ff',l:'#c8a8f0',m:'#9a78d0',d:'#6a4ca0',R:'#5a2f8a',r:'#3c1c64'},
+  closer:{w:'#6a8ad8',l:'#3f5fb8',m:'#28408e',d:'#162664',R:'#ffd866',r:'#e8a020'},
+  anchor:{w:'#b8f0c0',l:'#78d890',m:'#3fae62',d:'#1f7a3c',R:'#1d100a',r:'#000000'}
+};
+const PIECE_BALLS=['sweep','pick','chain'],PIECE_PINS=Object.keys(PINS);
+const KEY='combined-log1';
+let LOG=[];try{LOG=JSON.parse(localStorage.getItem(KEY)||'[]');}catch(e){}
+let gameNo=LOG.length?LOG[LOG.length-1].game:0,thrown=false;
+const T={speed:.45,win:80,bend:90,risk:1,two:true,cam:'lane'};
+try{if(localStorage.getItem('combined-cam')==='top')T.cam='top';}catch(e){}
+const cv=document.getElementById('lane'),c=cv.getContext('2d');
+const LW=180,LH=300;
+function fit(){const box=cv.parentElement.getBoundingClientRect();const s=Math.max(.5,Math.min((box.width-16)/LW,box.height/LH));cv.style.width=Math.floor(LW*s)+'px';cv.style.height=Math.floor(LH*s)+'px';}
+window.addEventListener('resize',fit);
+const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+const $=id=>document.getElementById(id);
+const still=window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+const sum=a=>a.reduce((t,v)=>t+v,0);
+let RNG=Math.random;
+function shuffle(a){a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(RNG()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+
+let g,tapPiece=null;
+function tick(s){stepSim(s,1/240);}
+// five racks for a game: one each of six, seven, eight, nine and ten pins, in a random order, each one of two shapes
+function pickRacks(){const by={};RACKS.forEach(r=>(by[r.pins.length]=by[r.pins.length]||[]).push(r));
+  return shuffle([6,7,8,9,10]).map(n=>{const b=by[n][Math.floor(RNG()*by[n].length)];return rackDef(b,oneSided(b)&&RNG()<.5);});}
+// the pins of a rack, with the conditional pins taken so far in their spots
+function rackPins(def,pins){pins=pins||g.pinsOwned;return def.pins.map((p,i)=>{const j=def.sp.indexOf(i),t=j>=0&&j<pins.length?pins[j]:'plain';
+  return{x:p[0],y:p[1],x0:p[0],y0:p[1],v:p[2],t,kind:t==='plain'?'p'+p[2]:t,slot:i,vx:0,vy:0,down:false,gone:false,age:0,ang:0};});}
+function setRack(def){FIELD=g.rack=def;g.pins=rackPins(def);g.rackBalls=0;g.last=null;g.setT=still?0:SET;g.nameT=1.6;$('fname').textContent=def.name;
+  const r=ballR();g.sx=clamp(g.sx,G.L+r+2,G.R-r-2);fixBend();g.pk=null;}
+// the hand: new balls you took come first, then the bag. The bag is refilled from the used balls when it runs out.
+function deal(){const h=[];while(g.fresh.length&&h.length<PER)h.push(g.fresh.shift());
+  while(h.length<PER){if(!g.draw.length){g.draw=shuffle(g.disc);g.disc=[];}h.push(g.draw.pop());}
+  g.hand=h.map(k=>({k,used:false}));g.sel=0;}
+function newGame(){gameNo++;
+  g={n:gameNo,racks:pickRacks(),bx:180,zoneAt:.2,ready:false,t0:0,pend:null,frame:0,frames:[],pins:[],rackBalls:0,sx:180,ex:180,bend:0,power:1,phase:.5,mode:'aim',sim:null,trail:[],last:null,intended:null,err:0,toast:null,toastT:0,wait:0,stopped:0,setT:0,nameT:0,
+    draw:shuffle(BAG0),disc:[],fresh:[],hand:[],sel:0,kind:null,pinsOwned:[],ballsOwned:[],took:[],pk:null,pred:null};
+  g.frames=g.racks.map(r=>({balls:[],marks:[],kinds:[],rack:r.name}));
+  deal();setRack(g.racks[0]);g.t0=performance.now();tapPiece=null;
+  ['over','log','offer'].forEach(id=>$(id).hidden=true);$('camBtn').dataset.cam=T.cam;board();hand();info();setBtn();
+  $('hint').textContent='Five frames, three balls each, a new rack every frame. Pick a ball from your hand, drag the ball, the bend handle and the aim ring; outlined pins are the ones that line takes. Press Ready, then stop the needle in the green.';}
+$('camBtn').addEventListener('click',()=>{T.cam=T.cam==='lane'?'top':'lane';drag=null;$('camBtn').dataset.cam=T.cam;try{localStorage.setItem('combined-cam',T.cam);}catch(e){}});
+const selKind=()=>g.hand[g.sel]&&!g.hand[g.sel].used?g.hand[g.sel].k:null;
+const ballR=()=>{const k=g&&selKind();return k?BALLS[k].r:RB;};
+function setBtn(){const b=$('throw');b.disabled=g.mode!=='aim'||!selKind();b.classList.toggle('live',g.mode==='aim'&&g.ready);b.textContent=g.mode==='aim'&&!g.ready?'READY':'THROW';}
+function saveLog(){try{localStorage.setItem(KEY,JSON.stringify(LOG));}catch(e){}}
+const tri=p=>4*Math.abs((((p%1)+1)%1)-.5)-1;
+function zone(){return Math.min(.6,T.win/1000*4*needleHz());}
+function fixBend(){const mid=(g.sx+g.ex)/2;g.bend=clamp(2*(g.bx-mid),-T.bend,T.bend);g.bx=mid+g.bend/2;}
+function needleHz(){return T.speed*(1+T.risk*Math.abs(g.bend)/T.bend)*POW[g.power].needle;}
+function total(){return sum(g.frames.map(f=>sum(f.balls)));}
+function board(){let h='';
+  for(let i=0;i<FRAMES;i++){const f=g.frames[i];let m='';for(let k=0;k<PER;k++)m+=`<span>${f.marks[k]||''}</span>`;
+    h+=`<div class="cell${i===g.frame&&g.mode!=='over'?' now':f.balls.length?' done':''}">${m}</div>`;}
+  $('board').innerHTML=h;$('tot').textContent=total();}
+// the hand: three balls; after them, one small button per conditional pin taken (tap to read it)
+function hand(){$('hand').innerHTML=g.hand.map((h,i)=>{const im=bicon(h.k);return `<button type="button" data-i="${i}" class="${h.used?'used':i===g.sel&&tapPiece===null?'sel':''}"${h.used?' disabled':''} aria-pressed="${i===g.sel}" aria-label="${BALLS[h.k].name} ball${h.used?', thrown':''}"><img src="${im.src}" width="${Math.min(30,im.n*2)}" height="${Math.min(30,im.n*2)}" alt="">${BALLS[h.k].name}</button>`;}).join('')
+  +g.pinsOwned.map(t=>`<button type="button" class="pc${tapPiece===t?' sel':''}" data-p="${t}" aria-label="${PINS[t].name}"><img src="${icon(t)}" alt=""></button>`).join('');}
+$('hand').addEventListener('click',e=>{const b=e.target.closest('button');if(!b||!g)return;
+  if(b.dataset.p){tapPiece=tapPiece===b.dataset.p?null:b.dataset.p;hand();info();return;}
+  const i=+b.dataset.i;if(g.mode!=='aim'||g.hand[i].used)return;g.sel=i;g.ready=false;tapPiece=null;const r=BALLS[g.hand[i].k].r;g.sx=clamp(g.sx,G.L+r+2,G.R-r-2);fixBend();hand();info();setBtn();});
+// the info strip: the selected ball and its rule, and what the drawn line scores with it
+function info(){const el=$('info');
+  if(tapPiece){el.innerHTML=`<img src="${icon(tapPiece)}" width="9" height="18" alt=""><b>${PINS[tapPiece].name}</b><span>${PINS[tapPiece].text}</span>`;return;}
+  const k=g.mode==='aim'?selKind():g.kind;if(!k){el.innerHTML='';return;}
+  const im=bicon(k),p=g.mode==='aim'&&g.pred;
+  el.innerHTML=`<img src="${im.src}" width="${im.n}" height="${im.n}" alt=""><b>${BALLS[k].name}</b><span>${BALLS[k].text}</span><output aria-label="What this line scores">${p?(p.r.m!==1?`<small>${p.r.pts}×${p.r.m}</small>`:'')+'+'+p.r.score:''}</output>`;}
+// what one ball is worth: points of the pins that fell, times Mult. No bonus for a strike.
+function scoreBall(fell,left,kind,last){const cleared=left.length===0&&fell.length>0,notes=[];let pts=0,add=0,x=1;
+  for(const p of fell){pts+=p.v;
+    if(p.t==='domino'&&p.by==='pin'){pts+=6;notes.push(['domino','+6']);}
+    if(p.t==='anchor'&&last){pts+=8;notes.push(['anchor','+8']);}}
+  if(fell.length){const w=left.filter(p=>p.t==='wall').length;if(w){add+=w;notes.push(['wall','+'+w,1]);}}
+  if(kind==='chain'){const n=fell.filter(p=>p.by==='pin').length;if(n){add+=n;notes.push(['chain','+'+n,1]);}}
+  if(fell.length===1&&fell[0].t==='lone'){x*=3;notes.push(['lone','×3',1]);}
+  if(cleared&&fell.some(p=>p.t==='closer')){x*=2;notes.push(['closer','×2',1]);}
+  if(kind==='sweep'&&cleared){x*=3;notes.push(['sweep','×3',1]);}
+  if(kind==='pick'&&fell.length===1){x*=4;notes.push(['pick','×4',1]);}
+  const m=(1+add)*x;return{pts,m,score:pts*m,cleared,notes};}
+// The preview: roll the drawn line with the selected ball, perfect release, on a copy of the rack. This is the same sim the throw runs.
+function runLine(pins,sx,ex,bend,kind){const cp=pins.map(q=>Object.assign({},q)),s=newSim(cp,makePath(sx,ex,bend,BALLS[kind].r),1,bend/90,BALLS[kind]);let k=0;while(!s.done&&k++<2500)tick(s);
+  return{fell:cp.filter(q=>q.down),left:cp.filter(q=>!q.down)};}
+function predict(){const k=selKind();if(g.mode!=='aim'||!k){g.pred=null;return;}
+  const key=[k,g.sx,g.ex,g.bend,g.pins.length,g.frame,g.hand.filter(h=>h.used).length].join('|');if(g.pk===key)return;g.pk=key;
+  const o=runLine(g.pins,g.sx,g.ex,g.bend,k),last=g.frames[g.frame].balls.length===PER-1;
+  g.pred={slots:new Set(o.fell.map(p=>p.slot)),r:scoreBall(o.fell,o.left,k,last)};info();}
+const spots=ps=>ps.map(p=>p.slot+1).sort((a,b)=>a-b).join(' ')||'none';
+function throwBall(){if(g.mode!=='aim'||!selKind())return;
+  if(!g.ready){g.ready=true;g.phase=RNG();setBtn();return;}
+  const kind=selKind(),K=BALLS[kind],n=tri(g.phase),z=zone(),ms=Math.round(n/(4*needleHz())*1000);let eff=0;if(Math.abs(n)>z)eff=Math.sign(n)*(Math.abs(n)-z)/(1-z);
+  g.pk=null;predict();
+  g.stopped=n;g.zoneAt=z;g.err=eff;g.intended=makePath(g.sx,g.ex,g.bend,K.r);
+  const path=makePath(g.sx,g.ex+eff*70,g.bend,K.r),f=g.frames[g.frame];
+  g.pend={type:'ball',game:g.n,frame:g.frame+1,ball:f.balls.length+1,rack:g.rack.name,pins_in_rack:g.rack.count,kind,hand:g.hand.map(h=>h.used?'('+h.k+')':h.k).join(' '),
+    pieces:g.pinsOwned.join(' ')||'none',start:Math.round(g.sx-180),aim:Math.round(g.ex-180),bend:Math.round(g.bend),ms,drift:Math.round(eff*70),setup:+((performance.now()-g.t0)/1000).toFixed(1),standing:g.pins.length,
+    outlined:spots(g.pins.filter(p=>g.pred.slots.has(p.slot))),outScore:g.pred.r.score,cam:T.cam};
+  g.hand[g.sel].used=true;g.kind=kind;tapPiece=null;
+  g.sim=newSim(g.pins,path,1,g.bend/90,K);g.trail=[];g.mode='roll';thrown=true;g.rackBalls++;g.pred=null;
+  hand();info();setBtn();}
+$('throw').addEventListener('click',throwBall);
+// a trigger note as its piece's icon and the number
+function chip(n){const[k,s,mu]=n;let im;if(PINS[k])im=`<img src="${icon(k)}" width="9" height="18" alt="${PINS[k].name}">`;else{const b=bicon(k);im=`<img src="${b.src}" width="${b.n}" height="${b.n}" alt="${BALLS[k].name}">`;}
+  return `<span class="${mu?'mu':'pt'}">${im}${s}</span>`;}
+function resolve(){const kind=g.kind,f=g.frames[g.frame],fell=g.pins.filter(p=>p.down),left=g.pins.filter(p=>!p.down),r=scoreBall(fell,left,kind,f.balls.length===PER-1);
+  f.balls.push(r.score);f.kinds.push(kind);f.marks.push(r.cleared?(g.rackBalls===1?'X':'/'):fell.length?String(fell.length):'-');
+  const mark=r.cleared?(g.rackBalls===1?'X':'/'):'';g.toast=r.score?'x':null;
+  $('toast').innerHTML=(mark?`<em>${mark}</em>`:'')+`<strong>+${r.score}</strong>`+(r.m!==1?`<b><span class="pt">${r.pts}</span>×<span class="mu">${r.m}</span></b>`:'')+(r.notes.length?`<p>${r.notes.map(chip).join('')}</p>`:'');
+  g.toastT=r.notes.length?2.2:1.5;
+  if(g.pend){const out=g.pend.outlined,fs=spots(fell);Object.assign(g.pend,{fell:fs,match:out===fs?'yes':'no',down:fell.length,points:r.pts,mult:r.m,score:r.score,total:total(),notes:r.notes.map(n=>n[0]+' '+n[1]).join(' + ')});LOG.push(g.pend);g.pend=null;saveLog();}
+  g.last=g.trail;g.pins=left;g.sim=null;g.kind=null;g.pk=null;let end=false,next=false;
+  if(f.balls.length>=PER){g.disc.push(...g.hand.map(h=>h.k));if(g.frame===FRAMES-1)end=true;else next=true;}
+  else if(r.cleared){g.pins=rackPins(g.rack);g.rackBalls=0;g.setT=still?0:SET;}
+  if(end){g.mode='over';board();hand();info();setBtn();showOver();return;}
+  if(next){g.mode='offer';board();hand();info();setBtn();setTimeout(()=>{if(g.mode==='offer')showOffer();},still?0:900);return;}
+  g.mode='aim';g.ready=false;g.t0=performance.now();const nx=g.hand.findIndex(h=>!h.used);if(g.hand[g.sel].used)g.sel=nx;
+  board();hand();info();setBtn();}
+
+// ---------- between frames: three pieces, take one or none. The next rack is shown with a pin in the spot it would take. ----------
+let offerSel=null;
+function makeOffers(){const pins=shuffle(PIECE_PINS.filter(t=>!g.pinsOwned.includes(t))),balls=shuffle(PIECE_BALLS.filter(t=>!g.ballsOwned.includes(t)));
+  const o=[];if(pins.length)o.push({kind:'pin',t:pins.shift()});if(balls.length)o.push({kind:'ball',t:balls.shift()});
+  const rest=shuffle(pins.map(t=>({kind:'pin',t})).concat(balls.map(t=>({kind:'ball',t}))));while(o.length<3&&rest.length)o.push(rest.shift());return shuffle(o);}
+function showOffer(){if(!$('offer').hidden)return;g.offers=makeOffers();offerSel=null;const nr=g.racks[g.frame+1];
+  $('offerList').innerHTML=g.offers.map((o,i)=>{const P=o.kind==='pin'?PINS[o.t]:BALLS[o.t],im=o.kind==='pin'?`<img src="${icon(o.t)}" width="13" height="26" alt="">`:(b=>`<img src="${b.src}" width="${b.n*2}" height="${b.n*2}" alt="">`)(bicon(o.t));
+    return `<button type="button" class="offer" data-i="${i}"><span class="ic">${im}</span><p><strong>${o.kind==='ball'?P.name+' ball':P.name}</strong>${P.text}</p></button>`;}).join('');
+  drawNext();$('offerTake').disabled=true;$('offer').hidden=false;}
+// the next rack from above, as a small map: a pin taken now stands in its spot (outlined); a ball taken now is first in the next hand
+function drawNext(){const nr=g.racks[g.frame+1],o=offerSel!==null?g.offers[offerSel]:null,own=g.pinsOwned.concat(o&&o.kind==='pin'?[o.t]:[]),ps=rackPins(nr,own);
+  const el=$('offerRack'),W=el.clientWidth||340,H=118,sx=x=>(x-60)/240*(W-40)+20,sy=y=>(y-20)/340*(H-34)+4;let h=`<figcaption>${nr.name}</figcaption>`;
+  if(nr.rail)h+=`<u style="${nr.rail>0?'right':'left'}:6px"></u>`;
+  (nr.posts||[]).forEach(p=>h+=`<i style="left:${sx(p.x)-6}px;top:${sy(p.y)+12}px;width:12px;height:12px"></i>`);
+  ps.forEach(p=>{const at=o&&o.kind==='pin'&&p.t===o.t;h+=`<img class="${at?'at':''}" src="${icon(p.kind)}" style="left:${sx(p.x)-6}px;top:${sy(p.y)}px" alt="">`;});
+  el.innerHTML=h;
+  $('offerInfo').innerHTML=o&&o.kind==='ball'?(b=>`<img src="${b.src}" width="${b.n}" height="${b.n}" alt="">first in<br>next hand`)(bicon(o.t)):`next: frame ${g.frame+2}<br>${nr.count} pins`;}
+$('offerList').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;offerSel=+b.dataset.i;
+  document.querySelectorAll('#offerList .offer').forEach((x,i)=>x.classList.toggle('sel',i===offerSel));$('offerTake').disabled=false;drawNext();});
+function takeOffer(o){LOG.push({type:'offer',game:g.n,frame:g.frame+1,offered:g.offers.map(x=>x.t+' '+x.kind).join(' | '),took:o?o.t+' '+o.kind:'nothing',total:total()});saveLog();
+  if(o){g.took.push(o);if(o.kind==='pin')g.pinsOwned.push(o.t);else{g.ballsOwned.push(o.t);g.fresh.push(o.t);}}
+  $('offer').hidden=true;g.frame++;deal();setRack(g.racks[g.frame]);g.mode='aim';g.ready=false;g.t0=performance.now();tapPiece=null;board();hand();info();setBtn();}
+$('offerTake').addEventListener('click',()=>{if(offerSel!==null)takeOffer(g.offers[offerSel]);});
+$('offerSkip').addEventListener('click',()=>takeOffer(null));
+
+function showOver(){$('overTitle').textContent='Game '+g.n;$('overTot').textContent=total();
+  $('overRecap').innerHTML=g.frames.map(f=>`<div><span>${f.rack}</span><i>${f.kinds.map((k,i)=>{const b=bicon(k);return `<span><img src="${b.src}" width="${b.n}" height="${b.n}" alt="${BALLS[k].name}">${f.balls[i]}</span>`;}).join('')}</i><b>${sum(f.balls)}</b></div>`).join('');
+  $('overTook').innerHTML=g.took.length?'took '+g.took.map(o=>o.kind==='pin'?`<span><img src="${icon(o.t)}" width="9" height="18" alt="">${PINS[o.t].name}</span>`:(b=>`<span><img src="${b.src}" width="${b.n}" height="${b.n}" alt="">${BALLS[o.t].name} ball</span>`)(bicon(o.t))).join(''):'took nothing';
+  $('over').hidden=false;}
+$('again').addEventListener('click',()=>newGame());
+
+// ---------- cameras: the sim stays in flat lane units, the camera only decides where they land on screen ----------
+// Pulled in closer than the other labs: a short wall strip, and the pin deck (y 40..300) gets about 110 of the 300 rows.
+const LC={D:2400,F:1338,A:2072000,Y0:-836};
+const CAM={
+  lane:{id:'lane',horizon:38,
+    proj(x,y){const z=LC.D-y;return{X:90+(x-180)*LC.F/z,Y:LC.Y0+LC.A/z,k:LC.F/z};},
+    inv(px,py){const z=LC.A/(py+.5-LC.Y0);return{x:180+(px+.5-90)*z/LC.F,y:LC.D-z,k:LC.F/z};}},
+  top:{id:'top',horizon:6,
+    proj(x,y){return{X:x/2,Y:y/2,k:.5};},
+    inv(px,py){return{x:px*2+1,y:py*2+1,k:.5};}}
+};
+const HY={ball:G.SY,aim:G.EY,bend:(G.SY+G.EY)/2};
+for(const id in CAM){const cm=CAM[id],Y=n=>cm.proj(180,HY[n]).Y,a=(Y('ball')+Y('bend'))/2,b=(Y('bend')+Y('aim'))/2;cm.band=y=>y>a?'ball':y>b?'bend':'aim';}
+
+// pointer: three bands pick the handle, drag is relative so nothing jumps
+let drag=null;
+function pt(e){const r=cv.getBoundingClientRect();return{x:(e.clientX-r.left)/r.width*LW,y:(e.clientY-r.top)/r.height*LH};}
+cv.addEventListener('pointerdown',e=>{if(!g||g.mode!=='aim')return;if(g.ready){g.ready=false;setBtn();}if(tapPiece){tapPiece=null;hand();info();}const p=pt(e),cm=CAM[T.cam];const which=cm.band(p.y);
+  drag={which,x0:p.x,v0:which==='ball'?g.sx:which==='aim'?g.ex:g.bx,k:cm.proj(180,HY[which]).k};try{cv.setPointerCapture(e.pointerId);}catch(_){ }e.preventDefault();});
+cv.addEventListener('pointermove',e=>{if(!drag||g.mode!=='aim')return;const dx=(pt(e).x-drag.x0)/drag.k,r=ballR();
+  if(drag.which==='ball')g.sx=clamp(drag.v0+dx,G.L+r+2,G.R-r-2);
+  else if(drag.which==='aim')g.ex=clamp(drag.v0+dx,G.L+8,G.R-8);
+  else g.bx=drag.v0+dx;
+  fixBend();});
+['pointerup','pointercancel'].forEach(n=>cv.addEventListener(n,()=>drag=null));
+
+function logText(){const sg=v=>(v>0?'+':'')+v;
+  let t='Combined Lab log. Five frames of three balls; each frame is a new rack of 6 to 10 pins; fallen pins stay down and the rack is set again only when a ball clears it. One "ball" row per throw and one "offer" row per choice between frames. '+
+    'Spots are numbered per rack front to back, then left to right (after mirroring). start/aim/bend are lane units from lane centre (lane edges -120/+120); aim is where the drawn line crosses the front row. timing_ms is early (-) or late (+); drift_px is how far a missed release pushed the ball off the drawn line. '+
+    'hand is the three balls of the frame, thrown ones in brackets. outlined is the spots the drawn line takes with the selected ball and a perfect release (shown while aiming), outlined_score what that would score; fell is what really fell; match says whether they are the same. '+
+    'score = points x mult. pieces is the conditional pins in the rack. Racks: '+RACKS.map(r=>r.name+' '+r.pins.length).join(', ')+'.\n';
+  t+='type,game,frame,ball,rack,pins_in_rack,kind,hand,pieces,start,aim,bend,timing_ms,drift_px,setup_seconds,pins_standing_before,outlined,outlined_score,fell,match,pins_down,points,mult,score,total,triggers,camera,offered,took\n';
+  LOG.forEach(r=>{if(r.type==='offer')t+=['offer',r.game,r.frame,'','','','','','','','','','','','','','','','','','','','','',r.total,'','',r.offered,r.took].join(',')+'\n';
+    else t+=['ball',r.game,r.frame,r.ball,r.rack,r.pins_in_rack,r.kind,r.hand,r.pieces,sg(r.start),sg(r.aim),sg(r.bend),sg(r.ms),sg(r.drift),r.setup,r.standing,r.outlined,r.outScore,r.fell,r.match,r.down,r.points,r.mult,r.score,r.total,r.notes,r.cam,'',''].join(',')+'\n';});
+  return t;}
+function openLog(){$('logText').value=LOG.length?logText():'No throws recorded yet.';$('log').hidden=false;}
+$('logBtn').addEventListener('click',openLog);$('overLog').addEventListener('click',openLog);
+$('logClose').addEventListener('click',()=>$('log').hidden=true);
+$('logClear').addEventListener('click',()=>{LOG=[];saveLog();openLog();});
+$('logCopy').addEventListener('click',async e=>{const b=e.currentTarget,ta=$('logText');try{await navigator.clipboard.writeText(ta.value);b.textContent='Copied';}catch(_){ta.focus();ta.select();b.textContent='Selected';}setTimeout(()=>b.textContent='Copy log',2200);});
+
+// ---------- pixel kit (from Big Rack Lab) ----------
+// ---------- pixel kit ----------
+function mk(w,h){const k=document.createElement('canvas');k.width=w;k.height=h;return k;}
+const B4=[0,8,2,10,12,4,14,6,3,11,1,9,15,7,13,5];
+const hex=h=>[parseInt(h.slice(1,3),16),parseInt(h.slice(3,5),16),parseInt(h.slice(5,7),16)];
+const thr=(x,y)=>(B4[(y&3)*4+(x&3)]+.5)/16;
+function ramp(cols,L,x,y){const n=cols.length-1;const v=Math.max(0,Math.min(.999,L))*n,i=Math.floor(v);return cols[(v-i)>thr(x,y)?i+1:i];}
+const px=(k,x,y,w,h,col)=>{k.fillStyle=col;k.fillRect(Math.round(x),Math.round(y),w,h);};
+function disc(k,cx,cy,r,col){k.fillStyle=col;for(let y=-r;y<=r;y++){const w=Math.floor(Math.sqrt(r*r-y*y+.6));k.fillRect(cx-w,cy+y,w*2+1,1);}}
+function ringPx(k,cx,cy,rx,ry,col){k.fillStyle=col;const n=Math.ceil((rx+ry)*5);for(let i=0;i<n;i++){const a=i/n*6.28319;k.fillRect(Math.round(cx+Math.cos(a)*rx),Math.round(cy+Math.sin(a)*ry),1,1);}}
+function plotLine(k,x0,y0,x1,y1,col){const n=Math.max(1,Math.ceil(Math.max(Math.abs(x1-x0),Math.abs(y1-y0))));k.fillStyle=col;for(let i=0;i<=n;i++)k.fillRect(Math.round(x0+(x1-x0)*i/n),Math.round(y0+(y1-y0)*i/n),1,1);}
+const FONT={'0':'111101101101111','1':'010110010010111','2':'111001111100111','3':'111001111001111','4':'101101111001001','5':'111100111001111','6':'111100111101111','7':'111001001001001','8':'111101111101111','9':'111101111001111',A:'111101111101101',B:'110101110101110',C:'111100100100111',D:'110101101101110',E:'111100111100111',F:'111100111100100',G:'111100101101111',H:'101101111101101',I:'111010010010111',K:'101101110101101',L:'100100100100111',M:'101111111101101',N:'111101101101101',O:'111101101101111',P:'111101111100100',R:'111101110101101',S:'111100111001111',T:'111010010010010',U:'101101101101111',V:'101101101101010',W:'101101111111101',X:'101101010101101',Y:'101101010010010','/':'001001010100100','-':'000000111000000',' ':'000000000000000'};
+function txt(k,s,x,y,col,m){m=m||1;k.fillStyle=col;for(const ch of s){const f=FONT[ch]||FONT[' '];for(let i=0;i<15;i++)if(f[i]==='1')k.fillRect(x+(i%3)*m,y+((i/3)|0)*m,m,m);x+=4*m;}}
+function sprite(rows,pal){const w=Math.max(...rows.map(r=>r.length)),k=mk(w,rows.length),q=k.getContext('2d');rows.forEach((r,y)=>{for(let x=0;x<r.length;x++){const col=pal[r[x]];if(col){q.fillStyle=col;q.fillRect(x,y,1,1);}}});return k;}
+function turned(s,flip){const k=mk(s.height,s.width),q=k.getContext('2d');if(flip){q.translate(0,s.width);q.rotate(-Math.PI/2);}else{q.translate(s.height,0);q.rotate(Math.PI/2);}q.drawImage(s,0,0);return k;}
+const PIN=['...ooo...','..owwlo..','..owwlo..','..owwlo..','...owo...','...owo...','..owwlo..','.owwwlmo.','.owwwlmo.','owwwwlmdo','oRRRRRrro','oRRRRRrro','owwwwlmdo','owwwwlmdo','.owwwlmo.','.owwwlmo.','..owlmo..','...ooo...'];
+function ballSprite(r,cols){const n=r*2+1,k=mk(n,n),q=k.getContext('2d');for(let y=-r;y<=r;y++)for(let x=-r;x<=r;x++){const d2=x*x+y*y;if(d2>r*r+.6)continue;const edge=r>2&&d2>(r-1)*(r-1)+.2;let L=.62-(x*.5+y*.62)/r*.42+(Math.sin(x*1.3+y*.7)>.72?.12:0);q.fillStyle=edge?cols[0]:ramp(cols.slice(1),L,x+8,y+8);q.fillRect(x+r,y+r,1,1);}q.fillStyle=cols[cols.length-1];q.fillRect(r-Math.ceil(r/2.2),r-Math.ceil(r/2.2),1,1);return k;}
+function hash(a,b){let h=(Math.imul(a|0,374761393)+Math.imul(b|0,668265263))|0;h=Math.imul(h^(h>>>13),1274126177);return((h^(h>>>16))>>>0)/4294967296;}
+
+// ---------- the hall and the lane ----------
+const THEME={
+rec:{wood:['#5a2f1a','#8a4e26','#b97a36','#dba552','#f0cf86'],gutter:['#170e0b','#2a1a15','#43291f'],line:'#2a160e',arrow:'#8a3c1c',cap:'#6b3f2a',pit:'#0a0605',wallBase:'#4c2a1a',
+  pin:{o:'#3b261c',w:'#fff8e8',l:'#efe2c4',m:'#d2bf9a',d:'#a58f6e'},band:{5:['#d83a2a','#9c2218'],3:['#e8a020','#b06c10'],2:['#3f8f6a','#286248']},
+  ui:['#2a160e','#f3e2b8','#3f8f6a','#d83a2a'],plate:'#1d100a',dot:'#fff8e8',dotSh:'#4a2412',dim:'#8a4e26',trail:'#fff8e8',shadow:'#3b1f12',handle:'#d83a2a',edge:'#2a160e',hi:'#fff8e8',ink:'#2a160e',mark:'#fff8e8',out:'#ffd23a',
+  // a short back wall: the sign band, then the pit mouth
+  wall(k){px(k,0,0,180,4,'#1d100a');px(k,0,4,180,22,'#4c2a1a');for(let x=4;x<180;x+=9)px(k,x,4,1,22,'#3a2016');
+    px(k,20,9,140,3,'#d86a28');px(k,20,12,140,3,'#f3e2b8');px(k,20,15,140,3,'#8a3c1c');},
+  strip(k){px(k,0,0,180,5,'#4c2a1a');for(let x=4;x<180;x+=9)px(k,x,0,1,5,'#3a2016');px(k,0,5,180,1,'#1d100a');}}
+};
+function buildTheme(o){if(o.built)return o;o.built=1;
+  o._wood=o.wood.map(hex);o._gut=o.gutter.map(hex);o._line=hex(o.line);o._arrow=hex(o.arrow);o._cap=hex(o.cap);o._pit=hex(o.pit);o._wall=hex(o.wallBase);o._rail=[hex('#f3e2b8'),hex('#d86a28')];
+  o.pins={};const mkPin=(key,band,body)=>{const s=sprite(PIN,Object.assign({R:band[0],r:band[1]},body||o.pin));o.pins[key]=s;o.pins[key+'r']=turned(s,false);o.pins[key+'l']=turned(s,true);};
+  [5,3,2].forEach(n=>mkPin('p'+n,o.band[n]));for(const t in PAL)mkPin(t,[PAL[t].R,PAL[t].r],Object.assign({o:o.pin.o},PAL[t]));
+  // pins at twice the sprite size for the lane camera, and a flat silhouette of each for the outline
+  const sil=(s,col)=>{const d=mk(s.width,s.height),q=d.getContext('2d');q.drawImage(s,0,0);q.globalCompositeOperation='source-in';q.fillStyle=col;q.fillRect(0,0,d.width,d.height);return d;};
+  o.pins2={};o.sil={};o.sil2={};for(const k in o.pins){const s=o.pins[k],d=mk(s.width*2,s.height*2),q=d.getContext('2d');q.imageSmoothingEnabled=false;q.drawImage(s,0,0,d.width,d.height);o.pins2[k]=d;o.sil[k]=sil(s,o.out);o.sil2[k]=sil(d,o.out);}
+  o.ballsBy={};for(const id in BALLS){o.ballsBy[id]={};for(let r=2;r<=12;r++)o.ballsBy[id][r]=ballSprite(r,BALLS[id].pal);}
+  o.bg={};return o;}
+const ICON={};
+function icon(kind){return ICON[kind]||(ICON[kind]=buildTheme(THEME.rec).pins[kind].toDataURL());}
+function bicon(k){if(ICON['b'+k])return ICON['b'+k];const r=clamp(Math.round(BALLS[k].r*.56),4,10);return ICON['b'+k]={src:buildTheme(THEME.rec).ballsBy[k][r].toDataURL(),n:2*r+1};}
+const BOARD=240/13;
+// what colour the floor is at a point on the lane (flat lane units), dithered at the screen pixel it lands on. A rail is painted in its gutter.
+function shade(o,x,y,sx,sy,k){
+  if(y<30)return o._pit;
+  const F=FIELD,ax=Math.abs(x-180);let u=ax,s=x-180,nb=false;
+  if(ax>=154){s=ax-296;u=Math.abs(s);nb=true;}
+  if(u>=142)return o._cap;
+  if(u>=120){
+    if(!nb&&F.rail&&s*F.rail>0&&u<132&&y<545)return u<122||u>=130||Math.floor(y/45)*45>y-3?o._line:o._rail[Math.floor(y/45)&1];
+    return ramp(o._gut,(nb?.1:.2)+(u-120)/22*.6,sx,sy);}
+  const bf=(s+120)/BOARD,bi=Math.floor(bf),fr=bf-bi;
+  let L=.52+((bi*37)%5-2)*.04+(hash(bi+(nb?40:0),Math.floor(y/(26+(bi%3)*9)))-.5)*.1;
+  if(!nb){L+=Math.max(0,1-ax/75)*.13;if(y<315)L+=.07;if(y>545)L+=.1;}
+  if(fr<Math.max(.12,1/(k*BOARD)))L-=.14;
+  if(nb)L*=.5;
+  const col=ramp(o._wood,L,sx,sy);
+  if(!nb){
+    if(y>=540&&y<545)return o._line;
+    for(let i=-2;i<=2;i++){const cx=180+i*40,ay=430+Math.abs(i)*10;if(y>=ay&&y<ay+20&&Math.abs(x-cx)<=(y-ay)/20*7)return o._arrow;}
+  }
+  return col;}
+function buildBg(o,cm){const k=mk(LW,LH),q=k.getContext('2d'),im=q.createImageData(LW,LH),d=im.data;
+  for(let sy=0;sy<LH;sy++)for(let sx=0;sx<LW;sx++){let col;
+    if(sy<cm.horizon)col=o._wall;else{const p=cm.inv(sx,sy);col=shade(o,p.x,p.y,sx,sy,p.k);}
+    const i=(sy*LW+sx)*4;d[i]=col[0];d[i+1]=col[1];d[i+2]=col[2];d[i+3]=255;}
+  q.putImageData(im,0,0);
+  if(cm.id==='lane'){o.wall(q);   // the pit mouth is as wide as the lane looks from this camera
+    const a=Math.round(cm.proj(38,30).X),b=Math.round(cm.proj(322,30).X);px(q,0,26,180,12,'#120a07');px(q,a,26,b-a,12,'#0a0605');px(q,0,26,180,2,'#1d100a');px(q,a-2,28,2,10,'#4c2a1a');px(q,b,28,2,10,'#4c2a1a');}
+  else o.strip(q);
+  return{cv:k};}
+function getBg(o,cm){const key=cm.id+'|'+(FIELD.rail||0);return o.bg[key]||(o.bg[key]=buildBg(o,cm));}
+
+// ---------- drawing ----------
+// a pin; out = the drawn line takes it, so it gets a bright outline
+function drawPin(o,cm,p,lift,out){const q=cm.proj(p.x,p.y),X=Math.round(q.X),Y=Math.round(q.Y),lane=cm.id==='lane',dir=Math.cos(p.ang)<0?'l':'r';
+  if(p.down){if(lane)c.drawImage(o.pins2[p.kind+dir],X-18,Y-13);else c.drawImage(o.pins[p.kind+dir],X-9,Y-4);return;}
+  if(lane){const s=o.pins2[p.kind],y0=Y-35-lift;px(c,X-6,Y-1,13,3,o.shadow);
+    if(!lift){c.save();c.globalAlpha=.2;c.beginPath();c.rect(X-9,Y+2,18,9);c.clip();c.translate(0,2*Y+2);c.scale(1,-1);c.drawImage(s,X-9,Y-35);c.restore();}
+    if(out){const t=o.sil2[p.kind];c.drawImage(t,X-11,y0);c.drawImage(t,X-7,y0);c.drawImage(t,X-9,y0-2);c.drawImage(t,X-9,y0+2);c.drawImage(t,X-10,y0-1);c.drawImage(t,X-8,y0+1);c.drawImage(t,X-10,y0+1);c.drawImage(t,X-8,y0-1);}
+    c.drawImage(s,X-9,y0);}
+  else{px(c,X-3,Y+4,8,3,o.shadow);const y0=Y-12-lift;if(out){const t=o.sil[p.kind];c.drawImage(t,X-5,y0);c.drawImage(t,X-3,y0);c.drawImage(t,X-4,y0-1);c.drawImage(t,X-4,y0+1);}c.drawImage(o.pins[p.kind],X-4,y0);}}
+function drawBall(o,cm,b,kind){const q=cm.proj(b.x,b.y),X=Math.round(q.X),Y=Math.round(q.Y),r=clamp(Math.round(BALLS[kind].r*q.k),2,12),B=o.ballsBy[kind],a=c.globalAlpha;
+  if(cm.id==='lane'){px(c,X-r+1,Y,2*r-1,2,o.shadow);if(kind==='ghost')c.globalAlpha=a*.55;c.drawImage(B[r],X-r,Y-2*r);c.globalAlpha=a;return{X,Y:Y-r,r};}
+  if(kind==='ghost')c.globalAlpha=a*.55;else disc(c,X+1,Y+2,r,o.shadow);c.drawImage(B[r],X-r,Y-r);c.globalAlpha=a;return{X,Y,r};}
+// a post: a red lane bollard with a pale band. The ball stops dead on it.
+function drawPost(o,cm,p){const q=cm.proj(p.x,p.y),X=Math.round(q.X),Y=Math.round(q.Y),r=Math.max(3,Math.round(p.r*q.k));
+  if(cm.id==='lane'){const h=Math.round(r*1.5),b=Math.max(2,Math.round(h*.3));
+    px(c,X-r-1,Y+1,2*r+3,2,o.shadow);px(c,X-r+1,Y+3,2*r-1,1,o.shadow);
+    px(c,X-r,Y-h,2*r+1,h+2,o.edge);px(c,X-r+1,Y+2,2*r-1,1,o.edge);px(c,X-r+1,Y-h-1,2*r-1,1,o.edge);
+    px(c,X-r+1,Y-h,2*r-1,h+2,'#b02a1c');px(c,X-r+1,Y-h,2*r-3,h+1,'#d83a2a');px(c,X-r+1,Y-h+b,2*r-1,b,'#d2bf9a');px(c,X-r+1,Y-h+b,2*r-3,b,'#f3e2b8');px(c,X-r+2,Y-h+1,1,h-1,'#ff8a5a');
+    return;}
+  disc(c,X+1,Y+2,r,o.shadow);disc(c,X,Y,r,o.edge);disc(c,X,Y,r-1,'#d83a2a');disc(c,X,Y,Math.max(1,r-3),'#f3e2b8');disc(c,X,Y,Math.max(0,r-5),'#d83a2a');}
+function dots(o,cm,p,dim){let i=0;for(const q of p.pts){if(q.y<G.BACK)break;const s=cm.proj(q.x,q.y),X=Math.round(s.X),Y=Math.round(s.Y);
+  if(dim){if(i%2===0)px(c,X,Y,1,1,o.dim);}else if(i%2===0||p.stop&&i>p.pts.length-3){px(c,X,Y+1,1,1,o.dotSh);px(c,X,Y,1,1,o.dot);}i++;}}
+function label(o,s,x,y){txt(c,s,x+1,y+1,o.mark);txt(c,s,x,y,o.ink);}
+function drawNeedle(o){const x0=22,w=136,y=284,h=8,mid=x0+w/2,half=w/2;
+  px(c,0,y-6,LW,LH-(y-6),o.plate);
+  px(c,x0-1,y-1,w+2,h+2,o.ui[0]);px(c,x0,y,w,h,o.ui[1]);
+  const zz=g.mode==='aim'?zone():g.zoneAt,zw=Math.max(1,Math.round(half*zz));px(c,mid-zw,y,zw*2,h,o.ui[2]);
+  if(!(g.mode==='aim'&&T.two&&!g.ready)){const n=g.mode==='aim'?tri(g.phase):g.stopped,nx=Math.round(mid+n*(half-1));px(c,nx-2,y-3,4,h+6,o.ui[0]);px(c,nx-1,y-2,2,h+4,o.ui[3]);}}
+function draw(){
+  const cm=CAM[T.cam],lane=cm.id==='lane',o=buildTheme(THEME.rec);
+  c.setTransform(1,0,0,1,0,0);c.globalAlpha=1;c.imageSmoothingEnabled=false;
+  c.drawImage(getBg(o,cm).cv,0,0);
+  if(!g)return;
+  const act=drag?drag.which:null,al=k=>act&&act!==k?.35:1,kind=g.mode==='aim'?selKind():g.kind;
+  let aimPos=null;
+  if(g.mode==='aim'){
+    if(g.last&&g.last.length>1){c.globalAlpha=.6;for(let i=1;i<g.last.length;i++){const a=cm.proj(g.last[i-1].x,g.last[i-1].y),b=cm.proj(g.last[i].x,g.last[i].y);plotLine(c,a.X,a.Y,b.X,b.Y,o.ink);}c.globalAlpha=1;}
+    dots(o,cm,makePath(g.sx,g.ex,g.bend,ballR()),false);
+    const a=cm.proj(g.ex,G.EY+(lane?24:34)),AX=Math.round(a.X),AY=Math.round(a.Y),rx=lane?9:6,ry=lane?4:6;
+    c.globalAlpha=al('aim');if(act==='aim')ringPx(c,AX,AY,rx+3,ry+2,o.hi);
+    ringPx(c,AX,AY,rx+1,ry+1,o.edge);ringPx(c,AX,AY,rx,ry,o.handle);px(c,AX-rx-5,AY,4,1,o.handle);px(c,AX+rx+2,AY,4,1,o.handle);c.globalAlpha=1;
+    aimPos={X:AX,Y:AY,rx};
+  }else if(g.intended){dots(o,cm,g.intended,true);
+    for(let i=1;i<g.trail.length;i++){const a=cm.proj(g.trail[i-1].x,g.trail[i-1].y),b=cm.proj(g.trail[i].x,g.trail[i].y);plotLine(c,a.X,a.Y+1,b.X,b.Y+1,o.dotSh);plotLine(c,a.X,a.Y,b.X,b.Y,o.trail);}}
+
+  // pins, posts and ball, far ones first; freshly set pins drop into place; pins the line takes are outlined
+  const lift=g.setT>0?Math.round(g.setT/SET*14):0,ents=[],outl=g.mode==='aim'&&g.pred&&!lift?g.pred.slots:null;
+  for(const p of g.pins)if(!p.gone)ents.push({y:p.y,p});
+  if(FIELD.posts)for(const q of FIELD.posts)ents.push({y:q.y,q});
+  const b=g.sim?g.sim.ball:{x:g.sx,y:G.SY};if(kind&&(!g.sim||!b.out||b.stuck))ents.push({y:b.y+.5,b});
+  ents.sort((m,n)=>m.y-n.y);let ballPos=null;
+  for(const e of ents){if(e.p)drawPin(o,cm,e.p,lift,outl&&outl.has(e.p.slot));else if(e.q)drawPost(o,cm,e.q);else{if(g.mode==='aim')c.globalAlpha=al('ball');ballPos=drawBall(o,cm,e.b,kind);
+    if(g.mode==='aim'&&act==='ball')ringPx(c,ballPos.X,ballPos.Y,ballPos.r+3,ballPos.r+3,o.hi);c.globalAlpha=1;}}
+  const bm=g.sim&&g.sim.boom;if(bm&&g.sim.t-bm.t<.22){const f=(g.sim.t-bm.t)/.22,q=cm.proj(bm.x,bm.y),e=cm.proj(bm.x+bm.r*f,bm.y),u=cm.proj(bm.x,bm.y-bm.r*f);ringPx(c,Math.round(q.X),Math.round(q.Y),Math.abs(e.X-q.X),Math.abs(u.Y-q.Y),'#ff9a30');}
+
+  if(g.mode==='aim'){const s=cm.proj(g.bx,HY.bend),X=Math.round(s.X),Y=Math.round(s.Y);
+    c.globalAlpha=al('bend');if(act==='bend')ringPx(c,X,Y,10,10,o.hi);
+    c.fillStyle=o.edge;for(let d=-7;d<=7;d++){const w=7-Math.abs(d);c.fillRect(X-w,Y+d,2*w+1,1);}
+    c.fillStyle=o.handle;for(let d=-6;d<=6;d++){const w=6-Math.abs(d);c.fillRect(X-w,Y+d,2*w+1,1);}
+    px(c,X-4,Y,2,1,o.hi);px(c,X-3,Y-1,1,3,o.hi);px(c,X+3,Y,2,1,o.hi);px(c,X+3,Y-1,1,3,o.hi);c.globalAlpha=1;
+    if(!thrown&&g.frame===0){label(o,'AIM',aimPos.X+aimPos.rx+8,aimPos.Y-2);label(o,'BEND',X+11,Y-2);if(ballPos)label(o,'START',ballPos.X+ballPos.r+4,ballPos.Y-2);}
+  }
+  drawNeedle(o);
+}
+
+const toastEl=$('toast'),nameEl=$('fname');
+let lastT=0,acc=0;
+function loop(ts){const dt=Math.min(.05,(ts-lastT)/1000||0);lastT=ts;
+  if(g.mode==='aim'){if(g.ready)g.phase+=needleHz()*dt;predict();}
+  if(g.mode==='roll'){acc+=dt;while(acc>1/240&&!g.sim.done){tick(g.sim);acc-=1/240;}
+    const b=g.sim.ball;if(!b.out)g.trail.push({x:b.x,y:b.y});
+    if(g.sim.done){g.mode='settle';g.wait=.55;acc=0;}}
+  else if(g.mode==='settle'){g.wait-=dt;if(g.wait<=0)resolve();}
+  if(g.toastT>0)g.toastT-=dt;if(g.setT>0)g.setT-=dt;if(g.nameT>0)g.nameT-=dt;
+  toastEl.style.opacity=g.toast&&g.toastT>0?Math.min(1,g.toastT*2):0;
+  nameEl.style.opacity=g.nameT>0&&g.mode==='aim'?Math.min(1,g.nameT*3):0;   // the rack's name, briefly, when it changes
+  draw();requestAnimationFrame(loop);}
+newGame();fit();requestAnimationFrame(loop);
+</script>
+</body>
+</html>

@@ -24,7 +24,7 @@ Read `docs/STATE.md` first. It says what is decided, what is open, and what is n
 ## Publishing
 - Josh wants to test from URLs, not Claude artifacts. The root `index.html` links to the game and every lab, so the repo can be served as-is by GitHub Pages from `main`.
 - When you add a lab, add its link to the root `index.html` and its row to `README.md`.
-- As of 21 November 2026 Pages had not been switched on; check before quoting a URL.
+- Pages was switched on 21 November 2026: `main` at the root, served at https://joshlitwin.github.io/bowl-rogue/. Work on a branch only shows there once it is merged to `main`.
 
 ## Commits
 - Commit as Josh: `Josh Litwin <312256629+joshlitwin@users.noreply.github.com>`. This is set in the clone's local git config; GitHub rejects his regular address.
