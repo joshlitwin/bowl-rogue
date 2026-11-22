@@ -118,6 +118,12 @@ Josh: "I basically have to hit all strikes to win eh? I feel like I can't affect
 - Bosses retuned to leave a similar share of strike lines (313 to 460 of 974): Bolted 2 and 3 pins, Bolted 7 and 10 pins, Centre post (y 340), Twin posts (x 122/238, y 400), Left-side and Right-side start.
 - Targets 120, 170, 220 / 320, 450, 600 / 750, 1000, 1250 / 1300, 1650, 2000; pay $5 / $6 / $8. `npm run ten-pin-bot`: level 1 always cleared; 4 of 8 real runs won all 12.
 
+### Ten-pin changes after Josh's first look (21 November)
+- Every pin worth 1, as in real ten-pin (upgrades still change it); plain pins all wear the red neck stripe; a plain strike is 10 × 2 = 20.
+- No rack configurations in ten-pin (a full rack is hard enough); the next-rack tray is gone.
+- Smaller ball: house 16 (Big 20, Small 13), drawn and simulated the same. That dropped strike lines from 10.3% to 7.7%, so KNOCK 80 to 62 brings them back to 9.9%.
+- Targets 50, 70, 90 / 180, 250, 330 / 420, 560, 700 / 750, 950, 1150. Bot: runs end between game 4 and winning all 12.
+
 ## Next
 Josh plays the Ten-Pin Lab and the Boss Lab (with growing layouts) and pastes logs. Questions: does re-finding the line each game feel like play or a chore; does a different ball or a bigger rack change what he does; if it's not fun, which of the three to switch off.
 

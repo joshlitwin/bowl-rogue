@@ -452,7 +452,7 @@ button.slot:active{transform:translateY(1px)}
 const G={L:60,R:300,BACK:30,FOUL:540,SY:520,EY:230,WL:38,WR:322};
 // spots: headpin, left 3, right 3, left corner, right corner, then the two you can buy: back centre (between the corners), left flank (headpin row, in line with the left corner)
 // pins 1-10 as numbered in ten-pin: 1 headpin; 2,3; 4,5,6; 7,8,9,10. 12 in apart (69 units across), rows 10.4 in deep (60 units)
-const PS=69,PR=60,SPOTS=[[0,0],[-1,1],[1,1],[-2,2],[0,2],[2,2],[-3,3],[-1,3],[1,3],[3,3]].map(([c,r],i)=>({x:180+c*PS/2,y:230-r*PR,v:i===0?5:i<3?3:2}));
+const PS=69,PR=60,SPOTS=[[0,0],[-1,1],[1,1],[-2,2],[0,2],[2,2],[-3,3],[-1,3],[1,3],[3,3]].map(([c,r],i)=>({x:180+c*PS/2,y:230-r*PR,v:1}));   // every pin worth 1, as in real ten-pin; upgrades change that
 // a layout moves spots, never closer together than the standard rack (61 px, headpin to a 3-pin)
 // a layout moves the headpin only (the rack already spans the lane), never closer to its neighbours than the standard rack
 const LAYOUTS={
@@ -475,7 +475,7 @@ const BOSSES={
 let BOSS=null;
 function startRange(){const a=G.L+RB+2,b=G.R-RB-2;return !BOSS||!BOSS.side?[a,b]:BOSS.side<0?[a,170]:[190,b];}
 // a full-size ball (8.5 in) and pins (4.8 in) at the same scale
-let RB=20,MB=2.2,FRIC=1.5;const BALLS={house:{rb:20,mb:2.2},big:{rb:24,mb:2.2},heavy:{rb:20,mb:3.6},light:{rb:20,mb:1.5},small:{rb:17,mb:2.2}};const RP=14,MP=1,REST=.78;var RT=18,KNOCK=80;   // ten-pin: fallen pins sweep less and need a firmer hit to fall, so about one line in nine strikes, as in five-pin
+let RB=16,MB=2.2,FRIC=1.5;const BALLS={house:{rb:16,mb:2.2},big:{rb:20,mb:2.2},heavy:{rb:16,mb:3.6},light:{rb:16,mb:1.5},small:{rb:13,mb:2.2}};const RP=14,MP=1,REST=.78;var RT=18,KNOCK=62;   // ten-pin: fallen pins sweep less and need a firmer hit to fall, so about one line in nine strikes, as in five-pin
 let CARRY=1.5,KICK=-.9,DRIVE=0,MESS=.8;
 const POW=[{speed:400,needle:.85},{speed:500,needle:1},{speed:620,needle:1.3}];
 function rack(){return RACK.map((p,i)=>({x:p.x,y:p.y,v:p.v,vx:0,vy:0,down:false,gone:false,age:0,ang:0,bolt:!!(BOSS&&BOSS.bolt&&BOSS.bolt.includes(i))}));}
@@ -551,8 +551,8 @@ function scoreFrames(fr){const flat=[].concat(...fr);let idx=0,tot=0;const out=[
   return out;}
 //SIM-END
 
-const OPT=(()=>{let q;try{q=new URLSearchParams(location.search);}catch(e){q=new URLSearchParams('');}return{layout:q.get('layout')!=='0',balls:q.get('balls')!=='0',spots:false};})();
-const FRAMES=5,TARGETS=[120,170,220,320,450,600,750,1000,1250,1300,1650,2000],NIGHT_FROM=3;
+const OPT=(()=>{let q;try{q=new URLSearchParams(location.search);}catch(e){q=new URLSearchParams('');}return{layout:false,balls:q.get('balls')!=='0',spots:false};})();
+const FRAMES=5,TARGETS=[50,70,90,180,250,330,420,560,700,750,950,1150],NIGHT_FROM=3;
 const STAGES=['rec','night','computer','arrival'];
 function stageOf(gi){return STAGES[Math.min(3,Math.floor(gi/3))];}
 // four levels; in each, a small game, a big game and a boss game
@@ -623,7 +623,7 @@ function startFx(to){if(fx||to===stage)return;fx={from:stage,to,t:still?.5:0,fli
 // ---------- the run: the rack is the build ----------
 let run,g;
 const newItem=t=>({t,lv:1,gain:0});
-const kindOf=(it,slot)=>it.t==='plain'?'p'+SLOTV[slot]:it.t;
+const kindOf=(it,slot)=>it.t==='plain'?'p5':it.t;
 function applyKit(){T.win=80+(run.gear.steady?30:0);T.bend=90*(run.gear.wrist?4/3:1);T.speed=.45*(run.gear.breath?.8:1);if(!OPT.balls)run.ball=run.gear.big?'big':'house';RB=BALLS[run.ball].rb;MB=BALLS[run.ball].mb;}
 const BALLOFFERS={big:{name:'Big ball',cost:10,text:'A wider ball. Catches more pins.'},heavy:{name:'Heavy ball',cost:10,text:'A heavier ball. Drives through the pins.'},
   light:{name:'Light ball',cost:10,text:'A lighter ball. Glances off pins.'},small:{name:'Small ball',cost:10,text:'A narrower ball. Threads gaps.'}};
