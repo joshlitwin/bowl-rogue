@@ -164,5 +164,16 @@ Pins score the moment they fall: each one pops its value above itself (+1 small 
 ### Shop pin art (22 November)
 Josh picked big pixel pins (mock `docs/design/shop-art/pixel/`) over illustrated ones (`docs/design/shop-art/illustrated/`). In Advancing Ten-Pin the pin offers are big pins standing on wood cards, and "your ten" is a perspective rack of standing pins (headpin nearest); a tap goes to the nearest pin. Placing, info and swapping work as before. The lane's sprites are unchanged.
 
+### After Josh's first two runs (22 November)
+Run 1 lost game 3 to Sweep bar (101/125); run 2 won game 1 (95/90) and lost game 2 (101/110). His games score about 95-100 with plain pins; the oracle bot's 180-230 had set targets far too high. Changes:
+- Targets 70, 85, 100 / 115, 135, 150 / 180, 220, 250 / 280, 340, 380. A 40-line bot (a stand-in for a person) clears level 1's small and big games with every build.
+- Level 1's boss is Short line or Bolted rack; Sweep bar and Rising tentacle come from level 2. Sweep bar sweeps on balls 4 and 8 (was 3, 6, 9): the 40-line bot scored 50-61 against it in levels 1-2.
+- `?line=5` puts the red line one row further (six rows, pins reach 32); it crosses the bend handle on screen, so it's a knob, not the default.
+- Lane bell is back: strikes worth 1 more ×. Strikes are ×2 on the ball's points by default.
+- The shop rack repaints when its box changes size (the front pin was clipped on Josh's phone).
+- Spark's text now says it multiplies the whole ball.
+
+Next idea from Josh: powers in three slots on each pin, `docs/design/advancing/powers.md`.
+
 ## Next
 Josh plays Advancing Ten-Pin (and the Advancing Rack Lab) and pastes logs. Check: did the best throw change between balls; did he ever leave pins to grow on purpose; did each boss hurt the way he played. Then a shop for this mode (pieces that favour striking or ripening). The fix list in `docs/IDEATION.md` (big shop pin art, level-up versus replace, dead pieces) still stands.
