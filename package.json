@@ -12,7 +12,8 @@
     "variety-bot": "node tools/variety-bot.js",
     "variety-flow": "QS='?layout=0' PAGE=labs/five-pin-variety/index.html node tools/flow.js",
     "boss-bot": "node tools/boss-bot.js",
-    "ten-pin-bot": "node tools/ten-pin-bot.js"
+    "ten-pin-bot": "node tools/ten-pin-bot.js",
+    "advancing-bot": "node tools/advancing-bot.js"
   },
   "devDependencies": {
     "@napi-rs/canvas": "^1.1.1",

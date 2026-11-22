@@ -127,5 +127,24 @@ Josh: "I basically have to hit all strikes to win eh? I feel like I can't affect
 ## Ten-Pin Lab verdict (21 November, late)
 Josh won all 12 games (54 strikes on 60 first balls, scores up to 4.6× the target): "Aesthetics are really cool, game is really easy and monotonous... As long as I kept hitting strikes, who cares?" He wants to rethink the bowling construct itself with a team of thinkers, artists and designers.
 
+## Round-2 pitches (22 November)
+Five blind designers (systems, bowling craft, physics toy, art and world, wildcard) and a critic, run from `docs/IDEATION.md` section 5. Side-by-side page: `docs/pitches/round-2/index.html`; critic with sim measurements: `docs/pitches/round-2/critic.md`. Key measurement: on the ten-pin rack a player can aim at a side or at one pin staying up (windows of 7 to 10 units), not at an exact set of pins (about 1 unit) or at where a pin ends up (one pixel moves it half a pin spacing).
+
+Josh picked a mix of **Hold the Lane** (invaders on a board that never resets) and **Holdover Rack** (standing pins ripen), simplified to start: pins not knocked down advance; pins knocked down come back at the back row; pins that go past a line cost you; configurations change by themselves; strikes stay possible but trade against letting pins mature. He also wants the small / big / boss structure kept, with bosses that kill a one-method build.
+
+## Advancing Rack Lab (built 22 November, not yet played by Josh)
+`labs/advancing-rack/`, from the Ten-Pin Lab; throw, camera and hall unchanged. No shop yet.
+- **One board per game, ten balls.** After each ball, standing pins step one row (60 units) toward the bowler and double in value (1, 2, 4, 8, 16). Fallen pins come back worth 1 at the back, as far back as they fit, at least 68 units from every pin, in random columns (half a pin spacing apart), so the rack's shape changes every ball. A pin that would step past the red line (the front of row 4) breaks through: it costs its value and comes back at the back. Front-row pins show their value in red.
+- **Strike** (every pin on the board down) ×2. No other Mult.
+- **Two levels of small, big, boss** (After Close from level 2). Bosses, one each, shuffled, named at the start of each level: **Short line** (the line one row closer; works against ripening) and **Bolted rack** (every pin falls only to the ball; works against striking). Targets 90, 110, boss / 130, 150, boss; boss targets are the level's base (120, 170) × 1 for Short line, × 0.6 for Bolted rack.
+- URL knobs: `?grow=add` (pins gain +1 instead of doubling), `?strike=1`, `?line=3`, `?breach=0`.
+- Log: board before and after each ball (column:row=value), board value, hot pins, how far the line moved, break-throughs and their cost. The Rack button (top left) opens the log.
+
+What the bot found (`npm run advancing-bot`: an oracle that tries ~1,600 lines a ball, then throws with a timing spread):
+- **With +1 growth, scores are conserved**: every policy scores about 100 a game at strike ×1 (each pin earns a point per ball whenever you take it), so strike ×2 always wins. Hence doubling.
+- With doubling, small and big games: a patient bot (takes ripe front pins, leaves others to grow) about 230, a strike bot about 182 (60 ms spread). Short line drops the patient bot to about 173; Bolted rack drops strike bots to about 95-110 while the patient bot keeps 150-180.
+- The best line changes almost every ball: the chosen line moves a median of 90-160 units between balls and repeats on under 10% of balls.
+- With targets on (80 ms spread, 3 runs each): the strike bot won 2 of 3 runs, the patient bot 1 of 3 (lost a small game and a Short line boss). A person can't search 1,600 lines a ball, so expect it harder in play.
+
 ## Next
-Read `docs/IDEATION.md`: his notes, the diagnosis, seed directions, and the plan for the next session (blind agent team, pitches side by side, build his picks as small labs), plus a fix list (big shop pin art, level-up versus replace, dead pieces).
+Josh plays the Advancing Rack Lab and pastes logs. Check: did the best throw change between balls; did he ever leave pins to grow on purpose; did each boss hurt the way he played. Then a shop for this mode (pieces that favour striking or ripening). The fix list in `docs/IDEATION.md` (big shop pin art, level-up versus replace, dead pieces) still stands.
