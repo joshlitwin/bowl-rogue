@@ -15,6 +15,7 @@ Read `docs/STATE.md` first. It says what is decided, what is open, and what is n
 - No cute or chibi art, no effect clutter.
 - Every lab keeps a Results log with a Copy button; he pastes logs back for analysis.
 - Settle feel questions by building something he can play, not by describing it.
+- On the advancing board, pins **advance** (never "step") toward the bowler; use "advance" in every player-facing text, log and doc.
 
 ## Testing
 - `npm install`, then `npm test` and `npm run bot` (jsdom plus @napi-rs/canvas).

@@ -623,12 +623,12 @@ const kindOf3=gi=>KINDS[gi%3],bossOf=gi=>gi%3===2?BOSSES[run.bosses[Math.floor(g
 // values: the headpin 5, the 2 and 3 pins 3, the rest 2 (the five-pin colours and values, so the art and pins carry over)
 const SLOTV=SPOTS.map(p=>p.v),SLOTN=['1 pin (headpin)','2 pin','3 pin','4 pin','5 pin','6 pin','7 pin','8 pin','9 pin','10 pin'],ADJ=[[1,2],[0,2,3,4],[0,1,4,5],[1,4,6,7],[1,2,3,5,7,8],[2,4,8,9],[3,7],[3,4,6,8],[4,5,7,9],[5,8]];
 const PINS={
-  slow:{name:'Slow pin',cost:4,text:()=>'Steps forward every other ball, doubling every ball, up to 64.'},
+  slow:{name:'Slow pin',cost:4,text:()=>'Advances every other ball, doubling every ball, up to 64.'},
   spark:{name:'Spark pin',cost:5,text:()=>'+1 Mult when you knock it down fresh (worth 1).'},
   shield:{name:'Shield pin',cost:5,text:()=>'Stands back up after its first hit, each time it comes back.'},
   plain:{name:'Plain pin',text:()=>'Doubles each ball it stands.'},
-  runner:{name:'Runner pin',cost:6,text:()=>'Steps two rows a ball and grows ×4.'},
-  anchor:{name:'Anchor pin',cost:5,text:()=>'Never steps. Doubles up to 32.'},
+  runner:{name:'Runner pin',cost:6,text:()=>'Advances two rows a ball and grows ×4.'},
+  anchor:{name:'Anchor pin',cost:5,text:()=>'Never advances. Doubles up to 32.'},
   glass:{name:'Glass pin',cost:6,text:()=>'Grows ×3 a ball, up to 81. Any pin that touches it knocks it down.'},
   bomb:{name:'Bomb pin',cost:6,text:()=>'Falling, it knocks down every pin near it.'},
   huddle:{name:'Huddle pin',cost:4,text:()=>'Pins come back packed close around it.'},
@@ -698,8 +698,8 @@ const BALLOFFERS={
   big:{name:'Big ball',cost:8,text:'A wider ball. Strikes more often.'},
   small:{name:'Small ball',cost:8,text:'A narrower ball. Easier to take one pin.'},
   plastic:{name:'Plastic ball',cost:8,text:'Light as a pin. Stops on a full hit, so the pins behind stay.'},
-  rush:{name:'Rush ball',cost:12,text:'After it, standing pins step two rows and grow twice.'},
-  brake:{name:'Brake ball',cost:10,text:'Once a game: after it, standing pins grow but don’t step.'},
+  rush:{name:'Rush ball',cost:12,text:'After it, standing pins advance two rows and grow twice.'},
+  brake:{name:'Brake ball',cost:10,text:'Once a game: after it, standing pins grow but don’t advance.'},
   toll:{name:'Toll ball',cost:10,text:'After it, pins that break through pay their value instead of costing it.'},
   sweep:{name:'Sweep ball',cost:10,text:'Back-row pins left standing don’t stop a strike.'},
   seed:{name:'Seed ball',cost:12,text:'After a strike with it, the pins come back worth 2.'}
@@ -761,7 +761,7 @@ function board(){let h='';
   const t=total(),won=t>=run.target,extra=Math.min(6,Math.floor((t/run.target-1)*10));
   $('tot').textContent=t;$('tgt').textContent=run.target;$('fill').style.width=Math.min(100,t/run.target*100)+'%';
   $('goal').className='goal'+(won?' made':'');[...$('bonus').children].forEach((e,i)=>e.className=i<extra?'on':'');}
-function hint(t){$('hint').textContent=t!==undefined?t:(run.thrown?(run.game===0&&g.frame<3?'Standing pins step forward and double. Past the red line they cost you. Reach the target to end the game early.':''):'Drag the ball, the bend handle and the aim ring. Only the one you touch moves. Then press Ready.');}
+function hint(t){$('hint').textContent=t!==undefined?t:(run.thrown?(run.game===0&&g.frame<3?'Standing pins advance and double. Past the red line they cost you. Reach the target to end the game early.':''):'Drag the ball, the bend handle and the aim ring. Only the one you touch moves. Then press Ready.');}
 function throwBall(){if(g.mode!=='aim')return;
   if(!g.ready){g.ready=true;g.phase=Math.random();setBtn();hint('The needle is live. Stop it in the green. Touch the lane to go back.');return;}
   const n=tri(g.phase),z=zone(),hz0=needleHz(),ms=Math.round(n/(4*hz0)*1000);let eff=0;if(Math.abs(n)>z)eff=Math.sign(n)*(Math.abs(n)-z)/(1-z);
@@ -976,7 +976,7 @@ cv.addEventListener('pointermove',e=>{if(!drag||g.mode!=='aim')return;const dx=(
   fixBend();});
 ['pointerup','pointercancel'].forEach(n=>cv.addEventListener(n,()=>drag=null));
 
-function logText(){const sg=v=>(v>0?'+':'')+v;let t='Advancing Ten-Pin log. Four levels of small, big, boss; ten balls a game at most, ending as soon as the target is reached ($1 per ball left, up to $4). One board per game that never resets. After each ball, pins left standing step one row toward you and double in value (1, 2, 4, 8, 16); pins that fell come back worth 1 at the back, as far back as they fit. A pin that would step past the red line breaks through: it costs its value and comes back at the back. A strike (every pin on the board) is worth '+ADV.STRIKEX+'x. Growth: '+ADV.GROW+'. Rows before the line: '+(ADV.LASTK+1)+' (Short line boss: 4). Bosses, one per level, strike killers and ripen killers alternating: Short line (the line one row closer), Sweep bar (balls 3, 6, 9: every standing pin swept off for nothing), Bolted rack (only the ball knocks pins down), Rising tentacle (a post that rises at the back of a middle column and steps forward each ball; it stops the ball). Your ten pins keep their type: Slow, Spark, Shield, Runner, Anchor, Glass, Bomb, Huddle, Crown, Rent, Crowd, Toll; the board lists a type by its first three letters after the value. Rack lists your ten by starting spot 1 to 10. Ball used: the house ball, or the one you bought (Big, Small, Plastic: size and weight; Rush, Brake, Toll, Sweep, Seed: the house ball with an effect on the step). Positions are px from lane centre (lane edges -120/+120). Board lists each pin as column:row=value, columns -3..3 are half a pin spacing apart (34.5 px), row 0 is the back. Hot is how many pins stood on the front row (they break through unless knocked down). Moved is how far the line changed from the previous ball (start + aim + half the bend). Timing is ms early (-) or late (+); drift is how far the ball was pushed off the drawn line.\n';
+function logText(){const sg=v=>(v>0?'+':'')+v;let t='Advancing Ten-Pin log. Four levels of small, big, boss; ten balls a game at most, ending as soon as the target is reached ($1 per ball left, up to $4). One board per game that never resets. After each ball, pins left standing advance one row toward you and double in value (1, 2, 4, 8, 16); pins that fell come back worth 1 at the back, as far back as they fit. A pin that would advance past the red line breaks through: it costs its value and comes back at the back. A strike (every pin on the board) is worth '+ADV.STRIKEX+'x. Growth: '+ADV.GROW+'. Rows before the line: '+(ADV.LASTK+1)+' (Short line boss: 4). Bosses, one per level, strike killers and ripen killers alternating: Short line (the line one row closer), Sweep bar (balls 3, 6, 9: every standing pin swept off for nothing), Bolted rack (only the ball knocks pins down), Rising tentacle (a post that rises at the back of a middle column and advances each ball; it stops the ball). Your ten pins keep their type: Slow, Spark, Shield, Runner, Anchor, Glass, Bomb, Huddle, Crown, Rent, Crowd, Toll; the board lists a type by its first three letters after the value. Rack lists your ten by starting spot 1 to 10. Ball used: the house ball, or the one you bought (Big, Small, Plastic: size and weight; Rush, Brake, Toll, Sweep, Seed: the house ball with an effect on how the board advances). Positions are px from lane centre (lane edges -120/+120). Board lists each pin as column:row=value, columns -3..3 are half a pin spacing apart (34.5 px), row 0 is the back. Hot is how many pins stood on the front row (they break through unless knocked down). Moved is how far the line changed from the previous ball (start + aim + half the bend). Timing is ms early (-) or late (+); drift is how far the ball was pushed off the drawn line.\n';
   t+='run,game,target,ball,ball_used,start,aim,bend,moved,timing_ms,drift_px,setup_seconds,board_value,hot,pins_down,value_down,clean_pins,mult,score,triggers,broke_through,cost,swept,net,result,board_before,board_after,boss,cash,your_ten,gear,shop_before_game\n';
   LOG.forEach(r=>{t+=[r.run,r.game,r.target,r.frame,r.ball||'house',sg(r.start),sg(r.aim),sg(r.bend),r.moved,sg(r.ms),sg(r.drift),r.setup,r.value,r.hot,r.down,r.downValue,r.clean,r.mult,r.score,r.notes||'',r.broke,r.cost,r.swept||0,r.net,r.result,r.rack,r.after,r.boss||'',r.cash||'',r.ten||'',r.gear||'',r.offers||''].join(',')+'\n';});return t;}
 function openLog(){$('logText').value=LOG.length?logText():'No throws recorded yet.';$('log').hidden=false;}
