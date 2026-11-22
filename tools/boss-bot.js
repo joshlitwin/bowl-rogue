@@ -2,6 +2,8 @@
 // Each ball it searches a grid of lines for the best score from the pins now standing (perfect release),
 // then throws that line with a timing spread of SIG ms. In the shop it buys pins it can afford onto plain spots.
 // Prints each game: level, kind, boss, score against target, strikes; then where runs ended.
+// SEARCH: like a person on a new rack or boss, the first balls of a game miss the best line by a random offset
+// (first 2 balls after the rack layout changes, first 4 in a boss game), so targets are checked against a slower start.
 // usage: node tools/boss-bot.js [runs=3] [sig=60]
 const {JSDOM,VirtualConsole}=require('jsdom');const fs=require('fs');
 const html=fs.readFileSync(require('path').join(__dirname,'../labs/five-pin-bosses/index.html'),'utf8');const errs=[];
@@ -19,7 +21,8 @@ function bestLine(){const sr=startRange();let best=null;
     const fell=pins.filter(p=>p.down),left=pins.filter(p=>!p.down);if(!fell.length)continue;const r=scoreBall(fell,left,g.rackBalls===0);
     if(!best||r.score>best.v)best={v:r.score,L};}
   return best?best.L:[180,180,0];}
-function throwOne(){const L=bestLine();g.sx=L[0];g.ex=L[1];g.bx=(L[0]+L[1])/2+L[2]/2;fixBend();g.ready=true;
+function throwOne(){const L=bestLine().slice();const nth=g.frames.reduce((a,f)=>a+f.balls.length,0),search=BOSS?4:run.layout!=='standard'?2:0;
+  if(nth<search){L[0]=clamp(L[0]+(Math.random()-.5)*50,...startRange());L[1]+=(Math.random()-.5)*40;L[2]=clamp(L[2]+(Math.random()-.5)*80,-90,90);}g.sx=L[0];g.ex=L[1];g.bx=(L[0]+L[1])/2+L[2]/2;fixBend();g.ready=true;
   const n=clamp(gauss()*${SIG}*4*needleHz()/1000,-1,1);g.phase=(1-n)/4;throwBall();let j=0;while(!g.sim.done&&j++<3000)tick(g.sim);resolve();}
 // shop: pins by preference, levelling ones it has, onto plain spots or over the weakest pin; then an extra spot, then gear
 var PREF=['crown','leader','gold','trophy','wing','bomb','picket','twin','buddy','domino','tip','sweep','wall'];

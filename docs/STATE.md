@@ -95,7 +95,8 @@ Josh: "I basically just find what works for a strike and hit that every time. We
 
 ## Five-Pin Boss Lab (built 21 November, not yet played by Josh)
 `labs/five-pin-bosses/`: the Variety Lab with the Shelves shop, restructured Balatro-style at Josh's request.
-- **Four levels of three games:** small, big, boss (12 games). Targets 150, 220, 300 / 450, 650, 850 / 1100, 1450, 1800 / 2100, 2600, 3100, pegged to `npm run boss-bot` (aims the best line every ball with a 60 ms timing spread, buys pins by preference); guesses for a human. Pay $4 / $5 / $7 per win plus up to $4 for going over.
+- **Four levels of three games:** small, big, boss (12 games). Targets 120, 170, 220 / 380, 540, 700 / 950, 1250, 1550 / 1800, 2250, 2700; pay $5 / $6 / $8 per win plus up to $4 for going over. Set after Josh lost the first boss at 245 of 300 (first targets 150 to 3100, pay $4 / $5 / $7). Checked with `npm run boss-bot`, which now spends its first balls searching like a person (2 on a moved rack, 4 in a boss game): level 1 passes with margin, runs end between games 5 and 12.
+- **Shop and top bar (after Josh's iPhone screenshots):** the top bar starts 20 px down, below the status-bar blur; the last game's result and pay sit at the top of the shop beside the cash.
 - **Bosses**, four of six drawn per run, one per level, named on the shop's leave button and at the start of the game: Bolted 3-pins and Bolted corners (fall to the ball, or only to a very hard pin hit), Centre post and Twin posts (stop the ball; pins bounce off; the drawn line stops at the post), Left-side start and Right-side start (the other half of the approach hatched and closed). Each leaves about 240 to 500 of 1,014 strike lines on the standard rack, against 1,014 with no boss.
 - **Trophy** capped at +12 per level of the pin.
 - **Looks:** Rec Room (level 1), After Close (level 2), then two new looks made by a designer pass:

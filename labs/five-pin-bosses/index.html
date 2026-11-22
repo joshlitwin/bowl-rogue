@@ -523,11 +523,11 @@ function scoreFrames(fr){const flat=[].concat(...fr);let idx=0,tot=0;const out=[
 //SIM-END
 
 const OPT=(()=>{let q;try{q=new URLSearchParams(location.search);}catch(e){q=new URLSearchParams('');}return{layout:q.get('layout')!=='0',balls:q.get('balls')!=='0',spots:q.get('spots')!=='0'};})();
-const FRAMES=3,TARGETS=[150,220,300,450,650,850,1100,1450,1800,2100,2600,3100],NIGHT_FROM=3;
+const FRAMES=3,TARGETS=[120,170,220,380,540,700,950,1250,1550,1800,2250,2700],NIGHT_FROM=3;
 const STAGES=['rec','night','computer','arrival'];
 function stageOf(gi){return STAGES[Math.min(3,Math.floor(gi/3))];}
 // four levels; in each, a small game, a big game and a boss game
-const KINDS=['Small','Big','Boss'],PAY=[4,5,7];
+const KINDS=['Small','Big','Boss'],PAY=[5,6,8];
 const kindOf3=gi=>KINDS[gi%3],bossOf=gi=>gi%3===2?BOSSES[run.bosses[Math.floor(gi/3)]]:null;
 const SLOTV=[5,3,3,2,2,3,3],SLOTN=['Headpin','Left 3','Right 3','Left corner','Right corner','Back centre','Left flank'],ADJ=[[1,2],[0,3,5,6],[0,4,5],[1,5,6],[2,5],[1,2,3,4],[1,3]];
 const PINS={
