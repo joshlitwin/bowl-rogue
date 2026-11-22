@@ -4,19 +4,19 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Temperance Lanes</title>
-<meta name="description" content="Temperance Lanes: a bowling roguelike. Ten pins. Know when to stop.">
-<meta name="theme-color" content="#4c2a1a">
+<meta name="description" content="A bowling roguelike.">
+<meta name="theme-color" content="#1d100a">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Temperance Lanes">
 <meta property="og:title" content="Temperance Lanes">
-<meta property="og:description" content="A bowling roguelike. Ten pins. Know when to stop.">
+<meta property="og:description" content="A bowling roguelike.">
 <meta property="og:url" content="https://joshlitwin.github.io/bowl-rogue/">
 <meta property="og:image" content="https://joshlitwin.github.io/bowl-rogue/assets/share.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Temperance Lanes">
-<meta name="twitter:description" content="A bowling roguelike. Ten pins. Know when to stop.">
+<meta name="twitter:description" content="A bowling roguelike.">
 <meta name="twitter:image" content="https://joshlitwin.github.io/bowl-rogue/assets/share.png">
 <link rel="icon" href="assets/icon.svg" type="image/svg+xml">
 <link rel="icon" href="assets/icon-32.png" sizes="32x32" type="image/png">
@@ -27,74 +27,378 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@500;700&family=Silkscreen&display=swap" rel="stylesheet">
 <style>
-/* the front page: pick a mode. Rec Room '74 colours, the game's pixel fonts, one screen, no scrolling */
-:root{--ink:#1d100a;--wall:#4c2a1a;--panel:#3a2016;--chalk:#f3e2b8;--dim:#c9a878;--accent:#d86a28;--red:#d83a2a;--amber:#e8a020;--green:#3f8f6a;--wood:#c98f52;--woodline:#b47a40;
+/* the cover: one pixel-art scene drawn in code (the hall after close, the sign over lane 5), the name and the line are part of the art; Play and Labs sit on the approach */
+:root{--ink:#1d100a;--chalk:#f3e2b8;--dim:#c9a878;--red:#d83a2a;--px:2px;
   --display:"Pixelify Sans",system-ui,sans-serif;--num:"Silkscreen",ui-monospace,monospace;color-scheme:dark}
 *{box-sizing:border-box}
 html,body{height:100%;margin:0}
-body{background:var(--ink);color:var(--chalk);font-family:var(--display);display:flex;flex-direction:column;overflow:hidden;-webkit-tap-highlight-color:transparent;
-  padding:max(20px,calc(env(safe-area-inset-top) + 10px)) 14px max(22px,calc(env(safe-area-inset-bottom) + 10px))}
-main{flex:1;min-height:0;width:100%;max-width:420px;margin:0 auto;display:flex;flex-direction:column;gap:12px}
-/* the sign over the lanes */
-.sign{position:relative;background:var(--wall);border:3px solid #1d100a;box-shadow:inset 0 0 0 2px #7a4a2c;border-radius:6px;padding:14px 12px 12px;display:flex;align-items:center;gap:12px;overflow:hidden}
-.sign::before,.sign::after{content:"";position:absolute;left:0;right:0;height:5px}
-.sign::before{bottom:14px;background:var(--accent)}.sign::after{bottom:9px;background:var(--chalk)}
-.disc{position:relative;z-index:1;flex:none;width:52px;height:52px;border-radius:50%;background:var(--chalk);border:3px solid #3a2016;display:grid;place-items:center;font-family:var(--num);font-size:30px;line-height:1;color:var(--red);padding:0 0 2px 5px}
-.sign h1{position:relative;z-index:1;margin:0 0 12px;font-size:min(30px,6.6vw);white-space:nowrap;letter-spacing:.03em;line-height:1}
-.sign h1 small{display:block;font-family:var(--num);font-size:11px;letter-spacing:.08em;color:var(--dim);margin-top:6px}
-/* modes */
-.modes{flex:1;min-height:0;display:flex;flex-direction:column;gap:10px}
-.mode{flex:1;min-height:0;max-height:168px;display:flex;align-items:stretch;gap:12px;padding:10px;border-radius:8px;background:var(--panel);border:3px solid #1d100a;box-shadow:inset 0 0 0 2px rgba(243,226,184,.08);color:var(--chalk);text-decoration:none}
-.mode:focus-visible,.mode:hover{box-shadow:inset 0 0 0 2px var(--accent)}
-.mode:active{transform:translateY(1px)}
-.deck{flex:none;width:108px;border-radius:5px;background:repeating-linear-gradient(90deg,var(--wood) 0 11px,var(--woodline) 11px 12px);display:grid;place-items:center;border:2px solid #1d100a}
-.deck svg{width:100px;height:auto;image-rendering:pixelated;shape-rendering:crispEdges}
-.txt{flex:1;min-width:0;display:flex;flex-direction:column;justify-content:center;gap:5px}
-.txt strong{font-size:21px;line-height:1}
-.txt span{font-size:14px;line-height:1.25;color:var(--dim)}
-.txt em{align-self:flex-start;font-style:normal;font-family:var(--num);font-size:10px;letter-spacing:.06em;padding:3px 6px 2px;border-radius:3px;background:var(--accent);color:var(--ink)}
-.mode.alt em{background:transparent;color:var(--dim);box-shadow:inset 0 0 0 2px var(--dim)}
-.go{flex:none;align-self:center;width:0;height:0;border:9px solid transparent;border-left:12px solid var(--accent);border-right:0}
-footer{display:flex;justify-content:center}
-footer a{font-family:var(--num);font-size:12px;letter-spacing:.06em;color:var(--dim);text-decoration:none;padding:10px 14px}
-footer a:focus-visible,footer a:hover{color:var(--chalk)}
-/* one game: its card fills the middle, rack on top, words under it */
-.modes{justify-content:center}
-.mode.one{flex:0 1 auto;max-height:none;flex-direction:column;align-items:stretch;padding:14px;gap:14px}
-.mode.one .deck{width:auto;flex:1 1 auto;min-height:120px;max-height:260px}
-.mode.one .deck{overflow:hidden}.mode.one .deck svg{width:auto;height:86%;max-width:92%}.mode.one .txt em{white-space:nowrap}
-.mode.one .txt{gap:8px}.mode.one .txt strong{font-size:30px}.mode.one .txt span{font-size:16px}.mode.one .txt em{font-size:12px;padding:5px 8px 4px}
-.mode.one .go{position:absolute;right:20px;bottom:24px}
-.mode.one{position:relative}
-@media (max-height:620px){.sign{padding:10px 10px 10px}.disc{width:42px;height:42px;font-size:24px}.sign h1{font-size:min(25px,6.6vw);margin-bottom:10px}.txt span{font-size:13px}.deck{width:92px}.deck svg{width:86px}}
+body{background:#120a06;color:var(--chalk);font-family:var(--display);overflow:hidden;-webkit-tap-highlight-color:transparent}
+#scene{position:fixed;top:0;left:0;image-rendering:pixelated;image-rendering:crisp-edges;display:block}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.ui{position:fixed;left:0;right:0;bottom:0;display:flex;flex-direction:column;align-items:center;gap:calc(var(--px)*2);
+  padding:0 16px max(10px,calc(env(safe-area-inset-bottom) + 4px))}
+.play{display:block;min-width:min(240px,100%);padding:calc(var(--px)*6) calc(var(--px)*10) calc(var(--px)*6);text-align:center;text-decoration:none;
+  font:700 min(22px,6vw)/1 var(--display);letter-spacing:.04em;white-space:nowrap;color:#fff8e8;background:var(--red);
+  border:var(--px) solid var(--ink);
+  box-shadow:inset 0 var(--px) 0 #ff6a4a,inset 0 calc(var(--px)*-2) 0 #8a2418,0 var(--px) 0 var(--ink),0 0 0 var(--px) #2a160e}
+.play:focus-visible,.play:hover{background:#e84a32}
+.play:focus-visible{outline:var(--px) solid #ffd866;outline-offset:var(--px)}
+.play:active{transform:translateY(var(--px));box-shadow:inset 0 calc(var(--px)*-1) 0 #8a2418,0 0 0 var(--px) #2a160e}
+.labs{font:400 12px/1 var(--num);letter-spacing:.08em;color:var(--dim);text-decoration:none;padding:10px 16px}
+.labs:focus-visible,.labs:hover{color:var(--chalk)}
 </style>
 </head>
 <body>
-<main>
-  <header class="sign"><div class="disc" aria-hidden="true">5</div><h1>Temperance Lanes<small>a bowling roguelike</small></h1></header>
-  <nav class="modes" aria-label="Play">
-    <a class="mode one" href="labs/advancing-ten-pin/"><div class="deck" data-rack="adv"></div><div class="txt"><strong>Play</strong><span>Pins you leave advance and grow. Build them up with powers.</span><em id="runTag">12 games · shop</em></div><i class="go" aria-hidden="true"></i></a>
-  </nav>
-  <footer><a href="labs/">Labs</a></footer>
-</main>
+<canvas id="scene" aria-hidden="true"></canvas>
+<h1 class="sr">Temperance Lanes</h1>
+<p class="sr">A bowling roguelike</p>
+<nav class="ui" aria-label="Play">
+  <a class="play" id="play" href="labs/advancing-ten-pin/">Play</a>
+  <a class="labs" href="labs/">Labs</a>
+</nav>
 <script>
-// each mode's rack, drawn as pixel pins seen from above-behind: back rows first, band colour by value (5 red, 3 amber, 2 green)
-const PIN=['..ww..','..ww..','.wwww.','.wwww.','.bbbb.','wwwwww','wwwwww','.wwww.'];
-const BAND={5:'#d83a2a',3:'#e8a020',2:'#3f8f6a'};
-function rackSVG(pins){const W=48,H=30,s=[];
-  pins.sort((a,b)=>a[1]-b[1]).forEach(([x,y,v])=>{PIN.forEach((row,j)=>[...row].forEach((ch,i)=>{if(ch==='.')return;
-    s.push(`<rect x="${x-3+i}" y="${y-8+j}" width="1" height="1" fill="${ch==='b'?BAND[v]:j>=5?'#efe2c4':'#fff8e8'}"/>`);}));
-    s.push(`<rect x="${x-3}" y="${y}" width="6" height="1" fill="rgba(42,22,14,.45)"/>`);});
-  return `<svg viewBox="3 1 42 32" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">${s.join('')}</svg>`;}
-const RACKS={
-  five:[[24,27,5],[16,21,3],[32,21,3],[8,15,2],[40,15,2]],
-  classic:[[24,27,5],[16,21,3],[32,21,3],[8,15,2],[40,15,2]],
-  adv:[[11,31,2],[37,27,5],[24,23,3],[16,17,2],[32,17,2],[9,11,2],[24,11,2],[39,11,2]],
-  ten:[[24,29,5],[19,24,3],[29,24,3],[14,19,2],[24,19,2],[34,19,2],[9,14,2],[19,14,2],[29,14,2],[39,14,2]]
+// a run in progress (saved by the game at each ball and in the shop): the button says where it stands
+try{const d=JSON.parse(localStorage.getItem('advten-save')||'null');if(d&&d.run){const n=d.run.game+1;document.getElementById('play').textContent=`Continue · game ${n} of 12`;}}catch(e){}
+
+/* ---------- the scene ----------
+   Drawn into a small buffer of palette indices, then scaled up by a whole number with nearest-neighbour.
+   Light is a number 0..1 per pixel; each material has a ramp of hand-picked colours and a 4x4 ordered dither picks between neighbours. */
+const PAL={
+  void:'#120a06',ink:'#1d100a',d1:'#2a160e',d2:'#3a2016',wall:'#4c2a1a',d4:'#623620',d5:'#7a4a2c',
+  w1:'#8e5a30',w2:'#a8703e',wood:'#c98f52',w4:'#dba868',w5:'#ecc488',chalk:'#f3e2b8',white:'#fff8e8',
+  m1:'#2a2220',m2:'#453a33',m3:'#6e5e50',m4:'#9a8a78',p3:'#c9b896',p4:'#efe2c4',
+  r0:'#4a1410',r1:'#8a2418',red:'#d83a2a',r3:'#ff6a4a',
+  g1:'#5e2614',g2:'#8c3416',acc:'#d86a28',o3:'#ff9a52',amber:'#e8a020',gold:'#ffd866',core:'#fff4d6',
+  n0:'#0d0f24',n1:'#18204a',n2:'#2c3a72'
 };
-document.querySelectorAll('.deck').forEach(d=>d.innerHTML=rackSVG(RACKS[d.dataset.rack].map(p=>p.slice())));
-// a run in progress (saved by the game at each ball and in the shop): the tag says where it stands
-try{const d=JSON.parse(localStorage.getItem('advten-save')||'null');if(d&&d.run){const n=d.run.game+1;document.getElementById('runTag').textContent=`Continue · game ${n} of 12`;}}catch(e){}
+const NAMES=Object.keys(PAL),IDX={};NAMES.forEach((n,i)=>IDX[n]=i);
+const RGB=NAMES.map(n=>{const h=PAL[n];return[parseInt(h.slice(1,3),16),parseInt(h.slice(3,5),16),parseInt(h.slice(5,7),16)];});
+const R=a=>a.map(n=>IDX[n]);
+const RAMP={
+  wood:R(['void','ink','d1','d2','wall','d4','d5','w1','w2','wood','w4','w5','chalk']),
+  panel:R(['void','ink','d1','d2','wall','d4','g2','acc','o3']),
+  dark:R(['void','ink','d1','m1','m2','m3','m4']),
+  brick:R(['void','ink','d1','d2','r0','wall','d4']),
+  pin:R(['m2','m3','m4','p3','p4','white']),
+  ball:R(['void','r0','r1','red','r3']),
+  neonO:R(['g2','acc','o3','core']),
+  neonA:R(['d5','amber','gold','core']),
+  night:R(['void','n0','n1','n2'])
+};
+const BAYER=[0,8,2,10,12,4,14,6,3,11,1,9,15,7,13,5].map(v=>(v+.5)/16);
+const bay=(x,y)=>BAYER[(y&3)*4+(x&3)];
+const clamp=(v,a,b)=>v<a?a:v>b?b:v;
+const sstep=(a,b,v)=>{v=clamp((v-a)/(b-a),0,1);return v*v*(3-2*v);};
+function hash(a,b){let h=(a*374761393+b*668265263)|0;h=Math.imul(h^(h>>>13),1274126177);return((h^(h>>>16))>>>0)/4294967296;}
+// the dither is kept to a narrow band at each step of the ramp (SHARP), so most of a surface is flat colour, as if placed by hand
+const SHARP=2.4;
+function rampAt(r,I,x,y){I=clamp(I,0,1);const v=I*(r.length-1);let i=Math.floor(v);if((v-i-.5)*SHARP+.5>bay(x,y))i++;return r[Math.min(i,r.length-1)];}
+
+// text, rasterised from the page's own pixel fonts and thresholded to hard pixels
+function textMask(str,font,ls){
+  const c=document.createElement('canvas');c.width=320;c.height=64;const g=c.getContext('2d');
+  g.font=font;if('letterSpacing' in g)g.letterSpacing=(ls||0)+'px';g.fillStyle='#fff';g.textBaseline='alphabetic';g.fillText(str,8,44);
+  const d=g.getImageData(0,0,320,64).data;let x0=320,x1=-1,y0=64,y1=-1;
+  for(let y=0;y<64;y++)for(let x=0;x<320;x++)if(d[(y*320+x)*4+3]>120){if(x<x0)x0=x;if(x>x1)x1=x;if(y<y0)y0=y;if(y>y1)y1=y;}
+  if(x1<0)return{w:0,h:0,base:0,on:()=>false};
+  const w=x1-x0+1,h=y1-y0+1,m=new Uint8Array(w*h);
+  for(let y=0;y<h;y++)for(let x=0;x<w;x++)m[y*w+x]=d[((y+y0)*320+x+x0)*4+3]>120?1:0;
+  return{w,h,base:44-y0,m,on:(x,y)=>x>=0&&y>=0&&x<w&&y<h&&m[y*w+x]===1};
+}
+
+// the neon: each letter is a tube's centre line (points, baseline y=0); a core pixel line, a tube around it
+function line(set,x0,y0,x1,y1){const dx=Math.abs(x1-x0),dy=-Math.abs(y1-y0),sx=x0<x1?1:-1,sy=y0<y1?1:-1;let e=dx+dy;
+  for(;;){set.add(x0+','+y0);if(x0===x1&&y0===y1)break;const e2=2*e;if(e2>=dy){e+=dy;x0+=sx;}if(e2<=dx){e+=dx;y0+=sy;}}}
+function glyphs(big){
+  const X=big?10:8,w=big?8:7,s=big?5:4,C=big?16:13,D=4,tw=big?13:11,r=w-1;
+  const bowl=[[r,-X+2],[r-2,-X],[2,-X],[0,-X+2],[0,-2],[2,0],[r-2,0],[r,-2]];
+  return{
+    T:{w:tw,adv:(tw>>1)+4,s:[[[0,-C+1],[1,-C],[tw-2,-C],[tw-1,-C+1]],[[tw>>1,-C],[tw>>1,0]]]},
+    e:{w,s:[[[0,-(X>>1)],[r,-(X>>1)],[r,-X+2],[r-2,-X],[2,-X],[0,-X+2],[0,-2],[2,0],[r-1,0],[r,-1]]]},
+    m:{w:2*s+1,s:[[[0,0],[0,-X]],[[0,-X+2],[2,-X],[s-1,-X],[s,-X+1],[s,0]],[[s,-X+2],[s+2,-X],[2*s-1,-X],[2*s,-X+1],[2*s,0]]]},
+    p:{w,s:[[[0,D],[0,-X]],[[0,-X+2],[2,-X],[r-2,-X],[r,-X+2],[r,-2],[r-2,0],[2,0],[0,-2]]]},
+    r:{w:w-1,s:[[[0,0],[0,-X]],[[0,-X+3],[3,-X],[r-2,-X],[r-1,-X+1]]]},
+    a:{w,s:[[[r,-X],[r,0]],bowl.slice(0,8).concat([[r,-X+2]]).slice(0)]},
+    n:{w,s:[[[0,0],[0,-X]],[[0,-X+2],[2,-X],[r-2,-X],[r,-X+2],[r,0]]]},
+    c:{w,s:[bowl.slice(0,8)]},
+    L:{w:6,s:[[[0,-8],[0,0],[5,0]]]},
+    A:{w:6,s:[[[0,0],[0,-5],[2,-8],[3,-8],[5,-5],[5,0]],[[0,-4],[5,-4]]]},
+    N:{w:6,s:[[[0,0],[0,-8],[5,0],[5,-8]]]},
+    E:{w:6,s:[[[5,-8],[0,-8],[0,0],[5,0]],[[0,-4],[4,-4]]]},
+    S:{w:6,s:[[[5,-7],[4,-8],[1,-8],[0,-7],[0,-5],[1,-4],[4,-4],[5,-3],[5,-1],[4,0],[1,0],[0,-1]]]}
+  };
+}
+function neonWord(str,big,gap){
+  const G=glyphs(big),core=new Set;let x=0;
+  for(const ch of str){const g=G[ch];
+    g.s.forEach(st=>{for(let i=0;i<st.length-1;i++)line(core,x+st[i][0],st[i][1],x+st[i+1][0],st[i+1][1]);});
+    x+=(g.adv||g.w)+gap;}
+  let x0=1e9,x1=-1e9,y0=1e9,y1=-1e9;core.forEach(k=>{const[a,b]=k.split(',').map(Number);x0=Math.min(x0,a);x1=Math.max(x1,a);y0=Math.min(y0,b);y1=Math.max(y1,b);});
+  const w=x1-x0+3,h=y1-y0+3,m=new Uint8Array(w*h); // 2 = core, 1 = tube (4-neighbour), 3 = tube edge (diagonal only)
+  core.forEach(k=>{const[a,b]=k.split(',').map(Number);m[(b-y0+1)*w+(a-x0+1)]=2;});
+  const at=(x,y)=>x>=0&&y>=0&&x<w&&y<h?m[y*w+x]:0;
+  for(let y=0;y<h;y++)for(let x=0;x<w;x++)if(!m[y*w+x]){
+    if(at(x-1,y)===2||at(x+1,y)===2||at(x,y-1)===2||at(x,y+1)===2)m[y*w+x]=1;}
+  for(let y=0;y<h;y++)for(let x=0;x<w;x++)if(!m[y*w+x]){
+    if(at(x-1,y-1)===2||at(x+1,y-1)===2||at(x-1,y+1)===2||at(x+1,y+1)===2)m[y*w+x]=3;}
+  return{w,h,m,kind:(x,y)=>at(x,y),on:(x,y)=>at(x,y)>0};
+}
+
+// one pin seen from the front: rows of [width]; shaded left-lit; red neck stripes on rows 4 and 6
+const PINW=[2,4,4,4,2,2,2,4,4,6,6,6,6,6,6,6,6,4,4];
+function drawPin(S,cx,by,lit,dim){ // cx: centre (between two pixels), by: y of the base row
+  const top=by-PINW.length+1;
+  // outline first, so overlapping pins separate
+  for(let j=0;j<PINW.length;j++){const w=PINW[j],x0=cx-w/2;
+    S.set(x0-1,top+j,dim?'void':'d1');S.set(x0+w,top+j,dim?'void':'d1');}
+  S.set(cx-1,top-1,dim?'void':'d1');S.set(cx,top-1,dim?'void':'d1');
+  for(let j=0;j<PINW.length;j++){const w=PINW[j],x0=cx-w/2,band=(j===4||j===6);
+    for(let i=0;i<w;i++){const x=x0+i;
+      let I=lit*(1-.10*j/PINW.length);              // lit from above
+      const f=(i+.5)/w;I+= f<.35?.12:f>.7?-.22:0;   // round body: highlight left, shade right
+      if(band){S.set(x,top+j,dim?(I>.5?'r1':'r0'):(f>.7?'r1':I>.8?'r3':'red'));continue;}
+      S.set(x,top+j,RAMP.pin[clamp(Math.round(I*(RAMP.pin.length-1)),0,RAMP.pin.length-1)]);}}
+}
+
+function makeScene(W,H,opt){
+  const buf=new Uint8Array(W*H);
+  const S={W,H,set(x,y,n){x|=0;y|=0;if(x>=0&&y>=0&&x<W&&y<H)buf[y*W+x]=typeof n==='number'?n:IDX[n];},
+           get(x,y){return buf[y*W+x];}};
+  const card=!!opt.card,cx=W>>1;
+  // ---- layout (buffer pixels) ----
+  const T=neonWord('Temperance',W>=190||card,4);
+  const Ls=neonWord('LANES',false,6);
+  const Tg=textMask('A BOWLING ROGUELIKE','8px Silkscreen',0);
+  const uiTop=opt.uiTop==null?H:opt.uiTop;
+  const wallH=card?10:clamp(Math.round((H-300)*.55+16),12,120);
+  const panelTop=wallH;
+  const signTop=panelTop+(card?6:8);
+  const lanesY=signTop+T.h+4;              // LANES line
+  const tagY=lanesY+Ls.h+7;
+  const stripeY=card?lanesY+Ls.h+7:tagY+Tg.h+6;
+  const panelBot=stripeY+7;
+  const deckY=panelBot+31;                  // base of the head pin
+  const LD=58;                              // lane width at the head pin, px
+  const LB=card?W*1.05:Math.min(W*.9,190);  // lane width at the bottom edge
+  const k=(LB-LD)/(H-deckY),hor=deckY-LD/k;
+  const foulY=card?H+20:Math.min(uiTop-4,H-30);
+  const z=y=>1/(y-hor),zD=z(deckY),zF=z(foulY);
+  const zt=y=>(z(y)-zF)/(zD-zF);            // 0 at the foul line, 1 at the head pin
+  const yAt=t=>hor+1/(zF+t*(zD-zF));
+  const lw=y=>k*(y-hor);                     // lane width at y
+  const PITCH=1.56,GUT=.22;
+  // neon: the tube is the letter mask; its glow is a distance field over the panel
+  const signX=cx-(T.w>>1),lanesX=cx-(Ls.w>>1),tagX=cx-(Tg.w>>1);
+  const NE=new Float32Array(W*H),NA=new Float32Array(W*H); // glow strength orange / amber
+  function glow(mask,ox,oy,arr,Rr,amp){
+    for(let y=oy-Rr;y<oy+mask.h+Rr;y++)for(let x=ox-Rr;x<ox+mask.w+Rr;x++){
+      if(x<0||y<0||x>=W||y>=H)continue;let best=99;
+      for(let dy=-Rr;dy<=Rr;dy++)for(let dx=-Rr;dx<=Rr;dx++)if(mask.on(x-ox+dx,y-oy+dy)){const d=Math.hypot(dx,dy*1.2);if(d<best)best=d;}
+      if(best<99){const g=amp*Math.pow(1-best/(Rr+1),2);if(g>arr[y*W+x])arr[y*W+x]=g;}}
+  }
+  glow(T,signX,signTop,NE,9,1);
+  if(!opt.lanesOff)glow(Ls,lanesX,lanesY,NA,6,.8);
+  // what the oiled lane mirrors: per column, how much sign is above it; drawn as long soft streaks
+  const COL=new Float32Array(W);for(let x=0;x<W;x++){let m=0;for(let y=signTop-4;y<lanesY+Ls.h+4;y++)m+=NE[y*W+x]+NA[y*W+x]*.8;COL[x]=m;}
+  {let mx=0;for(let x=0;x<W;x++)mx=Math.max(mx,COL[x]);const c2=Float32Array.from(COL);
+   for(let x=0;x<W;x++){let a=0,n=0;for(let d=-3;d<=3;d++)if(x+d>=0&&x+d<W){a+=c2[x+d];n++;}COL[x]=mx?a/n/mx:0;}}
+  const reflY=deckY+(deckY-(signTop+T.h/2))*.9,reflS=(card?10:Math.max(16,(deckY-signTop)*.45));
+  const neonAt=(x,y)=>(x<0||y<0||x>=W||y>=H)?0:NE[y*W+x]+NA[y*W+x];
+
+  // ---- back wall above the masking panel: old brick, two tall windows onto the street when there is room ----
+  for(let y=0;y<panelTop;y++)for(let x=0;x<W;x++){
+    const row=y>>2,off=(row&1)?3:0,mortar=(y%4===3)||((x+off)%7===6);
+    let I=.16+.25*neonAt(x,Math.min(y,H-1))+.06*sstep(0,panelTop,y);
+    I+=(hash((x+off)/7|0,row)-.5)*.06;
+    S.set(x,y,rampAt(RAMP.brick,mortar?I-.12:I,x,y));}
+  if(!card&&wallH>=44){
+    const wh=wallH-14,ww=Math.min(26,Math.round(wh*.55));
+    [-1,1].forEach(sd=>{const x0=cx+sd*(W*.29)-ww/2|0,y0=6;
+      for(let y=y0;y<y0+wh;y++)for(let x=x0;x<x0+ww;x++){
+        const u=(y-y0)/wh,edge=x===x0||x===x0+ww-1||y===y0||y===y0+wh-1,mun=(x-x0===(ww>>1))||(y-y0===(wh*.42|0));
+        if(edge||mun){S.set(x,y,'ink');continue;}
+        // night over Yonge Street: deep blue, a warm wash from the street below
+        let I=.25+.55*u;let c=rampAt(RAMP.night,I,x,y);
+        if(u>.72&&bay(x,y)<(u-.72)*2.2)c=IDX.g1;
+        const fx=x-x0,fy=y-y0;
+        // across Yonge: the dark block opposite, a grid of its windows, a few still lit
+        if(wh>=40&&u>.56){c=rampAt(RAMP.night,.18+.1*u,x,y);const gx=(fx-1)%4,gy=(fy-Math.round(wh*.6))%5;
+          if(gx>=0&&gx<2&&gy>=0&&gy<2&&u<.9)c=hash((fx-1)>>2,((fy-Math.round(wh*.6))/5|0)+sd*9)<.35?IDX.amber:IDX.n1;}
+        if(y===y0+Math.round(wh*.3+(fx)*.18*sd))c=IDX.void;                                       // the streetcar wire
+        S.set(x,y,c);}
+      for(let x=x0-1;x<=x0+ww;x++){S.set(x,y0+wh,'d5');S.set(x,y0+wh+1,'d1');} // sill
+    });
+  }
+
+  // ---- masking panel: painted boards, the sign's glow on it, the Rec Room stripes along its foot ----
+  for(let y=panelTop;y<panelBot;y++)for(let x=0;x<W;x++){
+    const g=neonAt(x,y);let I=.36+.05*Math.sin((x-cx)/(W*.32)*Math.PI/2+Math.PI/2)-.05*sstep(panelTop,panelBot,y);
+    if((x-cx+600)%15===0)I-=.07;                 // board seams
+    I+=(hash(x,7)-.5)*.03;
+    let c;
+    if(g>0){c=rampAt(RAMP.panel,I+g*.5,x,y);}else c=rampAt(RAMP.panel,I,x,y);
+    S.set(x,y,c);}
+  for(let x=0;x<W;x++){S.set(x,panelTop,'d1');S.set(x,panelTop+1,'d5');}
+  // stripes: orange, a line of wall, cream, then the lip
+  for(let x=0;x<W;x++){
+    const g=neonAt(x,stripeY);
+    S.set(x,stripeY,g>.25?'o3':'acc');S.set(x,stripeY+1,'acc');S.set(x,stripeY+2,g>.2?'acc':'g2');
+    S.set(x,stripeY+3,'d2');S.set(x,stripeY+4,'chalk');S.set(x,stripeY+5,'p3');S.set(x,stripeY+6,'ink');}
+  // tagline, painted in chalk
+  if(!card)for(let y=0;y<Tg.h;y++)for(let x=0;x<Tg.w;x++)if(Tg.on(x,y))S.set(tagX+x,tagY+y,'chalk');
+
+  // ---- neon ----
+  function tube(mask,ox,oy,ramp,off){
+    for(let y=-1;y<=mask.h+1;y++)for(let x=-1;x<=mask.w+1;x++){
+      const k=mask.kind(x,y);
+      if(!k){if(!off&&mask.kind(x-1,y-2))S.set(ox+x,oy+y,'g1');continue;} // the tube's shadow on the boards
+      if(off){S.set(ox+x,oy+y,k===2?'d5':k===1?'d4':'wall');continue;}
+      S.set(ox+x,oy+y,ramp[k===2?3:k===1?(mask.kind(x,y+1)===2?2:1):0]);}
+  }
+  tube(T,signX,signTop,RAMP.neonO,false);
+  tube(Ls,lanesX,lanesY,RAMP.neonA,!!opt.lanesOff);
+  // two short amber rules either side of LANES
+  const ruleY=lanesY+(Ls.h>>1);
+  for(const sd of[-1,1])for(let i=4;i<20;i++){const x=sd<0?lanesX-i:lanesX+Ls.w-1+i;
+    S.set(x,ruleY,opt.lanesOff?'d5':(i===4||i===19)?'amber':'gold');}
+
+  // ---- the pit: a dark curtain behind the pins, a dim band of the lane light on it ----
+  const pitEdge=Math.round(deckY-3*3.4-3);
+  for(let y=panelBot;y<pitEdge;y++)for(let x=0;x<W;x++){
+    const u=(y-panelBot)/(pitEdge-panelBot),X=(x-cx+.5)/lw(pitEdge);
+    const li=Math.round(X/PITCH),inLane=Math.abs(X-li*PITCH)<.5,lit=li===0?1:.3;
+    S.set(x,y,rampAt(RAMP.dark,(.04+.2*sstep(.2,1,u)*lit)*(inLane?1:.55),x,y));}
+  // the lamp line under the lip
+  for(let x=0;x<W;x++){const X=(x-cx+.5)/lw(deckY),li=Math.round(X/PITCH),inL=Math.abs(X-li*PITCH)<.62;
+    S.set(x,panelBot,li===0&&inL?'gold':'d1');S.set(x,panelBot+1,li===0&&inL?'amber':'ink');}
+
+  // ---- lanes, gutters, caps ----
+  for(let y=pitEdge;y<H;y++){
+    const w=lw(y),t=zt(y),boardPx=w/39,deck=y<=deckY;
+    for(let x=0;x<W;x++){
+      const X=(x-cx+.5)/w,li=Math.round(X/PITCH),lx=X-li*PITCH,ax=Math.abs(lx);
+      const litLane=li===0,lampOn=litLane?1:.28;
+      let c;
+      if(ax<.5){ // the lane
+        const b=Math.floor((lx+.5)*39),fb=(lx+.5)*39-b;
+        let I;
+        if(deck){ // the pin deck under the lamp
+          I=litLane?.6+.3*sstep(pitEdge,deckY+2,y)-.22*sstep(.25,.5,ax):.16+.08*sstep(pitEdge,deckY,y);
+          I+=(hash(b,li*7)-.5)*.05;
+          c=rampAt(RAMP.wood,I,x,y);
+        }else if(y<foulY){
+          I=lampOn*(.42+.42*Math.pow(t,1.6))+(litLane?0:.06);
+          I*=1-.25*sstep(.15,.5,ax);              // falls off to the edges
+          I+=(hash(b,li*7)-.5)*.07+(hash(b,(z(y)*900)|0)-.5)*.03; // board tone and long grain
+          if(boardPx>=2.2&&fb*boardPx<1)I-=.09;    // seam
+          // the oiled lane mirrors the deck light and the sign
+          const dr=(y-reflY)/reflS,rf=COL[x]*Math.exp(-dr*dr)*lampOn;
+          I+=rf*.3;
+          const sheen=Math.exp(-(1-t)*5)*(1-sstep(.05,.42,ax));I+=.18*sheen*lampOn;
+          // arrows and dots, inlaid in darker wood
+          const tA=.36,tD=.17;
+          {const bb=(lx+.5)*39,nb=Math.round((bb-4.5)/5)*5+4.5,off=Math.abs(nb-19.5)/5;
+           if(off<=3.01){const ta=tA+(3-off)*.026,len=.06,dt=t-(ta-len);
+             if(dt>0&&dt<len&&Math.abs(bb-nb)<1.05*(1-dt/len)+.1)I-=.17;}}
+          c=rampAt(RAMP.wood,I,x,y);
+        }else{ // the approach: lighter wood planks in the dark
+          I=lampOn*.3+(litLane?0:.05)-.12*sstep(foulY,H,y);
+          I+=(hash(b,li*5+1)-.5)*.05;if(boardPx>=2.2&&fb*boardPx<1)I-=.06;
+          c=rampAt(RAMP.wood,I,x,y);}
+      }else if(deck){ // kickback walls either side of the deck
+        c=rampAt(RAMP.dark,(litLane?.16:.07)+(ax<.5+GUT?.04:0),x,y);
+      }else if(ax<.5+GUT){ // gutter: a dark rounded channel
+        const gu=(ax-.5)/GUT,curve=Math.sin(gu*Math.PI);
+        let I=(litLane?.38:.14)*(1-curve*.65)+(y<foulY?.08*t*(litLane?1:.3):0);
+        c=rampAt(RAMP.dark,I,x,y);
+      }else{ // capping between lane pairs
+        let I=.18+(litLane||Math.abs(li)===1?.18:0)*(y<foulY?.5+.5*t:.3);
+        const ex=(ax-.5-GUT)/(PITCH/2-.5-GUT);I+=ex>.6?-.05:.08;
+        c=rampAt(RAMP.dark,I,x,y);}
+      S.set(x,y,c);}
+  }
+  // foul line across the lit lane
+  if(foulY<H){const w=lw(foulY);for(let x=Math.round(cx-w*(.5+GUT));x<Math.round(cx+w*(.5+GUT));x++){S.set(x,foulY,'ink');S.set(x,foulY+1,'r1');}}
+
+  // ---- the racks: ten pins on each lane, the lit one bright ----
+  const ROWS=4,rowDy=3.4,sp=.289;
+  for(let li=-3;li<=3;li++){
+    const cxL=cx+li*PITCH*LD;if(cxL<-40||cxL>W+40)continue;
+    for(let r=ROWS-1;r>=0;r--)for(let j=0;j<=r;j++){
+      const X=(j-r/2)*sp,px=Math.round(cxL+X*LD*(1-r*.012)),by=Math.round(deckY-r*rowDy);
+      if(li===0){for(let d=-2;d<2;d++)S.set(px+d,by+1,r===0?'w1':'w2');drawPin(S,px,by,.92-r*.05,false);}
+      else drawPin(S,px,by,(card?.3:.42)-r*.03,true);}
+  }
+
+  // ---- ball return hood at the right edge, just behind the foul line: two balls waiting ----
+  if(!card&&foulY<H){
+    const hw=Math.round(lw(foulY)*.34),hh=Math.round(hw*.62),hx=W-Math.round(hw*.42),hy=foulY-3; // hx: centre, hy: base
+    for(let y=hy-hh;y<=hy;y++)for(let x=hx-(hw>>1);x<=hx+(hw>>1);x++){
+      const u=(x-hx)/(hw/2),v=(hy-y)/hh;                       // u -1..1, v 0 (base)..1 (top)
+      if(v>Math.sqrt(Math.max(0,1-u*u)))continue; // dome
+      const rim=v>Math.sqrt(Math.max(0,1-u*u))-.14;
+      let I=.22+.2*(-u)+.12*v+(rim?.12:0);
+      S.set(x,y,rampAt(RAMP.dark,I,x,y));}
+    // the opening, and the balls sitting in it
+    const oh=Math.round(hh*.5),ow=Math.round(hw*.7);
+    for(let y=hy-oh;y<=hy-1;y++)for(let x=hx-(ow>>1);x<=hx+(ow>>1);x++){const u=(x-hx)/(ow/2),v=(hy-y)/oh;if(v>Math.sqrt(Math.max(0,1-u*u)))continue;S.set(x,y,'void');}
+    const rr=Math.max(4,Math.round(oh*.62));
+    [[hx-Math.round(rr*1.05),0],[hx+Math.round(rr*1.05),1]].forEach(([bx,n])=>{const by=hy-rr;
+      for(let y=-rr;y<=rr;y++)for(let x=-rr;x<=rr;x++){const d=Math.hypot(x+.5,y+.5);if(d>rr)continue;
+        const nx=(x+.5)/rr,ny=(y+.5)/rr,I=clamp(.62-.5*(nx*.7+ny*.7)-.3*Math.pow(d/rr,3),0,1);
+        S.set(bx+x,by+y,n?rampAt(RAMP.dark,I*.85+.05,bx+x,by+y):rampAt(RAMP.ball,I,bx+x,by+y));}
+      S.set(bx-Math.round(rr*.4),by-Math.round(rr*.45),n?'m3':'r3');});
+    for(let x=hx-(hw>>1);x<=hx+(hw>>1);x++)S.set(x,hy+1,'void');
+  }
+
+  // ---- vignette: the edges of the hall fall away into the dark ----
+  const DK={};[['void','void'],['ink','void'],['d1','ink'],['d2','d1'],['wall','d2'],['d4','wall'],['d5','d4'],['w1','d5'],['w2','w1'],['wood','w2'],['w4','wood'],['w5','w4'],
+    ['chalk','p3'],['white','p4'],['p4','p3'],['p3','m4'],['m4','m3'],['m3','m2'],['m2','m1'],['m1','ink'],['r0','d1'],['r1','r0'],['red','r1'],['r3','red'],
+    ['g1','d2'],['g2','g1'],['acc','g2'],['o3','acc'],['amber','acc'],['gold','amber'],['core','gold'],['n0','void'],['n1','n0'],['n2','n1']].forEach(([a,b])=>DK[IDX[a]]=IDX[b]);
+  for(let y=0;y<H;y++)for(let x=0;x<W;x++){
+    const ex=Math.abs(x-cx+.5)/(W/2),ey=y/H;
+    let v=opt.boxed?sstep(.64,1.02,ex)*5:sstep(.72,1.02,ex)*1.1;
+    if(!card)v+=sstep(.86,1,ey)*.6;
+    let n=Math.floor(v+bay(x,y)*.9);let c=buf[y*W+x];while(n-->0)c=DK[c];buf[y*W+x]=c;}
+  return buf;
+}
+
+function toImage(buf,W,H,ctx){
+  const im=ctx.createImageData(W,H),d=im.data;
+  for(let i=0;i<W*H;i++){const c=RGB[buf[i]];d[i*4]=c[0];d[i*4+1]=c[1];d[i*4+2]=c[2];d[i*4+3]=255;}
+  return im;
+}
+
+const cv=document.getElementById('scene'),ctx=cv.getContext('2d');
+const CARD=/[?&]card\b/.test(location.search);
+let frames=null;
+function render(){
+  const vw=window.innerWidth,vh=window.innerHeight;
+  let W,H,s,left=0;
+  if(CARD){s=4;W=300;H=158;document.querySelector('.ui').style.display='none';}
+  else{
+    const boxW=Math.min(vw,Math.round(vh*.72));
+    s=Math.max(2,Math.min(Math.floor(boxW/176),Math.floor(vh/262)));
+    W=Math.ceil(boxW/s);H=Math.ceil(vh/s);left=Math.round((vw-W*s)/2);}
+  document.documentElement.style.setProperty('--px',s+'px');
+  const ui=document.querySelector('.ui').getBoundingClientRect();
+  cv.width=W;cv.height=H;cv.style.width=W*s+'px';cv.style.height=H*s+'px';cv.style.left=left+'px';
+  const uiTop=CARD?null:Math.floor(ui.top/s);
+  const boxed=!CARD&&W*s<vw-4;
+  frames=[toImage(makeScene(W,H,{uiTop,card:CARD,boxed}),W,H,ctx),toImage(makeScene(W,H,{uiTop,card:CARD,boxed,lanesOff:true}),W,H,ctx)];
+  ctx.putImageData(frames[0],0,0);
+}
+// the one motion: now and then the LANES tube stutters, as old neon does. Not under reduced motion.
+const still=matchMedia('(prefers-reduced-motion: reduce)');
+function flicker(){
+  if(!frames||still.matches||CARD){setTimeout(flicker,4000);return;}
+  const seq=[0,90,60,140,40];let i=0;
+  (function step(){if(i>=seq.length){ctx.putImageData(frames[0],0,0);setTimeout(flicker,7000+Math.random()*9000);return;}
+    ctx.putImageData(frames[(i+1)%2],0,0);setTimeout(step,seq[i++]+40);})();
+}
+let rt;addEventListener('resize',()=>{clearTimeout(rt);rt=setTimeout(render,80);});
+const ready=Promise.all(['700 20px "Pixelify Sans"','8px Silkscreen'].map(f=>document.fonts.load(f)));
+Promise.race([ready,new Promise(r=>setTimeout(r,2500))]).then(()=>{render();setTimeout(flicker,5000);});
 </script>
 </body>
 </html>
