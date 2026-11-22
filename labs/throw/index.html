@@ -57,7 +57,7 @@ button:focus-visible,input:focus-visible{outline:3px solid var(--accent);outline
 .cell.goal{background:transparent;border-color:var(--accent);color:var(--chalk)}
 .cell.goal small{color:var(--dim)}
 .cell.goal .sum{color:var(--accent)}
-.stage{flex:1;min-height:0;display:flex;align-items:center;justify-content:center;position:relative;padding:0 8px}
+.stage{flex:1;min-height:0;overflow:hidden;display:flex;align-items:center;justify-content:center;position:relative;padding:0 8px}
 canvas{display:block;touch-action:none;border-radius:6px;image-rendering:pixelated;image-rendering:crisp-edges;image-rendering:pixelated}
 .toast{position:absolute;left:50%;top:44%;transform:translate(-50%,-50%);font-family:var(--display);font-weight:700;font-size:26px;padding:6px 16px;background:var(--ink);color:var(--accent);border:3px solid var(--accent);border-radius:6px;pointer-events:none;opacity:0;white-space:nowrap;max-width:92%;overflow:hidden;text-overflow:ellipsis}
 .hint{font-size:13px;color:var(--dim);text-align:center;margin:0;padding:4px 12px 0;min-height:40px}
@@ -203,6 +203,10 @@ const cv=document.getElementById('lane'),c=cv.getContext('2d');
 const LW=180,LH=300;
 function fit(){const box=cv.parentElement.getBoundingClientRect();const s=Math.max(.5,Math.min((box.width-16)/LW,box.height/LH));cv.style.width=Math.floor(LW*s)+'px';cv.style.height=Math.floor(LH*s)+'px';}
 window.addEventListener('resize',fit);
+// re-fit whenever the lane's space changes (late web fonts, safe areas, the iPhone toolbar), not only on window resize
+try{new ResizeObserver(()=>requestAnimationFrame(fit)).observe(cv.parentElement);}catch(e){}
+if(window.visualViewport)visualViewport.addEventListener('resize',()=>requestAnimationFrame(fit));
+if(document.fonts&&document.fonts.ready)document.fonts.ready.then(fit);
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 
 // ---------- stage (the hall's look) ----------

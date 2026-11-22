@@ -91,7 +91,7 @@ body[data-stage="night"] .cell.done{border-color:var(--panel)}
 .goal.made .bar u{display:flex}
 .bar u s{width:4px;height:4px;background:rgba(0,0,0,.35)}
 .bar u s.on{background:var(--coin)}
-.stage{flex:1;min-height:0;display:flex;align-items:center;justify-content:center;position:relative;padding:0 8px}
+.stage{flex:1;min-height:0;overflow:hidden;display:flex;align-items:center;justify-content:center;position:relative;padding:0 8px}
 canvas{display:block;touch-action:none;border-radius:6px;image-rendering:pixelated;image-rendering:crisp-edges;image-rendering:pixelated}
 .toast{position:absolute;left:0;right:0;top:47%;margin:0 auto;width:max-content;max-width:94%;transform:translateY(-50%);display:grid;grid-template-columns:auto auto;align-items:center;justify-content:center;gap:2px 10px;padding:6px 12px 7px;background:var(--ink);color:var(--chalk);border:3px solid var(--accent);border-radius:3px;box-shadow:0 4px 0 rgba(0,0,0,.5);font-family:var(--num);white-space:nowrap;pointer-events:none;opacity:0;max-width:96%}
 .toast em{grid-row:span 2;font-style:normal;font-size:40px;line-height:40px;color:var(--accent)}
@@ -403,6 +403,10 @@ const cv=document.getElementById('lane'),c=cv.getContext('2d');
 const LW=180,LH=300;
 function fit(){const box=cv.parentElement.getBoundingClientRect();const s=Math.max(.5,Math.min((box.width-16)/LW,box.height/LH));cv.style.width=Math.floor(LW*s)+'px';cv.style.height=Math.floor(LH*s)+'px';}
 window.addEventListener('resize',fit);
+// re-fit whenever the lane's space changes (late web fonts, safe areas, the iPhone toolbar), not only on window resize
+try{new ResizeObserver(()=>requestAnimationFrame(fit)).observe(cv.parentElement);}catch(e){}
+if(window.visualViewport)visualViewport.addEventListener('resize',()=>requestAnimationFrame(fit));
+if(document.fonts&&document.fonts.ready)document.fonts.ready.then(fit);
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 const $=id=>document.getElementById(id);
 

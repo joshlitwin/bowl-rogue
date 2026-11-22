@@ -52,7 +52,7 @@ img{image-rendering:pixelated}
 .info span{min-width:0;overflow:hidden;text-overflow:ellipsis}
 .info.ask{justify-content:flex-end;color:var(--chalk);background:transparent}
 .tri{display:inline-block;width:0;height:0;border:5px solid transparent;border-left:8px solid var(--accent);border-right:0}
-.stage{flex:1;min-height:0;display:flex;align-items:stretch;gap:6px;padding:0 6px 0 8px}
+.stage{flex:1;min-height:0;overflow:hidden;display:flex;align-items:stretch;gap:6px;padding:0 6px 0 8px}
 .lanebox{flex:1;min-width:0;position:relative;display:flex;align-items:center;justify-content:center}
 canvas{display:block;touch-action:none;border-radius:6px;image-rendering:pixelated}
 /* the bag: nine one-off balls, fixed places */
@@ -248,6 +248,10 @@ const cv=document.getElementById('lane'),c=cv.getContext('2d');
 const LW=180,LH=300;
 function fit(){const box=cv.parentElement.getBoundingClientRect();const s=Math.max(.5,Math.min(box.width/LW,box.height/LH));cv.style.width=Math.floor(LW*s)+'px';cv.style.height=Math.floor(LH*s)+'px';}
 window.addEventListener('resize',fit);
+// re-fit whenever the lane's space changes (late web fonts, safe areas, the iPhone toolbar), not only on window resize
+try{new ResizeObserver(()=>requestAnimationFrame(fit)).observe(cv.parentElement);}catch(e){}
+if(window.visualViewport)visualViewport.addEventListener('resize',()=>requestAnimationFrame(fit));
+if(document.fonts&&document.fonts.ready)document.fonts.ready.then(fit);
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 const $=id=>document.getElementById(id);
 
