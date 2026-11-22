@@ -443,6 +443,31 @@ img.gl.boss{box-shadow:0 0 0 1px #2a160e,0 0 0 2px var(--go)}
 @media (min-height:660px){.wtray .offer img.gl{width:27px;height:27px}.wtray{grid-template-columns:1fr 60px}}
 /* win card: the level's boss, picture and rule */
 .wlist li img.gl{width:27px;height:27px}
+/* ---- first-time tips (advten-tips): one short line over the lane, pulses on things that already exist ---- */
+.tipline{position:absolute;left:50%;top:2px;transform:translateX(-50%);max-width:92%;padding:4px 9px 5px;background:var(--ink);color:var(--chalk);border:2px solid var(--coin);border-radius:3px;box-shadow:0 3px 0 rgba(0,0,0,.5);font:400 13px/1.2 var(--display);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;pointer-events:none}
+.tipline[hidden]{display:none}
+#bossBtn.tip{animation:tipPulse .6s steps(2) 4}
+@keyframes tipPulse{50%{box-shadow:0 0 0 3px var(--coin)}}
+.tipshop .wtray .offer:not(.got){animation:tipLift .5s steps(4) both}
+.tipshop .wtray .offer:nth-child(2){animation-delay:.25s}.tipshop .wtray .offer:nth-child(3){animation-delay:.5s}
+@keyframes tipLift{40%{transform:translateY(-7px)}}
+.tippick .rackmap.place canvas{animation:tipRing .5s steps(2) 4}
+@keyframes tipRing{50%{filter:brightness(1.35)}}
+.tipghost{position:absolute;width:22px;height:22px;margin:-11px 0 0 -11px;border:3px solid var(--chalk);border-radius:50%;background:rgba(243,226,184,.25);pointer-events:none;z-index:3;opacity:0}
+.offer .tnew{position:absolute;left:4px;top:4px;width:6px;height:6px;background:var(--coin);box-shadow:0 0 0 2px var(--ink)}
+.wlist .tpips{display:inline-flex;gap:3px;margin-left:8px;vertical-align:middle}
+.wlist .tpips s{width:7px;height:7px;background:rgba(0,0,0,.4);animation:tipPip .2s steps(1) both}
+@keyframes tipPip{to{background:var(--coin)}}
+.wlist .tfly{position:absolute;right:14px;color:var(--coin);font-family:var(--num);font-size:13px;opacity:0;animation:tipFly .6s steps(6) both}
+@keyframes tipFly{0%{opacity:0;transform:translateY(6px)}30%,70%{opacity:1}100%{opacity:0;transform:translateY(-14px)}}
+.goal b.tipneg{color:#ff6a52}
+canvas.pwloop{flex:none;width:56px;height:52px;border-radius:3px;image-rendering:pixelated}
+#shop .shead #shopMsg canvas.pwloop{width:42px;height:39px;align-self:center}
+#rackTips{flex:none;margin-left:auto;padding:4px 8px;border:2px solid var(--dim);border-radius:4px;background:transparent;color:var(--dim);font:400 12px/1 var(--display);white-space:nowrap}
+#rackTips.ask{border-color:var(--accent);color:var(--chalk)}
+#rackSheet .shead h2{margin-right:0}
+#shop .tray[hidden],#shopReroll[hidden],#rackTips[hidden]{display:none}
+#shop .box{position:relative}
 </style>
 </head>
 <body data-stage="rec">
@@ -457,6 +482,7 @@ img.gl.boss{box-shadow:0 0 0 1px #2a160e,0 0 0 2px var(--go)}
 <div class="stage">
   <canvas id="lane" width="180" height="300" aria-label="Bowling lane. Drag the ball, the bend handle and the aim ring."></canvas>
   <div class="toast" id="toast" aria-live="polite"></div>
+  <div class="tipline" id="tipLine" hidden></div>
 </div>
 <p class="hint" id="hint"></p>
 <div class="controls">
@@ -485,7 +511,7 @@ img.gl.boss{box-shadow:0 0 0 1px #2a160e,0 0 0 2px var(--go)}
   <div class="row"><button class="main" id="shopNext" type="button"></button></div>
 </div></div>
 <div class="sheet" id="rackSheet" hidden><div class="box">
-  <div class="shead"><h2>Your build</h2><b class="chip" id="rackCash"></b></div>
+  <div class="shead"><h2>Your build</h2><button id="rackTips" type="button">Tips again</button><b class="chip" id="rackCash"></b></div>
   <div class="bgrid"><div id="rackGrid"></div><div class="shelf" id="rackGear"></div></div>
   <div class="btot" id="rackPows"></div>
   <div class="strip" id="rackMsg" aria-live="polite"></div>
@@ -828,7 +854,7 @@ function rackNames(){const n=run.rack.map((it,i)=>it.t==='plain'&&!pwOf(it).leng
 function ballsIn(frame){return 1;}
 function ballsLeftMax(){return FRAMES+(run&&run.gear&&run.gear.overtime?2:0);}
 // one step of the lane, plus pins that act when they fall
-function tick(s){stepSim(s,1/240);for(const p of s.pins){if(p.down&&!p.seen&&p.shield>0){p.shield--;p.cracked=true;p.down=false;p.vx=p.vy=0;p.age=0;p.x=colX(p.c);p.y=pinY(p);delete p.by;continue;}if(p.down&&!p.seen){p.seen=true;const bn=pc(p,'bomb')+(p.item.t==='bomb'?1:0);if(bn)for(const q of s.pins){if(!q.down&&!q.bolt&&Math.hypot(q.x-p.x,q.y-p.y)<=50+25*Math.min(3,bn)){p.boom=(p.boom||0)+1;q.by='pin';q.ord=s.ord=(s.ord||0)+1;q.down=true;const dx=q.x-p.x,dy=q.y-p.y,d=Math.hypot(dx,dy)||1;q.vx=dx/d*160;q.vy=dy/d*160;}}}}}
+function tick(s){stepSim(s,1/240);for(const p of s.pins){if(p.down&&!p.seen&&p.shield>0){p.shield--;p.cracked=true;p.hitNow=1;p.down=false;p.vx=p.vy=0;p.age=0;p.x=colX(p.c);p.y=pinY(p);delete p.by;continue;}if(p.down&&!p.seen){p.seen=true;const bn=pc(p,'bomb')+(p.item.t==='bomb'?1:0);if(bn)for(const q of s.pins){if(!q.down&&!q.bolt&&Math.hypot(q.x-p.x,q.y-p.y)<=50+25*Math.min(3,bn)){p.boom=(p.boom||0)+1;q.by='pin';q.ord=s.ord=(s.ord||0)+1;q.down=true;const dx=q.x-p.x,dy=q.y-p.y,d=Math.hypot(dx,dy)||1;q.vx=dx/d*160;q.vy=dy/d*160;}}}}}
 // what one ball is worth: points from the pins that fell, times Mult
 function scoreBall(fell,left,fresh){const cleared=left.length===0&&fell.length>0,strike=cleared&&fresh,notes=[];let pts=0,m=1;
   const twins=fell.filter(p=>p.item.t==='twin').length;
@@ -857,12 +883,12 @@ function startGame(){run.target=tgtOf(run.game);run.tips=0;
   else if(BOSSES.tentacle.posts)delete BOSSES.tentacle.posts;
   toastEl.className='toast';
   if(!BOSS){g.toast='boss';$('toast').innerHTML=`<strong>${kindOf3(run.game)} game</strong><b>beat ${run.target} · boss ${bossImg(lvlBoss(run.game))} ${BOSSES[lvlBoss(run.game)].name}</b>`;g.toastT=2.6;}topBar();strip();board();hint();setBtn();
-  if(BOSS){g.toast='boss';$('toast').innerHTML=`<strong>${BOSS.name}</strong><b>Boss · beat ${run.target}</b>`;g.toastT=2.6;}saveRun('aim');}
+  if(BOSS){g.toast='boss';$('toast').innerHTML=`<strong>${BOSS.name}</strong><b>Boss · beat ${run.target}</b>`;g.toastT=2.6;}saveRun('aim');tipsGame();}
 // the boss intro: shown as the boss game opens (from the shop, or reopening the page before its first ball)
 function showIntro(){const k=lvlBoss(run.game);g.toastT=0;$('introName').textContent=BOSSES[k].name;$('introCash').textContent='$'+run.cash;
   $('introRule').innerHTML=`${bossImg(k,'big')}<div><h3>Boss · beat ${run.target}</h3><p>${BOSSUI[k].rule}</p></div>`;$('intro').hidden=false;
   const cv=$('introPic'),t0=performance.now(),f=now=>{if($('intro').hidden)return;drawBossPic(cv,k,still?BOSSPIC[k].still:((now-t0)/1000)%BOSSPIC[k].T);if(!still)requestAnimationFrame(f);};f(t0);}
-function closeIntro(){$('intro').hidden=true;}
+function closeIntro(){$('intro').hidden=true;if(!tipsBossGo())tipsOnLane();}
 $('introGo').addEventListener('click',closeIntro);
 // a rule shown over the lane for a few seconds (the boss badge)
 function ruleToast(head,line){g.toast='rule';toastEl.className='toast wrap';toastEl.innerHTML=`<strong>${head}</strong>${line?`<b>${line}</b>`:''}`;g.toastT=3.4;}
@@ -898,7 +924,7 @@ function throwBall(){if(g.mode!=='aim')return;
   const path=makePath(g.sx,g.ex+eff*70,g.bend);
   let clean=null;if(eff!==0){const cp=g.pins.map(q=>Object.assign({},q)),cs=newSim(cp,g.intended,1,g.bend/90);let k=0;while(!cs.done&&k++<2500)tick(cs);clean=cp.filter(q=>q.down).length;}
   g.pend={clean,ms,run:run.n,game:run.game+1,target:run.target,frame:g.frame+1,ball:g.frames[g.frame].balls.length+1,start:Math.round(g.sx-180),aim:Math.round(g.ex-180),bend:Math.round(g.bend),needle:+n.toFixed(2),drift:Math.round(eff*70),hz:+needleHz().toFixed(2),setup:+((performance.now()-g.t0)/1000).toFixed(1),standing:g.pins.length,rack:boardText(g.pins),ten:rackText(),cash:run.cash,ball:run.ball,value:g.pins.reduce((a,p)=>a+p.v,0),hot:g.pins.filter(p=>p.k===LK()).length,moved:g.lastLine?Math.round(Math.abs(g.sx-g.lastLine[0])+Math.abs(g.ex-g.lastLine[1])+Math.abs(g.bend-g.lastLine[2])/2):'',gear:gearNames().replace(/, /g,' + '),cam:T.cam,level:Math.floor(run.game/3)+1,kind:kindOf3(run.game),boss:BOSS?BOSS.name:'',layout:LAYOUTS[run.layout].name,offers:g.frame===0&&g.frames[0].balls.length===0?run.offerNote||'':''};
-  g.lastLine=[g.sx,g.ex,g.bend];g.sim=newSim(g.pins,path,1,g.bend/90);g.trail=[];g.mode='roll';run.thrown=true;g.rackBalls++;
+  tipEnd();tipMark('throw');g.lastLine=[g.sx,g.ex,g.bend];g.sim=newSim(g.pins,path,1,g.bend/90);g.trail=[];g.mode='roll';run.thrown=true;g.rackBalls++;
   setBtn();hint();}
 $('throw').addEventListener('click',throwBall);
 // the swap button shows the ball waiting in the return; one tap puts it in your hand
@@ -920,7 +946,8 @@ function resolve(){g.live=0;const fell=g.pins.filter(p=>p.down),left=g.pins.filt
   g.toast=r.score||cost?'x':null;toastEl.className='toast';
   $('toast').innerHTML=(r.strike?'<em>X</em>':'')+`<strong>+${r.score}</strong>`+(r.m!==1?`<b><span class="pt">${r.pts}</span>×<span class="mu">${r.m}</span></b>`:'')+(cost||r.notes.length?`<p>${r.notes.map(n=>`<span class="pt">${n}</span>`).join('')}${cost>0?`<span class="neg">−${cost}</span>`:cost<0?`<span class="pt">Toll +${-cost}</span>`:''}</p>`:'')+(st&&st.swept.length?'<p><span class="neg">Swept</span></p>':'');
   g.toastT=cost?2.2:1.5;
-  if(g.pend){Object.assign(g.pend,{down:fell.length,downValue:r.pts,notes:r.notes.join(' + '),swept:st?st.swept.length:0,points:r.pts,mult:r.m,score:r.score,broke:st?st.broke.length:0,cost,net,result:head||'hit',after:st?boardText(st.pins):''});if(g.pend.clean===null)g.pend.clean=fell.length;LOG.push(g.pend);g.pend=null;saveLog();}
+  if(st)tipsResolve(fell,left,st,r);
+  if(g.pend){Object.assign(g.pend,{tips:TIPLOG.splice(0).join(' '),down:fell.length,downValue:r.pts,notes:r.notes.join(' + '),swept:st?st.swept.length:0,points:r.pts,mult:r.m,score:r.score,broke:st?st.broke.length:0,cost,net,result:head||'hit',after:st?boardText(st.pins):''});if(g.pend.clean===null)g.pend.clean=fell.length;LOG.push(g.pend);g.pend=null;saveLog();}
   g.last=g.trail;g.sim=null;
   if(last){g.pins=left;g.mode='over';g.left=ballsLeftMax()-1-g.frame;board();endGame();setBtn();return;}
   // the step, animated: kept pins slide a row forward, broken ones slide on over the line and drop, fresh ones drop in at the back
@@ -935,7 +962,7 @@ function stepAnim(dt){const S=g.step;S.t+=dt;const a=Math.min(1,S.t/.35),e=a*a*(
   if(S.sweep){const u=clamp(S.t/.7,0,1);S.barY=LINEY()+10-(LINEY()+10-(G.BACK-12))*u*u*(3-2*u);}   // the bar sweeps from the line into the pit
   for(const p of S.pins){if(p.y0===undefined)continue;if(p.fresh){p.alpha=b;p.y=p.y0+(pinY(p)-p.y0)*b;}else p.y=p.y0+(pinY(p)-p.y0)*e;}
   for(const p of S.broke){if(p.swept){p.y=Math.min(p.y0,S.barY-12);p.alpha=clamp((p.y-G.BACK)/24,0,1);}else{p.y=p.y0+(p.y1-p.y0)*e;p.alpha=1-b;}}
-  if(S.t>=(S.sweep?1.05:.65)){for(const p of S.pins){p.y=pinY(p);p.alpha=1;delete p.y0;}g.pins=S.pins;g.step=null;g.mode='aim';g.ready=false;g.t0=performance.now();hint();setBtn();saveRun('aim');
+  if(S.t>=(S.sweep?1.05:.65)){for(const p of S.pins){p.y=pinY(p);p.alpha=1;delete p.y0;}g.pins=S.pins;g.step=null;g.mode='aim';g.ready=false;g.t0=performance.now();hint();setBtn();saveRun('aim');tipsAim();
     if(BOSS&&BOSS.sweep&&sweepWarn()){ruleToast(`${bossImg('sweep')}Sweep after this ball`,'');g.toastT=2.4;}}}
 // the win card: what you scored, each line of pay and why, what comes next; then the shop
 function showWin(){const p=run.pay,k=kindOf3(run.game),bo=BOSS,n=run.game+1,nb=bossOf(n),marks=g.frames.flatMap(f=>f.marks),balls=g.frames.flatMap(f=>f.balls);
@@ -947,10 +974,10 @@ function showWin(){const p=run.pay,k=kindOf3(run.game),bo=BOSS,n=run.game+1,nb=b
     +(run.tips?`<li><span>Toll pins<small>Paid during the game</small></span><b>+$${run.tips}</b></li>`:'')
     +`<li class="next"><span>Next: ${nb?'Boss · '+nb.name:kindOf3(n)+' game'}<small>${n%3===0?'Level '+(Math.floor(n/3)+1)+' · ':''}beat ${tgtOf(n)}</small></span><b>${n+1}/12</b></li>`
     +`<li>${bossImg(lvlBoss(n))}<span>${nb?'':'Boss in game '+(bossGame(n)+1)+': '}${BOSSES[lvlBoss(n)].name}<small>${BOSSUI[lvlBoss(n)].rule}</small></span></li>`;
-  $('win').hidden=false;saveRun('win');}
-$('winNext').addEventListener('click',()=>{$('win').hidden=true;showShop();});
+  $('win').hidden=false;saveRun('win');tipsWin();}
+$('winNext').addEventListener('click',()=>{$('win').hidden=true;showShop();tipsShop();});
 function endGame(){const t=total(),won=t>=run.target,final=run.game===TARGETS.length-1;
-  if(won&&!final){const extra=Math.min(4,g.left||0),earn=PAY[run.game%3]+extra;run.cash+=earn;run.rerolls=0;run.bought=false;topBar();rollOffers();
+  if(won&&!final){const extra=Math.min(4,g.left||0),earn=PAY[run.game%3]+extra;run.cash+=earn;run.rerolls=0;run.bought=false;topBar();tipsShopVisit();if(TOPT.rings)run.changed=[];rollOffers();
     run.pay={t,target:run.target,extra,earn,base:PAY[run.game%3],fresh:true,left:g.left||0};pending=null;sel=null;gsel=null;showWin();return;}
   $('overTitle').textContent=won?'Run complete':'Run over';$('overCash').textContent='$'+run.cash;
   $('overTrack').innerHTML=TARGETS.map((v,i)=>`<span class="${i<run.game||(won&&i===run.game)?'won':i===run.game?'lost':''}">${tgtOf(i)}</span>`).join('');
@@ -993,16 +1020,16 @@ const rich=s=>s.replace(/(\+\d+ points|\+\d+ Mult|Mult ×[\d.]+|\$\d+|\d+×)/g,'
 function randLayout(not){const ids=Object.keys(LAYOUTS).filter(k=>k!==run.layout&&!(not||[]).includes(k));return ids[Math.floor(Math.random()*ids.length)];}
 const pickOut=a=>a.splice(Math.floor(Math.random()*a.length),1)[0];
 // pins: three at random; the only thing Reroll changes
-function rollPins(){const pins=Object.keys(PINS).filter(k=>k!=='plain'&&!PINS[k].gone);run.pinOffers=[0,1,2].map(()=>{const t=pickOut(pins);return{kind:'pin',t,name:PINS[t].name,text:PINS[t].text(1),cost:PINS[t].cost,bought:false};});
-  const pws=Object.keys(POWERS);run.powOffers=[0,1,2].map(()=>{const t=pickOut(pws);return{kind:'pow',t,name:POWERS[t].name,text:POWERS[t].text(1),cost:POWERS[t].cost,bought:false};});
+function rollPins(){const gt=gate(),pins=Object.keys(PINS).filter(k=>k!=='plain'&&!PINS[k].gone&&(!gt||gt.pin.includes(k)));run.pinOffers=[0,1,2].map(()=>{const t=pickOut(pins);return t&&{kind:'pin',t,name:PINS[t].name,text:PINS[t].text(1),cost:PINS[t].cost,bought:false};}).filter(Boolean);
+  const pws=Object.keys(POWERS).filter(k=>!gt||gt.pow.includes(k));run.powOffers=[0,1,2].map(()=>{const t=pickOut(pws);return{kind:'pow',t,name:POWERS[t].name,text:POWERS[t].text(1),cost:POWERS[t].cost,bought:false};});
   run.seen.push('pins: '+run.pinOffers.map(o=>o.name+' $'+o.cost).join('; ')+' | powers: '+run.powOffers.map(o=>o.name+' $'+o.cost).join('; '));composeOffers();}
 function composeOffers(){run.offers=(run.pinOffers||[]).concat(run.powOffers||[],run.ballOffers||[],run.gearOffer?[run.gearOffer]:[]);}
 // a new shop: pins rolled; balls stay on the shelf until bought, two at a time; one piece of gear, new each shop, not refilled
-function rollOffers(){
-  if(OPT.balls){const pool=Object.keys(BALLOFFERS).filter(k=>k!==run.hook&&!run.ballStock.includes(k));while(run.ballStock.length<2&&pool.length)run.ballStock.push(pickOut(pool));
+function rollOffers(){const gt=gate();
+  if(gt){run.ballOffers=[];}else if(OPT.balls){const pool=Object.keys(BALLOFFERS).filter(k=>k!==run.hook&&!run.ballStock.includes(k));while(run.ballStock.length<2&&pool.length)run.ballStock.push(pickOut(pool));
     run.ballOffers=run.ballStock.map(k=>({kind:'ball',t:k,name:BALLOFFERS[k].name,text:BALLOFFERS[k].text,cost:BALLOFFERS[k].cost,bought:false}));}else run.ballOffers=[];
   const gear=Object.keys(GEAR).filter(k=>!run.gear[k]&&!(OPT.balls&&k==='big'));
-  run.gearOffer=gear.length?(k=>({kind:'gear',t:k,name:GEAR[k].name,text:GEAR[k].text,cost:GEAR[k].cost,bought:false}))(pickOut(gear)):null;
+  run.gearOffer=gt?null:gear.length?(k=>({kind:'gear',t:k,name:GEAR[k].name,text:GEAR[k].text,cost:GEAR[k].cost,bought:false}))(pickOut(gear)):null;
   if(OPT.layout){const a=randLayout(),b=randLayout([a]),c=randLayout([a,b]);run.layoutOpts=[{id:a,cost:0},{id:b,cost:LAYCOST},{id:c,cost:LAYCOST}];run.nextLayout=a;run.layoutPaid=0;
     run.seen.push('next rack: '+LAYOUTS[a].name+' free; '+LAYOUTS[b].name+' $'+LAYCOST+'; '+LAYOUTS[c].name+' $'+LAYCOST);}
   run.seen.push('balls: '+(run.ballOffers.map(o=>o.name+' $'+o.cost).join('; ')||'none')+' | gear: '+(run.gearOffer?run.gearOffer.name+' $'+run.gearOffer.cost:'none'));
@@ -1149,7 +1176,7 @@ function drawGear(el,onTap,selK){el.innerHTML='';if(run.hook){const w=document.c
 function pinInfo(i){const it=run.rack[i],pw=pwOf(it);return `<img src="${iconOf(it)}" alt=""><div><h3>${short(PINS[it.t].name)}${slots(it)}</h3><p>${pw.length?(it.t!=='plain'?rich(PINS[it.t].text(it.lv))+' ':'')+pwText2(it):rich(PINS[it.t].text(it.lv))}</p></div>`;}
 // one power across the rack: its rule, and which pins hold it
 function powInfo(k){const on=run.rack.map((it,i)=>[i,pwCount(it,k)]).filter(a=>a[1]);
-  return `${pwImg(k,'big')}<div><h3>${POWERS[k].name}<small>${on.length?'pin'+(on.length>1?'s ':' ')+on.map(([i,n])=>(i+1)+(n>1?' ×'+n:'')).join(', '):''}</small></h3><p>${rich(POWERS[k].text(1))} <small class="ag">${POWERS[k].more}</small></p></div>`;}
+  return `${pwLoop(k,Math.max(1,...on.map(a=>a[1])))}<div><h3>${POWERS[k].name}<small>${on.length?'pin'+(on.length>1?'s ':' ')+on.map(([i,n])=>(i+1)+(n>1?' ×'+n:'')).join(', '):''}</small></h3><p>${rich(POWERS[k].text(1))} <small class="ag">${POWERS[k].more}</small></p></div>`;}
 // a boss in the info strip
 function bossInfo(k,gi){return `${bossImg(k,'big')}<div><h3>${BOSSES[k].name}<small>Boss · game ${gi+1}</small></h3><p>${BOSSUI[k].rule}</p></div>`;}
 // three slots as three little bands: filled in the power's colours, empty as outlines
@@ -1170,7 +1197,8 @@ function rackDiagram(id){const n=run.rack.length,W=96,H=30,X=x=>Math.round((x-60
     +(id==='standard'?'':base.map(p=>`<rect x="${X(p.x)-d/2+.5}" y="${Y(p.y)-d/2+.5}" width="${d-1}" height="${d-1}" fill="none" stroke="var(--deck-dim)" stroke-width="1"/>`).join(''))
     +at.map((p,i)=>`<rect x="${X(p.x)-d/2-1}" y="${Y(p.y)-d/2-1}" width="${d+2}" height="${d+2}" fill="var(--paper-ink)"/><rect x="${X(p.x)-d/2}" y="${Y(p.y)-d/2}" width="${d}" height="${d}" fill="${i===0?'var(--tag)':'var(--paper)'}"/>`).join('')+'</svg>';}
 function showShop(){const box=$('shop').firstElementChild,el=$('shopList'),chip=$('shopCash'),p=run.pay;$('shop').hidden=false;   // shown first, so the canvases can measure themselves
-  box.classList.toggle('placing',!!pending);box.classList.remove('nudge');const bEl=$('shopBalls'),gEl=$('shopGearBuy'),wEl=$('shopPows');[el,bEl,gEl,wEl].forEach(e=>e.innerHTML='');
+  box.classList.toggle('placing',!!pending);box.classList.remove('nudge');box.classList.toggle('tipshop',SHOPTIP==='shop');box.classList.toggle('tippick',SHOPTIP==='pick'&&!!pending);
+  {const gt=gate();box.querySelector('.ptray').hidden=!!gt&&!gt.trays.includes('pin');$('shopReroll').hidden=!!gt&&!gt.trays.includes('reroll');}const bEl=$('shopBalls'),gEl=$('shopGearBuy'),wEl=$('shopPows');[el,bEl,gEl,wEl].forEach(e=>e.innerHTML='');
   if(chip.textContent!=='$'+run.cash){chip.textContent='$'+run.cash;chip.classList.remove('bump');void chip.offsetWidth;chip.classList.add('bump');}
   if(p&&p.fresh){p.fresh=false;chip.insertAdjacentHTML('beforeend',`<span class="fly">+$${p.earn}</span>`);}
   const have=powerCounts();
@@ -1179,12 +1207,12 @@ function showShop(){const box=$('shop').firstElementChild,el=$('shopList'),chip=
     b.setAttribute('aria-label',o.bought?o.name+', sold':`${o.name}, $${o.cost}. ${o.text}${o.kind==='pow'&&have[o.t]?' You have '+have[o.t]+'.':''}`);
     const tag=`<span class="c">${on?'×':'$'+o.cost}</span>`;
     b.innerHTML=o.kind==='pin'?`${tag}<canvas data-t="${o.t}" aria-hidden="true"></canvas><strong>${short(o.name)}</strong>`
-      :o.kind==='pow'?`${tag}<span class="gw">${pwImg(o.t)}${have[o.t]&&!o.bought?`<em class="have" aria-hidden="true">×${have[o.t]}</em>`:''}</span><strong>${o.name}</strong>`
+      :o.kind==='pow'?`${tag}${tipNew(o)}<span class="gw">${pwImg(o.t)}${have[o.t]&&!o.bought?`<em class="have" aria-hidden="true">×${have[o.t]}</em>`:''}</span><strong>${o.name}</strong>`
       :o.kind==='ball'?`${tag}<i class="cradle"><img class="gear" src="${gicon(o.t)}" alt=""></i><strong>${o.name.replace(' ball','')}</strong>`
       :`${tag}<img class="gear" src="${gicon(o.t)}" alt=""><strong>${o.name}</strong>`;
     b.addEventListener('click',()=>{if(o.bought)return;sel=null;gsel=null;bsel=false;
       if(o.kind==='pin'||o.kind==='pow'){pick=null;pending=pending===o?null:o;}else{pending=null;pick=pick===o?null:o;}
-      showShop();});(o.kind==='pin'?el:o.kind==='pow'?wEl:o.kind==='ball'?bEl:gEl).appendChild(b);});
+      const ghost=tipsPick(o);showShop();if(ghost)tipGhost();});(o.kind==='pin'?el:o.kind==='pow'?wEl:o.kind==='ball'?bEl:gEl).appendChild(b);});
   el.querySelectorAll('.offer:not(.got) canvas').forEach(c=>drawCard(c,c.dataset.t));
   $('shopBallTray').hidden=!run.ballOffers.length;$('shopGearTray').hidden=!run.gearOffer;$('shopBallTray').parentNode.hidden=!run.ballOffers.length&&!run.gearOffer;
   $('shopBallTray').parentNode.classList.toggle('solo',!run.ballOffers.length||!run.gearOffer);
@@ -1193,11 +1221,12 @@ function showShop(){const box=$('shop').firstElementChild,el=$('shopList'),chip=
     b.disabled=!on&&run.cash+run.layoutPaid<l.cost;b.innerHTML=`${rackDiagram(l.id)}<span>${LAYOUTS[l.id].name}</span>${l.cost?`<b>$${l.cost}</b>`:''}`;b.setAttribute('aria-label',`Next rack: ${LAYOUTS[l.id].name}${l.cost?', $'+l.cost:''}`);
     b.addEventListener('click',()=>{if(on)return;run.cash+=run.layoutPaid;run.layoutPaid=l.cost;run.cash-=l.cost;run.nextLayout=l.id;topBar();showShop();});lays.appendChild(b);});
   const m=$('shopMsg'),info=pending||pick;m.className='strip'+(pending?' go':info?' info':sel===null&&!gsel&&!bsel?' idle':'');
-  m.innerHTML=pending&&pending.kind==='pow'?`${pwImg(pending.t,'big')}<div><h3>${pending.name}</h3><p>${rich(pending.text)} <small class="ag">${POWERS[pending.t].more}</small></p></div><span class="arrow tri"></span>`
+  m.innerHTML=pending&&pending.kind==='pow'?`${pwLoop(pending.t,1)}<div><h3>${pending.name}</h3><p>${rich(pending.text)} <small class="ag">${POWERS[pending.t].more}</small></p></div><span class="arrow tri"></span>`
     :pending?`<img src="${icon(pending.t)}" alt=""><div><h3>${short(pending.name)}</h3><p>${rich(pending.text)}</p></div><span class="arrow tri"></span>`
     :pick?`<img class="gear" src="${pick.kind==='spot'?icon(pick.t):gicon(pick.t)}" alt=""><div><h3>${short(pick.name)}</h3><p>${rich(pick.text)}</p></div><button type="button" class="buy" id="shopBuy"${run.cash<pick.cost?' disabled':''}>Buy <b>$${pick.cost}</b></button>`
     :sel!==null?pinInfo(sel):gsel?gearInfo(gsel):bsel?bossInfo(lvlBoss(run.game+1),bossGame(run.game+1))
-    :'';
+    :SHOPTIP==='shop'?'<div><h3>Fit a power to a pin.</h3></div>':'';
+  if(SHOPTIP==='shop'&&!info&&sel===null&&!gsel&&!bsel)m.className='strip info';
   $('shopResult').hidden=!m.classList.contains('idle');{const nk=lvlBoss(run.game+1);$('shopResult').innerHTML=(p?`<b>${p.t}<small> / ${p.target}</small></b><span><i>Won</i>+$${p.earn}</span>`:'')+`<button type="button" class="bchip" id="shopBoss" aria-label="Boss: ${BOSSES[nk].name}">${bossImg(nk)}</button>`;
     $('shopBoss').addEventListener('click',()=>{bsel=true;sel=null;gsel=null;pending=null;pick=null;showShop();});}   // the win card has the breakdown
   if(pick)$('shopBuy').addEventListener('click',()=>buy(pick));
@@ -1207,8 +1236,8 @@ function showShop(){const box=$('shop').firstElementChild,el=$('shopList'),chip=
   {const sb=$('shopBuild'),pi=[6,3,1,0,2,5,9].map(i=>run.rack[i]).filter(Boolean);sb.innerHTML=`<span>${pi.slice(0,3).map(it=>`<img src="${iconOf(it)}" alt="">`).join('')}</span>Build`;}}
 function shopTap(i){gsel=null;pick=null;bsel=false;
   if(pending&&pending.kind==='pow'){const o=pending,it=run.rack[i];if(pwOf(it).length>=3){sel=i;pending=null;showShop();return;}   // full: show its build instead
-    run.cash-=o.cost;it.pw=pwOf(it).concat(o.t);o.bought=true;run.bought=true;run.seen.push('bought '+o.name+' $'+o.cost+' on '+SLOTN[i]);pending=null;sel=i;topBar();strip();showShop();return;}
-  if(pending){const o=pending,it=run.rack[i];run.cash-=o.cost;run.rack[i]=Object.assign(newItem(o.t),{pw:pwOf(it)});o.bought=true;run.bought=true;run.seen.push('bought '+o.name+' $'+o.cost+' at '+SLOTN[i]);pending=null;sel=null;topBar();showShop();return;}
+    run.cash-=o.cost;it.pw=pwOf(it).concat(o.t);o.bought=true;run.bought=true;tipsChanged(i);SHOPTIP=null;run.seen.push('bought '+o.name+' $'+o.cost+' on '+SLOTN[i]);pending=null;sel=i;topBar();strip();showShop();return;}
+  if(pending){const o=pending,it=run.rack[i];run.cash-=o.cost;run.rack[i]=Object.assign(newItem(o.t),{pw:pwOf(it)});o.bought=true;run.bought=true;tipsChanged(i);run.seen.push('bought '+o.name+' $'+o.cost+' at '+SLOTN[i]);pending=null;sel=null;topBar();showShop();return;}
   if(sel===null)sel=i;else if(sel===i)sel=null;else{const a=run.rack[sel];run.rack[sel]=run.rack[i];run.rack[i]=a;sel=null;}
   showShop();}
 $('shopReroll').addEventListener('click',()=>{const rc=2+run.rerolls;if(run.cash<rc)return;run.cash-=rc;run.rerolls++;pending=null;pick=null;topBar();rollPins();showShop();});
@@ -1231,7 +1260,7 @@ function showRack(){const m=$('rackMsg');$('rackCash').textContent='$'+run.cash;
   drawGear($('rackGear'),k=>{rgsel=rgsel===k?null:k;rsel=null;rpw=null;showRack();},rgsel);
   m.className='strip'+(rsel===null&&!rgsel&&!rpw?' tally':'');
   m.innerHTML=rsel!==null?pinInfo(rsel):rgsel?gearInfo(rgsel):rpw?powInfo(rpw):'<span>Pins double each ball</span><span><i>Strike</i>×2</span>';}
-function openBuild(){rsel=null;rgsel=null;rpw=null;newAsk=false;$('rackNew').textContent='New run';showRack();}
+function openBuild(){rsel=null;rgsel=null;rpw=null;newAsk=false;$('rackNew').textContent='New run';tipsAsk=false;$('rackTips').textContent='Tips again';$('rackTips').classList.remove('ask');$('rackTips').hidden=TIPS.off;showRack();}
 $('rackBtn').addEventListener('click',openBuild);
 $('rackClose').addEventListener('click',()=>$('rackSheet').hidden=true);
 
@@ -1260,9 +1289,9 @@ cv.addEventListener('pointermove',e=>{if(!drag||g.mode!=='aim')return;const dx=(
   fixBend();});
 ['pointerup','pointercancel'].forEach(n=>cv.addEventListener(n,()=>drag=null));
 
-function logText(){const sg=v=>(v>0?'+':'')+v;let t='Advancing Ten-Pin log. Four levels of small, big, boss; ten balls a game at most, ending as soon as the target is reached ($1 per ball left, up to $4). One board per game that never resets. After each ball, pins left standing advance one row toward you and double in value (1, 2, 4, 8, 16); pins that fell come back worth 1 at the back, as far back as they fit. A pin that would advance past the red line breaks through: it costs its value and comes back at the back. A strike (every pin on the board) is worth '+ADV.STRIKEX+'x. Growth: '+ADV.GROW+'. Powers: each pin has three slots; a pin shows them as letters in brackets, e.g. 0:3=8[qqh] (q Quick growth, h Head start, k Spark, l Lantern, w Slow, d Shield, b Bomb, r Rent, t Toll). No pin grows past '+ADV.CAP+'. Rows before the line: '+(ADV.LASTK+1)+' (Short line boss: 4). Bosses, one per level, strike killers and ripen killers alternating: Short line (the line one row closer), Sweep bar (balls 4 and 8: every standing pin swept off for nothing; never in level 1), Bolted rack (only the ball knocks pins down), Rising tentacle (a post that rises at the back of a middle column and advances each ball; it stops the ball). Your ten pins keep their type: Slow, Spark, Shield, Runner, Anchor, Glass, Bomb, Huddle, Crown, Rent, Crowd, Toll; the board lists a type by its first three letters after the value. Rack lists your ten by starting spot 1 to 10. Ball used: the house ball, or the one you bought (Big, Small, Plastic: size and weight; Rush, Brake, Toll, Sweep, Seed: the house ball with an effect on how the board advances). Positions are px from lane centre (lane edges -120/+120). Board lists each pin as column:row=value, columns -3..3 are half a pin spacing apart (34.5 px), row 0 is the back. Hot is how many pins stood on the front row (they break through unless knocked down). Moved is how far the line changed from the previous ball (start + aim + half the bend). Timing is ms early (-) or late (+); drift is how far the ball was pushed off the drawn line.\n';
-  t+='run,game,target,ball,ball_used,start,aim,bend,moved,timing_ms,drift_px,setup_seconds,board_value,hot,pins_down,value_down,clean_pins,mult,score,triggers,broke_through,cost,swept,net,result,board_before,board_after,boss,cash,your_ten,gear,shop_before_game\n';
-  LOG.forEach(r=>{t+=[r.run,r.game,r.target,r.frame,r.ball||'house',sg(r.start),sg(r.aim),sg(r.bend),r.moved,sg(r.ms),sg(r.drift),r.setup,r.value,r.hot,r.down,r.downValue,r.clean,r.mult,r.score,r.notes||'',r.broke,r.cost,r.swept||0,r.net,r.result,r.rack,r.after,r.boss||'',r.cash||'',r.ten||'',r.gear||'',r.offers||''].join(',')+'\n';});return t;}
+function logText(){const sg=v=>(v>0?'+':'')+v;let t='Advancing Ten-Pin log. Four levels of small, big, boss; ten balls a game at most, ending as soon as the target is reached ($1 per ball left, up to $4). One board per game that never resets. After each ball, pins left standing advance one row toward you and double in value (1, 2, 4, 8, 16); pins that fell come back worth 1 at the back, as far back as they fit. A pin that would advance past the red line breaks through: it costs its value and comes back at the back. A strike (every pin on the board) is worth '+ADV.STRIKEX+'x. Growth: '+ADV.GROW+'. Powers: each pin has three slots; a pin shows them as letters in brackets, e.g. 0:3=8[qqh] (q Quick growth, h Head start, k Spark, l Lantern, w Slow, d Shield, b Bomb, r Rent, t Toll). No pin grows past '+ADV.CAP+'. Rows before the line: '+(ADV.LASTK+1)+' (Short line boss: 4). Bosses, one per level, strike killers and ripen killers alternating: Short line (the line one row closer), Sweep bar (balls 4 and 8: every standing pin swept off for nothing; never in level 1), Bolted rack (only the ball knocks pins down), Rising tentacle (a post that rises at the back of a middle column and advances each ball; it stops the ball). Your ten pins keep their type: Slow, Spark, Shield, Runner, Anchor, Glass, Bomb, Huddle, Crown, Rent, Crowd, Toll; the board lists a type by its first three letters after the value. Rack lists your ten by starting spot 1 to 10. Ball used: the house ball, or the one you bought (Big, Small, Plastic: size and weight; Rush, Brake, Toll, Sweep, Seed: the house ball with an effect on how the board advances). Positions are px from lane centre (lane edges -120/+120). Board lists each pin as column:row=value, columns -3..3 are half a pin spacing apart (34.5 px), row 0 is the back. Hot is how many pins stood on the front row (they break through unless knocked down). Moved is how far the line changed from the previous ball (start + aim + half the bend). Timing is ms early (-) or late (+); drift is how far the ball was pushed off the drawn line. Tips lists the first-time tips that fired since the previous ball (advten-tips flags: throw, advance, redline, broke, early, shop, pick, pw:<power>, onlane, fx:<power>, boss:<boss>, bossgo:<boss>; tips-again when they were reset).\n';
+  t+='run,game,target,ball,ball_used,start,aim,bend,moved,timing_ms,drift_px,setup_seconds,board_value,hot,pins_down,value_down,clean_pins,mult,score,triggers,broke_through,cost,swept,net,result,board_before,board_after,boss,cash,your_ten,gear,shop_before_game,tips\n';
+  LOG.forEach(r=>{t+=[r.run,r.game,r.target,r.frame,r.ball||'house',sg(r.start),sg(r.aim),sg(r.bend),r.moved,sg(r.ms),sg(r.drift),r.setup,r.value,r.hot,r.down,r.downValue,r.clean,r.mult,r.score,r.notes||'',r.broke,r.cost,r.swept||0,r.net,r.result,r.rack,r.after,r.boss||'',r.cash||'',r.ten||'',r.gear||'',r.offers||'',r.tips||''].join(',')+'\n';});return t;}
 function openLog(){$('logText').value=LOG.length?logText():'No throws recorded yet.';$('log').hidden=false;}
 $('rackLog').addEventListener('click',openLog);$('overLog').addEventListener('click',openLog);
 $('logClose').addEventListener('click',()=>$('log').hidden=true);
@@ -1526,8 +1555,8 @@ function drawShortLine(o,cm,ly){const gy=ADV.BACKY+ADV.LASTK*ADV.STEP+30;
   if(g.mode==='aim'&&g.frame<2&&Math.floor(lastT/400)%2===0)for(const x of [110,180,250]){const a=cm.proj(x,(gy+ly)/2),X=Math.round(a.X),Y=Math.round(a.Y);px(c,X,Y-2,1,1,'#ff6a52');px(c,X-1,Y-1,3,1,'#ff6a52');px(c,X-2,Y,5,1,'#ff6a52');}}
 // Sweep bar: parked high over the back of the deck; it hangs low and blinks before a sweep ball, and after that ball it sweeps from the line into the pit
 const sweepWarn=()=>g.mode==='aim'&&(g.frame+1)%4===0&&g.frame<ballsLeftMax()-1;
-function sweepY(){return g.step&&g.step.sweep?g.step.barY:sweepWarn()?ADV.BACKY-12:ADV.BACKY-24;}
-function drawSweepBar(o,cm,y){const sweeping=g.step&&g.step.sweep,warn=sweepWarn();
+function sweepY(){if(TIP&&TIP.barY!==undefined)return TIP.barY;return g.step&&g.step.sweep?g.step.barY:sweepWarn()?ADV.BACKY-12:ADV.BACKY-24;}
+function drawSweepBar(o,cm,y){const sweeping=g.step&&g.step.sweep,warn=sweepWarn()||!!(TIP&&TIP.barY!==undefined);
   if(warn&&Math.floor(lastT/350)%2)c.globalAlpha=.6;
   const L=cm.proj(G.L+2,y),Rr=cm.proj(G.R-2,y),X0=Math.round(L.X),X1=Math.round(Rr.X),Y=Math.round(L.Y),h=warn||sweeping?5:3;
   if(cm.id==='lane'&&!sweeping){const top=Math.max(52,Y-(warn?14:6));px(c,X0+2,top,1,Y-top,'#8e98aa');px(c,X1-2,top,1,Y-top,'#8e98aa');}   // hangers
@@ -1537,7 +1566,7 @@ function drawSweepBar(o,cm,y){const sweeping=g.step&&g.step.sweep,warn=sweepWarn
 function drawTentNext(o,cm){const T=BOSS.tent;if(!T)return;for(let k=T.k+1;k<=LK();k++){const a=cm.proj(colX(T.c),rowY(k)),X=Math.round(a.X),Y=Math.round(a.Y);px(c,X-1,Y,3,1,'#9a6ad8');px(c,X,Y-1,1,3,'#9a6ad8');}}
 function postNow(q){const S=g.step;if(!S||!S.post0)return q;const u=Math.min(1,S.t/.35);if(S.post0.y<=q.y)return Object.assign({},q,{y:S.post0.y+(q.y-S.post0.y)*u*u*(3-2*u)});return S.t<.3?null:q;}
 function drawPin(o,cm,p){const q=cm.proj(p.x,p.y),X=Math.round(q.X),Y=Math.round(q.Y);if(p.alpha!==undefined&&p.alpha<1)c.globalAlpha=Math.max(0,p.alpha);drawPinBody(o,cm,p,X,Y);if(p.item&&(p.item.t==='shield'||p.P&&p.P.shield)&&p.cracked&&!p.shield&&!p.down&&cm.id==='lane'){px(c,X-1,Y-15,2,3,'#1a1010');}
-  if(!p.down&&!p.broke&&p.v>1&&g.mode!=='roll'&&g.mode!=='settle'){const s=String(p.v),w=s.length*4-1,ty=cm.id==='lane'?Y-24:Y-19,col=(p.k===LK()||p.stand)?'#ff6a52':p.v>=4?'#ffd866':'#fff2d8';px(c,X-Math.floor(w/2)-1,ty-1,w+2,7,'rgba(20,10,6,.72)');txt(c,s,X-Math.floor(w/2),ty,col);}
+  const pv=p.show!==undefined?p.show:p.v;if(!p.down&&!p.broke&&pv>1&&g.mode!=='roll'&&g.mode!=='settle'){const s=String(pv),w=s.length*4-1,ty=cm.id==='lane'?Y-24:Y-19,col=(p.k===LK()||p.stand)?'#ff6a52':p.v>=4?'#ffd866':'#fff2d8';px(c,X-Math.floor(w/2)-1,ty-1,w+2,7,'rgba(20,10,6,.72)');txt(c,s,X-Math.floor(w/2),ty,col);}
   if(!p.down&&!p.broke&&p.k===LK()&&g.mode==='aim'){const bl=Math.floor(lastT/260)%2;px(c,X-4,Y+(cm.id==='lane'?2:6),9,1,bl?'#ff4a32':'#a8231a');}
   c.globalAlpha=1;}
 function drawPinBody(o,cm,p,X,Y){if(p.bolt&&!p.down)drawBolt(o,cm,p);const K=pinKey(o,p.kind,p.item);
@@ -1594,10 +1623,10 @@ function draw(){
 
   // pins and ball, far ones first
   const ents=[];for(const p of g.pins)if(!p.gone)ents.push({y:p.y,p});if(BOSS&&BOSS.posts)for(const q0 of BOSS.posts){const q=postNow(q0);if(q)ents.push({y:q.y,q});}
-  if(BOSS&&BOSS.sweep)ents.push({y:sweepWarn()?1e9:sweepY(),by:sweepY(),bar:1});   // lowered for a sweep ball, it hangs in front of the back row
+  if(BOSS&&BOSS.sweep)ents.push({y:sweepWarn()||TIP&&TIP.barY!==undefined?1e9:sweepY(),by:sweepY(),bar:1});   // lowered for a sweep ball, it hangs in front of the back row
   const b=g.sim?g.sim.ball:{x:g.sx,y:G.SY};if(!g.sim||!b.out||b.stuck)ents.push({y:b.y+.5,b});
-  ents.sort((m,n)=>m.y-n.y);let ballPos=null;
-  for(const e of ents){if(e.p)drawPin(o,cm,e.p);else if(e.q)drawPost(o,cm,e.q);else if(e.bar)drawSweepBar(o,cm,e.by);else{if(g.mode==='aim')c.globalAlpha=al('ball');ballPos=drawBall(o,cm,e.b);
+  ents.sort((m,n)=>m.y-n.y);let ballPos=null;drawRings(o,cm);
+  for(const e of ents){if(e.p)drawPin(o,cm,e.p);else if(e.q){if(TIP&&TIP.rise!==undefined&&TIP.rise<1)drawRise(o,cm,e.q,TIP.rise);else drawPost(o,cm,e.q);}else if(e.bar)drawSweepBar(o,cm,e.by);else{if(g.mode==='aim')c.globalAlpha=al('ball');ballPos=drawBall(o,cm,e.b);
     if(g.mode==='aim'&&act==='ball')ringPx(c,ballPos.X,ballPos.Y,ballPos.r+3,ballPos.r+3,o.hi);c.globalAlpha=1;
     if(e.b.stuck&&g.sim){const u=Math.min(1,(g.sim.t-(g.sim.stuckT=g.sim.stuckT||g.sim.t))/.4);if(u<1){const r=ballPos.r+2+Math.round(u*8);ringPx(c,ballPos.X,ballPos.Y-2,r,Math.round(r*.7),'#fff8e8');}}}}
 
@@ -1607,8 +1636,9 @@ function draw(){
     c.fillStyle=o.edge;for(let d=-7;d<=7;d++){const w=7-Math.abs(d);c.fillRect(X-w,Y+d,2*w+1,1);}
     c.fillStyle=o.handle;for(let d=-6;d<=6;d++){const w=6-Math.abs(d);c.fillRect(X-w,Y+d,2*w+1,1);}
     px(c,X-4,Y,2,1,o.hi);px(c,X-3,Y-1,1,3,o.hi);px(c,X+3,Y,2,1,o.hi);px(c,X+3,Y-1,1,3,o.hi);c.globalAlpha=1;
-    if(!run.thrown){label(o,'AIM',aimPos.X+aimPos.rx+8,aimPos.Y-2);label(o,'BEND',X+11,Y-2);if(ballPos)label(o,'START',ballPos.X+ballPos.r+4,ballPos.Y-2);}
+    if(!tipSeen('throw')){label(o,'AIM',aimPos.X+aimPos.rx+8,aimPos.Y-2);label(o,'BEND',X+11,Y-2);if(ballPos)label(o,'START',ballPos.X+ballPos.r+4,ballPos.Y-2);}
   }
+  if(TIP&&TIP.draw&&!sheetUp())TIP.draw(o,cm,TIP.t);
   for(const q of g.pops)drawPop(cm,q);
   drawNeedle(o);
 }
@@ -1631,13 +1661,172 @@ function loop(ts){const dt=Math.min(.05,(ts-lastT)/1000||0);lastT=ts;
     const b=g.sim.ball;if(!b.out)g.trail.push({x:b.x,y:b.y});
     if(g.sim.done){g.mode='settle';g.wait=.55;}}
   else if(g.mode==='settle'){g.wait-=dt;if(g.wait<=0)resolve();}
-  else if(g.mode==='step')stepAnim(still?1:dt);
+  else if(g.mode==='step')stepAnim(still?1:dt/(TIP&&TIP.slow||1));
+  tipTick(dt);paintLoops(ts);
   if(g.toastT>0)g.toastT-=dt;
   for(const q of g.pops)q.t+=dt;g.pops=g.pops.filter(q=>q.t<popLife(q.v));
   toastEl.style.opacity=g.toast&&g.toastT>0?Math.min(1,g.toastT*2):0;
   if(fx){fx.t+=dt;if(!fx.flip&&fx.t>=.9){fx.flip=true;setChrome(fx.to);}
     if(fx.t>=(still?1.9:2.7)){stage=fx.to;fx=null;}}
   draw();requestAnimationFrame(loop);}
+// ---------- first-time tips: a real run teaches itself, one moment at a time (docs/design/tutorial/plan.md) ----------
+// Flags live in advten-tips, apart from the run save, so New run, a lost run or a load never resets them.
+// ?tips=reset clears them on load, ?tips=off skips every tip (and shows the full shop); under jsdom (the bots) tips are off unless ?tips=on.
+// ?rings=on rings the pins changed in the last shop for the first ball of the next game; ?gate=on opens the first shops one tray at a time.
+const TIPS_KEY='advten-tips',TQ=(()=>{try{return new URLSearchParams(location.search);}catch(e){return new URLSearchParams('');}})();
+const TOPT={rings:TQ.get('rings')==='on',gate:TQ.get('gate')==='on'};
+const TIPS={seen:{},shops:0,off:false},TIPN={};let TIPLOG=[],TIP=null,tipKey='',TIPHOLD=false,SHOPTIP=null;
+(function tipsLoad(){const q=TQ.get('tips');let d=null;try{d=JSON.parse(localStorage.getItem(TIPS_KEY)||'null');}catch(e){}
+  if(d&&d.seen)TIPS.seen=d.seen;if(d&&d.shops)TIPS.shops=d.shops;
+  TIPS.off=q==='off'||(q!=='on'&&q!=='reset'&&(/jsdom/i.test(navigator.userAgent||'')||navigator.webdriver===true));
+  if(q==='reset'){TIPS.seen={};TIPS.shops=0;tipsSave();}})();
+function tipsSave(){if(TIPS.off)return;try{localStorage.setItem(TIPS_KEY,JSON.stringify({seen:TIPS.seen,shops:TIPS.shops}));}catch(e){}}
+function tipSeen(k){return TIPS.off||!!TIPS.seen[k];}
+// a moment that fires is kept for good and noted on the next Results log row (column tips)
+function tipMark(k){if(TIPS.off||TIPS.seen[k])return;TIPS.seen[k]=1;TIPN[k]=(TIPN[k]||0)+1;TIPLOG.push(k);tipsSave();}
+const ballKey=()=>run.n+'/'+run.game+'/'+g.rackBalls;
+const sheetUp=()=>['win','shop','rackSheet','log','intro','over'].some(id=>!$(id).hidden);
+// a lane moment: one at a time, at most one per ball, never during the roll; o.draw paints on the lane, o.line is the one short line,
+// o.slow slows the advance animation, o.aim ends it when the board is back to aiming, o.dur ends it on its own (0: never). Any tap ends it.
+function moment(k,o){if(tipSeen(k)||TIP||!g||tipKey===ballKey())return false;   // resolve() calls it as the ball settles, just before the advance; tipTick ends any moment once a ball rolls
+  TIP=Object.assign({k,t:0,dur:2},o);tipKey=ballKey();tipMark(k);if(TIP.start)TIP.start();tipLine(TIP.line);return true;}
+function tipLine(s){const el=$('tipLine');el.textContent=s||'';el.hidden=!s;}
+function tipEnd(){if(!TIP)return;const T=TIP;TIP=null;tipLine('');if(T.end)T.end();}
+function tipTick(dt){if(!TIP)return;if(g.mode==='roll'||g.mode==='settle'){tipEnd();return;}if(sheetUp())return;TIP.t+=dt;if(TIP.tick)TIP.tick(TIP.t);if(TIP.dur&&TIP.t>=TIP.dur)tipEnd();}
+document.addEventListener('pointerdown',()=>{if(TIP&&!sheetUp())tipEnd();},true);
+// small outlined pixel text, centred on X
+function tipTxt(s,X,Y,col,edge,m){m=m||1;const w=s.length*4*m-m,x=Math.round(X-w/2);for(const [dx,dy] of [[-1,0],[1,0],[0,-1],[0,1],[1,1]])txt(c,s,x+dx,Math.round(Y)+dy,edge,m);txt(c,s,x,Math.round(Y),col,m);}
+const ease=u=>{u=clamp(u,0,1);return u*u*(3-2*u);};
+// where a cost flies to: the score panel on the back wall (the top view has none: the top right corner)
+function scoreSpot(o,cm){const R=o.dispR;return cm.id==='lane'&&R?{X:R[0]+R[2]/2,Y:R[1]+R[3]/2}:{X:LW-24,Y:10};}
+const GLCV={};
+function pwCanvas(k){if(GLCV[k])return GLCV[k];const t=mk(9,9),q=t.getContext('2d');if(!q)return t;q.fillStyle=POWERS[k].c[0];q.fillRect(0,0,9,9);
+  q.drawImage(sprite(PWG[k],{'#':k==='bomb'?'#f0eef4':'#2a160e',w:k==='bomb'?'#8a8a96':'#ffffff',r:'#ff5a2a'}),0,0);return GLCV[k]=t;}
+
+// --- moments after a ball: first advance, first break-through, each power's first effect ---
+function tipsResolve(fell,left,st,r){if(TIPS.off)return;
+  const now=p=>st.kept.find(q=>q.item===p.item),was=p=>left.find(q=>q.item===p.item);
+  if(st.kept.length&&moment('advance',{slow:3,dur:0,aim:1,line:'Standing pins advance and double.',
+    start(){for(const p of st.kept){const o=was(p);if(o)p.v0=o.v;}},
+    tick(){const S=g.step;if(!S)return;const u=S.t/.35;for(const p of S.pins)if(p.v0!==undefined)p.show=u<.6?p.v0:undefined;},
+    end(){for(const p of g.pins){delete p.show;delete p.v0;}},draw:drawTipAdvance}))return;
+  const brk=st.broke.filter(p=>!st.swept.includes(p));
+  if(brk.length&&st.cost>0&&moment('broke',{slow:2,dur:0,aim:1,pins:brk.slice(),cost:st.cost,draw:drawTipBroke,
+    start(){$('tot').classList.add('tipneg');},end(){$('tot').classList.remove('tipneg');}}))return;
+  // each power's first effect: a pop in the power's colour where it acted, larger and longer than a value pop; first time only
+  const fx=[],add=(k,pops)=>{if(pops.length&&!tipSeen('fx:'+k))fx.push([k,pops]);};
+  add('spark',fell.filter(p=>pc(p,'spark')>(p.b||0)).map(p=>({p,s:'+1x'})));
+  if(fell.length)add('rent',left.filter(p=>pc(p,'rent')).map(p=>({p:now(p)||p,s:'+'+2*pc(p,'rent')})));
+  add('toll',fell.filter(p=>pc(p,'toll')&&p.k===LK()).map(p=>({p,s:'+'+pc(p,'toll'),coin:1})));
+  add('bomb',fell.filter(p=>p.boom&&pc(p,'bomb')).map(p=>({p,ring:30})));
+  add('shield',left.filter(p=>p.hitNow&&pc(p,'shield')).map(p=>({p:now(p)||p,ring:12})));
+  add('quick',st.kept.filter(p=>pc(p,'quick')&&was(p)&&p.v>was(p).v).map(p=>({p,s:'x'+Math.round(p.v/was(p).v)})));
+  add('head',st.fresh.filter(p=>pc(p,'head')).map(p=>({p,s:String(p.v)})));
+  {const pops=[];for(const L of left){const n=pc(L,'lantern');if(!n||!now(L))continue;const nb=left.filter(q=>q!==L&&now(q)&&Math.hypot(q.x-L.x,q.y-L.y)<=LANTR[Math.min(3,n)]);
+      if(nb.length){pops.push({p:now(L),ring:10});nb.forEach(q=>pops.push({p:now(q),ring:7}));}}add('lantern',pops);}
+  add('slow',left.filter(p=>pc(p,'slow')&&now(p)&&now(p).k===p.k&&(ptOf(p).step===undefined||ptOf(p).step>0)).map(p=>({p:now(p),s:'II'})));
+  if(fx.length){let [k,pops]=fx[0];if(pops.every(q=>q.s))pops=[pops.slice().sort((a,b)=>b.p.y-a.p.y)[0]];   // a number pops on one pin only, the nearest
+    moment('fx:'+k,{dur:1.5,pops,col:k==='bomb'?'#ff7a3a':POWERS[k].c[0],draw:drawTipFx});}}
+function drawTipAdvance(o,cm){const S=g.step;if(!S)return;const u=S.t/.35,lane=cm.id==='lane';
+  for(const p of S.pins){const q=cm.proj(p.x,p.y),X=Math.round(q.X),Y=Math.round(q.Y),ty=lane?Y-24:Y-19;
+    if(p.fresh&&p.v===1&&(p.alpha||0)>.3){px(c,X-3,ty-1,5,7,'rgba(20,10,6,.72)');txt(c,'1',X-1,ty,'#e8d8b8');}
+    else if(p.v0!==undefined&&u>=.6&&p.v>p.v0){c.globalAlpha=clamp((u-.6)/.25,0,1);tipTxt('x'+Math.round(p.v/p.v0),X,ty-8,'#ffd866','#6a3a08');c.globalAlpha=1;}}}
+function drawTipBroke(o,cm){const S=g.step;if(!S)return;const T=TIP,ps=T.pins,lane=cm.id==='lane',u=clamp((S.t-.2)/.45,0,1);if(u<=0)return;
+  const x=ps.reduce((a,p)=>a+p.x,0)/ps.length,a=cm.proj(x,LINEY()),to=scoreSpot(o,cm),e=ease(u),X=a.X+(to.X-a.X)*e,Y=a.Y-12+(to.Y-(a.Y-12))*e;
+  c.globalAlpha=u>.85?(1-u)/.15:1;tipTxt('-'+T.cost,X,Y-(lane?5:3),'#ff6a52','#5a0e06',2);c.globalAlpha=1;}
+function drawTipFx(o,cm,t){const T=TIP,lane=cm.id==='lane';c.globalAlpha=t>T.dur-.3?Math.max(0,(T.dur-t)/.3):1;
+  for(const pp of T.pops){const q=cm.proj(pp.p.x,pp.p.y),X=Math.round(q.X),Y=Math.round(q.Y);
+    if(pp.ring){const r=Math.round(4+Math.min(1,t/.5)*pp.ring*(lane?q.k*3:1));ringPx(c,X,Y-(lane?8:2),r,Math.max(2,Math.round(r*.6)),T.col);}
+    if(pp.s){const rise=Math.min(1,t/.6)*8,ty=Y-(lane?36:28)-rise;if(pp.coin){disc(c,X-9,Math.round(ty)+4,3,'#ffd866');}tipTxt(pp.s,X+(pp.coin?3:0),ty,T.col,'#2a160e',2);}}
+  c.globalAlpha=1;}
+// --- moment at aim: front row warning (a ghost of the pin slides past the red line; its value flies off the score), twice ---
+function tipsAim(){if(TIP&&TIP.aim)tipEnd();if(TIPS.off||!tipSeen('advance'))return;
+  const front=g.pins.filter(p=>p.k===LK()&&!p.stand&&!p.broke).sort((a,b)=>b.v-a.v);
+  if(front.length)moment('redline',{dur:3.2,pin:front[0],line:'Past the red line it costs its value.',draw:drawTipRed});}
+function drawTipRed(o,cm,t){const p=TIP.pin,u=(t%1.6)/1.6,ly=LINEY(),lane=cm.id==='lane';
+  if(Math.floor(t*5)%2===0)for(let x=G.L;x<=G.R;x+=6){const a=cm.proj(x,ly),b=cm.proj(Math.min(G.R,x+4),ly);plotLine(c,Math.round(a.X),Math.round(a.Y)-1,Math.round(b.X),Math.round(b.Y)-1,'#ff6a52');plotLine(c,Math.round(a.X),Math.round(a.Y)+1,Math.round(b.X),Math.round(b.Y)+1,'#ff6a52');}
+  const ga=ease(u/.5),gy=p.y+ADV.STEP*ga,q=cm.proj(p.x,gy);
+  if(u<.7){c.globalAlpha=.45*(u<.5?1:(.7-u)/.2);drawPinUp(o,cm,pinKey(o,p.kind,p.item),Math.round(q.X),Math.round(q.Y));c.globalAlpha=1;}
+  if(u>.45){const b=clamp((u-.45)/.45,0,1),a=cm.proj(p.x,ly),to=scoreSpot(o,cm),e=ease(b),X=a.X+(to.X-a.X)*e,Y=a.Y-10+(to.Y-(a.Y-10))*e;
+    c.globalAlpha=b>.85?(1-b)/.15:1;tipTxt('-'+p.v,X,Y-(lane?4:2),'#ff6a52','#5a0e06',2);c.globalAlpha=1;}}
+// --- moments as a game opens: the level's boss badge pulses the first time each boss is ahead; the first game with powers shows them on the lane ---
+function tipsGame(){if(TIPS.off||TIPHOLD)return;tipEnd();tipKey='';if(BOSS)return;   // the boss game waits for its intro card to close
+  const k=lvlBoss(run.game);if(moment('boss:'+k,{dur:2.4,start(){const b=$('bossBtn');b.classList.remove('tip');void b.offsetWidth;b.classList.add('tip');},end(){$('bossBtn').classList.remove('tip');}}))return;
+  tipsOnLane();}
+function tipsOnLane(){if(run.rack.some(it=>pwOf(it).length))moment('onlane',{dur:2.4,draw:drawTipOnLane});}
+function drawTipOnLane(o,cm,t){const lane=cm.id==='lane',on=Math.floor(t*4)%2===0;
+  for(const p of g.pins){const pw=pwOf(p.item);if(!pw.length||p.down)continue;const q=cm.proj(p.x,p.y),X=Math.round(q.X),Y=Math.round(q.Y);
+    if(on)ringPx(c,X,Y+(lane?1:3),lane?8:7,lane?3:6,POWERS[pw[0]].c[0]);c.drawImage(pwCanvas(pw[0]),X-4,Y-(lane?(p.v>1?36:30):(p.v>1?30:24)));}}
+// --- the boss game's first ball, the first time each boss is met: its effect played on the real lane ---
+const BOSSGO={
+  short:{draw(o,cm,t){const gy=ADV.BACKY+ADV.LASTK*ADV.STEP+30,ly=LINEY(),y=gy+(ly-gy)*ease((t%1.1)/.6);
+    for(let x=G.L;x<=G.R;x+=6){const a=cm.proj(x,y),b=cm.proj(Math.min(G.R,x+4),y);plotLine(c,Math.round(a.X),Math.round(a.Y),Math.round(b.X),Math.round(b.Y),'#ffd866');plotLine(c,Math.round(a.X),Math.round(a.Y)+1,Math.round(b.X),Math.round(b.Y)+1,'#ff6a52');}}},
+  sweep:{tick(t){TIP.barY=t<.5?-40+(ADV.BACKY-6+40)*ease(t/.5):t<1.2?ADV.BACKY-6:ADV.BACKY-6-18*ease((t-1.2)/.6);}},
+  bolted:{draw(o,cm,t){const ps=g.pins.filter(p=>p.bolt&&!p.down).sort((a,b)=>a.k-b.k||a.c-b.c),f=(t%1.1)/1.1*(ps.length+2)-1,lane=cm.id==='lane';
+    ps.forEach((p,i)=>{if(Math.abs(f-i)>1)return;const q=cm.proj(p.x,p.y),X=Math.round(q.X),Y=Math.round(q.Y);
+      if(lane){px(c,X-6,Y,13,1,'#ffffff');px(c,X-4,Y-3,9,1,'#ffffff');px(c,X+6,Y-2,1,1,'#ffffff');px(c,X+5,Y-3,3,1,'#fff8e8');px(c,X+6,Y-4,1,3,'#fff8e8');}
+      else ringPx(c,X,Y,7,7,'#ffffff');});}},
+  tentacle:{tick(t){TIP.rise=Math.min(1,t/.6);},draw(o,cm,t){const T=BOSS&&BOSS.tent;if(!T||t<.6||Math.floor(t*4)%2)return;const k=T.k+1>LK()?0:T.k+1;
+    c.globalAlpha=.4;drawPost(o,cm,{x:colX(T.c),y:rowY(k),r:13});c.globalAlpha=1;}}};
+function tipsBossGo(){if(TIPS.off||!BOSS||g.frame||g.frames[0].balls.length)return false;const k=lvlBoss(run.game),B=BOSSGO[k];
+  return moment('bossgo:'+k,{dur:2.2,draw:B.draw,tick:B.tick});}
+// the tentacle rising out of its hole (its first ball)
+function drawRise(o,cm,p,u){const q=cm.proj(p.x,p.y),X=Math.round(q.X),Y=Math.round(q.Y)+(cm.id==='lane'?0:5);
+  c.save();c.beginPath();c.rect(0,0,LW,Y);c.clip();c.translate(0,Math.round((1-u)*26));drawPost(o,cm,p);c.restore();px(c,X-5,Y,11,3,'#120a1c');px(c,X-4,Y+1,9,1,'#05030a');}
+// ?rings=on: a thin ring in the power's colour round each pin changed in the last shop, until the first throw of the game
+function drawRings(o,cm){if(!TOPT.rings||!run.changed||!run.changed.length||g.mode!=='aim'||g.rackBalls)return;const lane=cm.id==='lane';c.globalAlpha=.7;
+  for(const p of g.pins){const i=run.rack.indexOf(p.item);if(p.down||!run.changed.includes(i))continue;const pw=pwOf(p.item),col=pw.length?POWERS[pw[pw.length-1]].c[0]:'#ffd866',q=cm.proj(p.x,p.y);
+    ringPx(c,Math.round(q.X),Math.round(q.Y)+(lane?1:3),lane?7:7,lane?3:6,col);}c.globalAlpha=1;}
+function tipsChanged(i){if(TOPT.rings){(run.changed=run.changed||[]).includes(i)||run.changed.push(i);}}
+
+// --- the win card: the first early finish lights a pip per ball left and flies +$1 from each ---
+function tipsWin(){const p=run.pay;if(TIPS.off||tipSeen('early')||!p||!p.extra)return;tipMark('early');const li=$('winList').children[1];if(!li)return;li.style.position='relative';
+  li.querySelector('span small').insertAdjacentHTML('beforebegin',`<i class="tpips" aria-hidden="true">${Array.from({length:p.extra},(_,i)=>`<s style="animation-delay:${.3+i*.35}s"></s>`).join('')}</i>`);
+  li.insertAdjacentHTML('beforeend',Array.from({length:p.extra},(_,i)=>`<i class="tfly" aria-hidden="true" style="top:${4}px;animation-delay:${.3+i*.35}s">+$1</i>`).join(''));
+}
+
+// --- the shop: the first one lifts the power cards in turn and lights the rings; the first pick shows where it goes ---
+function tipsShop(){if(TIPS.off||tipSeen('shop'))return;tipMark('shop');SHOPTIP='shop';showShop();
+  setTimeout(()=>{if(SHOPTIP==='shop'&&!pending&&!$('shop').hidden)drawMap($('shopMap'),shopTap,sel,{kind:'pow',t:'tip'},OPT.layout?run.nextLayout:run.layout);},1100);}
+$('shop').addEventListener('pointerdown',()=>{if(SHOPTIP){SHOPTIP=null;$('shop').firstElementChild.classList.remove('tipshop','tippick');}},true);
+function tipsPick(o){if(TIPS.off||o.kind!=='pow'||pending!==o)return false;tipMark('pw:'+o.t);if(tipSeen('pick'))return false;tipMark('pick');SHOPTIP='pick';return true;}
+// a touch mark travels once from the picked power to the first pin with a free slot
+function tipGhost(){const box=$('shop').firstElementChild,map=$('shopMap'),hits=map._hit||[],src=$('shopMsg').querySelector('canvas,img');
+  const h=hits.find(h=>h.i===0&&pwOf(run.rack[0]).length<3)||hits.find(h=>pwOf(run.rack[h.i]).length<3);if(!h||!src||!box.animate)return;
+  const br=box.getBoundingClientRect(),sr=src.getBoundingClientRect(),mr=map.getBoundingClientRect(),d=document.createElement('i');d.className='tipghost';box.appendChild(d);
+  const x0=sr.left+sr.width/2-br.left,y0=sr.top+sr.height/2-br.top,x1=mr.left+h.x-br.left,y1=mr.top+h.y-br.top,at=(x,y,op,off)=>Object.assign({left:x+'px',top:y+'px',opacity:op},off===undefined?{}:{offset:off});
+  d.animate([at(x0,y0,0),at(x0,y0,1,.15),at(x1,y1,1,.75),at(x1,y1,0)],{duration:1500,easing:'ease-in-out',delay:300,fill:'both'}).onfinish=()=>d.remove();}
+const tipNew=o=>o.kind==='pow'&&!o.bought&&!TIPS.off&&!TIPS.seen['pw:'+o.t]?'<i class="tnew" aria-hidden="true"></i>':'';
+// --- the first shops, one tray at a time (?gate=on; counts shops ever visited, advten-tips.shops) ---
+const STARTER=['quick','head','spark','rent','slow'];
+const GATE=[null,{trays:['pow'],pow:STARTER,pin:[]},{trays:['pow','pin'],pow:STARTER.concat('lantern'),pin:['runner','anchor','crown']},
+  {trays:['pow','pin','reroll'],pow:STARTER.concat('lantern','bomb','toll'),pin:['runner','anchor','crown','glass','huddle','crowd']}];
+function gate(){if(!TOPT.gate||TIPS.off)return null;return GATE[TIPS.shops]||null;}
+function tipsShopVisit(){if(TIPS.off)return;TIPS.shops++;tipsSave();}
+
+// --- power loops: four frames, half a second each, one pin showing what the power does; they replace the still glyph in the info strips ---
+const pwLoop=(k,n)=>`<canvas class="pwloop" data-w="${k}" data-n="${n||1}" width="28" height="26" aria-hidden="true"></canvas>`;
+function paintLoops(ts){const list=document.querySelectorAll('canvas.pwloop');if(!list.length)return;const f=still?2:Math.floor(ts/500)%4;
+  for(const cv of list){if(cv._f===f)continue;cv._f=f;paintLoop(cv,cv.dataset.w,+cv.dataset.n||1,f);}}
+function paintLoop(cv,k,n,f){const q=cv.getContext&&cv.getContext('2d');if(!q)return;const o=buildTheme(THEME.rec),W=28,H=26;q.imageSmoothingEnabled=false;
+  q.fillStyle='#2a160e';q.fillRect(0,0,W,H);q.fillStyle='#4a2a1a';q.fillRect(0,H-4,W,4);
+  const K=pinKey(o,'p5',{pw:Array(Math.min(3,n)).fill(k)}),P='p5',up=(key,x,dy)=>q.drawImage(o.pins[key],x,H-19+(dy||0)),down=(key,x)=>q.drawImage(o.pins[key+'r'],x-4,H-10);
+  const lab=(s,cx,col,y)=>{const w=s.length*4-1;y=y===undefined?0:y;q.fillStyle='rgba(20,10,6,.8)';q.fillRect(cx-Math.floor(w/2)-1,y,w+2,7);txt(q,s,cx-Math.floor(w/2),y+1,col);};
+  const C=POWERS[k].c[0];
+  if(k==='quick'){const m=2+n,v=[1,m,m*m,Math.min(ADV.CAP,m*m*m)][f];up(K,5);lab(String(v),9,f?'#ffd866':'#fff2d8');txt(q,'x'+m,17,10,C);}
+  else if(k==='head'){up(P,3);lab('1',7,'#e8d8b8');if(f>0){up(K,16,f===1?-4:0);if(f>1)lab(String(2**Math.min(3,n)),20,'#ffd866');}}
+  else if(k==='spark'){if(f===0)up(K,4);else down(K,4);txt(q,f<2?'x1':'x2',17,10,f<2?'#e8d8b8':C);}
+  else if(k==='lantern'){up(K,3);if(f>0){q.fillStyle=f%2?C:'#c09a18';for(let i=0;i<20;i++){const a=i/20*6.283;q.fillRect(Math.round(20+Math.cos(a)*7),Math.round(H-11+Math.sin(a)*9),1,1);}}up(P,16);lab(String([1,3,9,27][f]),20,f?'#ffd866':'#fff2d8');}
+  else if(k==='slow'){const v=String([1,2,4,8][f]);up(P,3,f*2);lab(v,7,f?'#ffd866':'#fff2d8',Math.min(f*2,3));up(K,16);lab(v,20,f?'#ffd866':'#fff2d8');if(f){q.fillStyle=C;q.fillRect(25,H-15,1,5);q.fillRect(27,H-15,1,5);}}
+  else if(k==='shield'){if(f===1)down(K,9);else{up(K,9);if(f>1){q.fillStyle='#1a1010';q.fillRect(12,H-17,2,3);}if(f===2){q.fillStyle='#f0f4fa';[[6,8],[21,8],[5,16],[22,16],[13,3]].forEach(([x,y])=>q.fillRect(x,y,1,1));}}}
+  else if(k==='bomb'){if(f===0){up(K,3);up(P,16);}else{down(K,3);if(f===1)up(P,16);else down(P,16);const r=[0,5,9,12][f];q.fillStyle='#ff7a3a';for(let i=0;i<16;i++){const a=i/16*6.283;q.fillRect(Math.round(8+Math.cos(a)*r),Math.round(H-7+Math.sin(a)*r*.6),1,1);}}}
+  else if(k==='rent'){up(K,4);txt(q,'+'+2*n,15,[14,10,6,2][f],C);}
+  else if(k==='toll'){q.fillStyle='#d83a2a';for(let x=0;x<W;x+=3)q.fillRect(x,H-3,2,1);if(f===0)up(K,6);else down(K,6);if(f>1){const y=f===2?9:4;disc(q,17,y+2,2,'#ffd866');txt(q,String(n),21,y,'#ffd866');}}}
+
+// --- Tips again, in the Your build sheet: a second tap confirms; every moment (and the first-shop gating) plays again ---
+let tipsAsk=false;
+$('rackTips').addEventListener('click',e=>{const b=e.currentTarget;if(!tipsAsk){tipsAsk=true;b.textContent='Replay all tips?';b.classList.add('ask');return;}
+  tipsAsk=false;b.classList.remove('ask');b.textContent='Tips again';TIPS.seen={};TIPS.shops=0;tipsSave();TIPLOG.push('tips-again');tipEnd();tipKey='';$('rackSheet').hidden=true;});
 // ---------- save state: the run is kept at the start of each ball, on the win card and in the shop; opening the page picks it up there ----------
 const SAVE='advten-save';
 function clearSave(){try{localStorage.removeItem(SAVE);}catch(e){}}
@@ -1649,13 +1838,13 @@ function saveRun(screen){if(!run||!g)return;try{
 function loadRun(){let d=null;try{d=JSON.parse(localStorage.getItem(SAVE)||'null');}catch(e){}
   if(!d||d.v!==1||!d.run||!Array.isArray(d.run.rack))return false;
   try{run=d.run;run.rack.forEach(it=>{if(!it.pw)it.pw=[];});runNo=Math.max(runNo,run.n||0);composeOffers();applyKit();stage=d.stage||stageOf(run.game);fx=null;setChrome(stage);
-    const keep={tips:run.tips,seen:run.seen,offerNote:run.offerNote};startGame();Object.assign(run,keep);
+    const keep={tips:run.tips,seen:run.seen,offerNote:run.offerNote};TIPHOLD=true;startGame();TIPHOLD=false;Object.assign(run,keep);
     if(d.boss&&BOSS){BOSS.tent=d.boss.tent;BOSS.posts=d.boss.posts;}
     const q=d.g;Object.assign(g,{frames:q.frames,frame:q.frame,chain:q.chain,netUsed:q.netUsed,brakeUsed:q.brakeUsed,breaks:q.breaks,rackBalls:q.rackBalls,sx:q.sx,ex:q.ex,bend:q.bend,bx:(q.sx+q.ex)/2+q.bend/2,left:q.left,lastLine:q.lastLine});
     g.pins=q.pins.filter(o=>run.rack[o.i]).map(o=>{const p=mkPin(o.c,o.k,o.v,run.rack[o.i],o.stand,{shield:o.shield,w:o.w,b:o.b});p.cracked=o.cracked;return p;});
     pending=null;pick=null;sel=null;gsel=null;board();strip();topBar();hint();setBtn();
     if(d.screen==='win'||d.screen==='shop'){g.mode='over';g.toastT=0;if(d.screen==='win')showWin();else showShop();}
-    else{saveRun('aim');if(BOSS&&g.frame===0&&!g.frames[0].balls.length)showIntro();}
+    else{saveRun('aim');if(BOSS&&g.frame===0&&!g.frames[0].balls.length)showIntro();else if(g.frame===0&&!g.frames[0].balls.length)tipsGame();}
     return true;}catch(e){console.error(e);clearSave();return false;}}
 // New run from the Rack sheet: a second tap confirms, since it drops the saved run
 let newAsk=false;
