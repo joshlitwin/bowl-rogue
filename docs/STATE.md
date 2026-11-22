@@ -124,27 +124,8 @@ Josh: "I basically have to hit all strikes to win eh? I feel like I can't affect
 - Smaller ball: house 16 (Big 20, Small 13), drawn and simulated the same. That dropped strike lines from 10.3% to 7.7%, so KNOCK 80 to 62 brings them back to 9.9%.
 - Targets 50, 70, 90 / 180, 250, 330 / 420, 560, 700 / 750, 950, 1150. Bot: runs end between game 4 and winning all 12.
 
+## Ten-Pin Lab verdict (21 November, late)
+Josh won all 12 games (54 strikes on 60 first balls, scores up to 4.6× the target): "Aesthetics are really cool, game is really easy and monotonous... As long as I kept hitting strikes, who cares?" He wants to rethink the bowling construct itself with a team of thinkers, artists and designers.
+
 ## Next
-Josh plays the Ten-Pin Lab and the Boss Lab (with growing layouts) and pastes logs. Questions: does re-finding the line each game feel like play or a chore; does a different ball or a bigger rack change what he does; if it's not fun, which of the three to switch off.
-
-## Earlier next (Rules Lab)
-Josh plays Five-Pin Rules Lab and pastes the log. Questions: does choosing between striking and picking pins off feel like a decision; do games feel too short when you strike; are the targets right.
-
-## The plan the Combined Lab came from
-- Each frame is a new rack: a different shape and pin count (six to ten), sometimes posts or a rail.
-- A hand of three balls dealt from a small bag.
-- While dragging, the pins the line will take are outlined for the selected ball, so choices are between visible outcomes.
-- Start with plain pieces; add conditional pins and balls one purchase at a time.
-- No stone pins, no "refill only when empty", no surfaces that change the hook, no strike bonus that compounds.
-
-If that is fun, the shop comes back on top of it.
-
-## Open
-- How many pins, and how wide a rack fits the lane on a phone.
-- Whether the shop sells pins, balls, or both.
-- Target curve. With strikes on nearly every ball the last run scored 86, 313, 855, 1179, 2538, 2952 against targets of 50, 100, 180, 300, 450, 650.
-- Which ideas to take from the pitches: stacks of pins per spot, pins that break after falling four times, lane tiles the route triggers, a scoresheet of patterns.
-- Known rough edges in Five-Pin Run: Trophy pin scales without limit; Sweeper, Wallflower and Buddy are dead weight when strikes are reliable; the gear icons are rough.
-
-## Not tested anywhere
-Real touch input is only ever tested by Josh playing on his phone. Animations are checked at fixed moments in headless Chrome, not watched running.
+Read `docs/IDEATION.md`: his notes, the diagnosis, seed directions, and the plan for the next session (blind agent team, pitches side by side, build his picks as small labs), plus a fix list (big shop pin art, level-up versus replace, dead pieces).
