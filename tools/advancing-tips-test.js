@@ -33,7 +33,7 @@ let fails=0;const ok=(name,cond,extra)=>{console.log((cond?'ok   ':'FAIL ')+name
   // win with balls left: the early-finish pips on the win card
   A.ev("run.target=1;g.frames[0].balls.push(500);play(1)");
   ok('win card open with balls left',A.ev("!$('win').hidden&&run.pay.extra>0"),A.ev("run.pay&&run.pay.left"));
-  ok('first early finish fires, pips light on the win card',A.ev("tipSeen('early')&&$('winList').querySelectorAll('.tpips s').length===run.pay.extra"));
+  ok('first early finish fires, a coin per ball left with +$1 rising off each',A.ev("tipSeen('early')&&$('winPay').querySelectorAll('.balls img.coin:not(.off)').length===run.pay.extra&&$('winPay').querySelectorAll('.balls .tfly').length===run.pay.extra"));
   A.ev("$('winNext').click()");
   ok('first shop fires: power cards lift, the line shows',A.ev("tipSeen('shop')&&$('shop').firstElementChild.classList.contains('tipshop')&&$('shopMsg').textContent==='Fit a power to a pin.'"));
   ok('shops visited counted',A.ev('TIPS.shops')===1);
@@ -41,7 +41,7 @@ let fails=0;const ok=(name,cond,extra)=>{console.log((cond?'ok   ':'FAIL ')+name
   A.ev("run.cash=40;showShop();$('shopPows').querySelector('.offer').click()");
   const pk=A.ev("pending&&pending.t");
   ok('first pick fires (pick, pw:'+pk+'), rings pulse',A.ev(`tipSeen('pick')&&tipSeen('pw:${pk}')&&$('shop').firstElementChild.classList.contains('tippick')`));
-  ok('the picked power plays its loop in the strip',A.ev("!!$('shopMsg').querySelector('canvas.pwloop[data-w=\""+pk+"\"]')"));
+  ok('the picked power shows its band by the rack',A.ev("!!$('shopInfo').querySelector('canvas.bandcard[data-k=\""+pk+"\"]')&&!$('shopInfo').hidden"));
   A.ev('shopTap(0)');ok('placing it ends the pick moment',A.ev("SHOPTIP===null&&!$('shop').firstElementChild.classList.contains('tippick')&&pwOf(run.rack[0]).length===1"));
   // a second kind picked: its own pw: flag; the same kind again: no new flag
   A.ev("{const o=run.offers.find(o=>o.kind==='pow'&&!o.bought&&o.t!=='"+pk+"');if(o){[...$('shopPows').children][run.offers.filter(x=>x.kind==='pow').indexOf(o)].click();shopTap(1);}}");
@@ -56,7 +56,7 @@ let fails=0;const ok=(name,cond,extra)=>{console.log((cond?'ok   ':'FAIL ')+name
   ok('no lane moment while the intro card is up',A.ev("!TIP"));
   A.ev("$('introGo').click()");ok('boss\'s first ball on the lane (bossgo:'+bb+')',A.ev(`tipSeen('bossgo:${bb}')&&TIP&&TIP.k==='bossgo:${bb}'`));
   // the build sheet: a power chip plays its loop
-  A.ev("$('rackBtn').click();$('rackPows').querySelector('.pwchip').click()");ok('Your build: a power plays its loop',A.ev("!!$('rackMsg').querySelector('canvas.pwloop')"));
+  A.ev("$('rackBtn').click();$('rackPows').querySelector('.pwchip').click()");ok('build view: a power shows its band',A.ev("!!$('rackMsg').querySelector('img.bp')"));
   A.ev("$('rackClose').click()");
   const firstFires=JSON.parse(A.ev('fires()'));
   ok('every moment fired exactly once',Object.values(firstFires).every(n=>n===1),A.ev('fires()'));
@@ -75,7 +75,7 @@ let fails=0;const ok=(name,cond,extra)=>{console.log((cond?'ok   ':'FAIL ')+name
     ok('reload: no moment seen before fires again (same run, a new run, win card, shop)',again.length===0,'new firsts only: '+B.ev('fires()'));}
   ok('reload: first-throw labels stay hidden',B.ev("tipSeen('throw')"));
 
-  // ---- Tips again: two taps in Your build ----
+  // ---- Tips again: two taps in the build view ----
   B.ev("$('shop').hidden=true;openBuild()");B.ev("$('rackTips').click()");
   ok('Tips again asks first',B.ev("$('rackTips').textContent")==='Replay all tips?'&&B.ev("Object.keys(TIPS.seen).length")>0);
   B.ev("$('rackTips').click()");

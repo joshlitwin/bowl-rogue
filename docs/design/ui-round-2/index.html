@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Temperance Lanes · UI round 2</title>
+<style>
+:root{--ink:#1d100a;--panel:#3a2016;--chalk:#f3e2b8;--dim:#c9a878;--accent:#d86a28;--go:#d83a2a}
+*{box-sizing:border-box}
+body{margin:0;background:var(--ink);color:var(--chalk);font:15px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+main{max-width:1500px;margin:0 auto;padding:24px 20px 60px}
+h1{margin:0 0 4px;font-size:26px}
+h2{margin:40px 0 4px;font-size:21px;border-top:2px solid var(--panel);padding-top:22px}
+h3{margin:0 0 2px;font-size:16px}
+p{margin:0 0 10px;color:var(--dim);max-width:760px}
+code{background:var(--panel);padding:1px 5px;border-radius:3px;color:var(--chalk);font-size:13px}
+.size{position:sticky;top:0;z-index:2;display:flex;gap:8px;align-items:center;padding:10px 0;background:var(--ink)}
+.size button{font:inherit;color:var(--chalk);background:transparent;border:2px solid var(--dim);border-radius:4px;padding:5px 12px;cursor:pointer}
+.size button[aria-pressed="true"]{background:var(--chalk);color:var(--ink);border-color:var(--chalk)}
+.row{display:flex;gap:18px;flex-wrap:wrap;align-items:flex-start;margin-top:12px}
+figure{margin:0;width:260px}
+figure img{display:block;width:100%;border-radius:6px;border:2px solid var(--panel);background:#000}
+figcaption{margin-top:6px;font-size:13px;color:var(--dim)}
+figcaption b{display:block;color:var(--chalk);font-size:14px}
+.pick{outline:3px solid var(--accent);outline-offset:3px;border-radius:6px}
+.tag{display:inline-block;margin-left:6px;padding:0 6px;border-radius:3px;background:var(--accent);color:var(--ink);font-size:12px;font-weight:700;vertical-align:1px}
+.pair{display:flex;gap:10px;align-items:flex-start}
+.pair figure{width:220px}
+.item{margin-top:22px}
+.arrow{align-self:center;color:var(--dim);font-size:22px}
+</style>
+</head>
+<body>
+<main>
+<h1>Temperance Lanes · UI round 2</h1>
+<p>Branch <code>ui/round-2</code>. Game: <code>labs/advancing-ten-pin/</code>. Every screenshot is the real page in headless Chrome. Touch was not tested.</p>
+<div class="size" role="group" aria-label="Screen size"><span>Size</span><button type="button" data-s="390x700" aria-pressed="true">390 × 700</button><button type="button" data-s="360x600" aria-pressed="false">360 × 600</button></div>
+
+<h2>Done</h2>
+
+<div class="item"><h3>1. Win card in the game's own look</h3>
+<p>The back-wall panel with your score and the target, coins dropping into the cash, the run as twelve pips, the next game and the level's boss (tap it for the rule).</p>
+<div class="row"><div class="pair"><figure><img data-src="before-win-card" alt=""><figcaption><b>Before</b></figcaption></figure><span class="arrow">→</span><figure><img data-src="win-card" alt=""><figcaption><b>After</b></figcaption></figure></div>
+<figure><img data-src="win-card-boss-next" alt=""><figcaption><b>Boss next</b></figcaption></figure><figure><img data-src="win-card-boss-beaten" alt=""><figcaption><b>Boss beaten</b></figcaption></figure></div></div>
+
+<div class="item"><h3>2. Powers are bands again</h3>
+<p>Power cards show a pin's neck wearing the band. Pins wear up to three bands; an empty slot is a groove. Slow, Shield, Bomb and Toll carry a pattern so close colours stay apart.</p>
+<div class="row"><div class="pair"><figure><img data-src="before-shop" alt=""><figcaption><b>Before</b></figcaption></figure><span class="arrow">→</span><figure><img data-src="shop" alt=""><figcaption><b>After</b></figcaption></figure></div>
+<figure><img data-src="bands-sheet" alt=""><figcaption><b>All nine bands</b>Power card, a pin in the rack, the swatch used in counts</figcaption></figure></div></div>
+
+<div class="item"><h3>3. No Build button in the shop; the rack explains itself</h3>
+<p>Tap a pin in the shop's rack to see it. Shown here with the default placement (Pin up close).</p>
+<div class="row"><div class="pair"><figure><img data-src="before-shop-pin-tapped" alt=""><figcaption><b>Before</b></figcaption></figure><span class="arrow">→</span><figure><img data-src="shop-pin-tapped" alt=""><figcaption><b>After</b></figcaption></figure></div></div></div>
+
+<div class="item"><h3>4, 5. Build button and the TL disc</h3>
+<p>Top left: a rack of ten seen from above, with the view's name. Back wall: the TL monogram replaces the 5. The night hall's neon now reads BOWL (it said 5 PIN).</p>
+<div class="row"><div class="pair"><figure><img data-src="before-lane" alt=""><figcaption><b>Before</b></figcaption></figure><span class="arrow">→</span><figure><img data-src="lane" alt=""><figcaption><b>After</b></figcaption></figure></div>
+<figure><img data-src="lane-night" alt=""><figcaption><b>Night hall</b></figcaption></figure></div></div>
+
+<div class="item"><h3>6. The build view, renamed</h3>
+<p>Pins wear their bands; counts use band swatches. The name is one line: <code>VIEW</code>.</p>
+<div class="row"><div class="pair"><figure><img data-src="before-build" alt=""><figcaption><b>Before</b></figcaption></figure><span class="arrow">→</span><figure><img data-src="build" alt=""><figcaption><b>After</b></figcaption></figure></div>
+<figure><img data-src="build-pin-tapped" alt=""><figcaption><b>A pin tapped</b></figcaption></figure></div></div>
+
+<h2>A. Where a pin's explanation shows <code>?info=</code></h2>
+<p>Each row: a pin tapped, a power picked, a pin picked. Balls, gear and the boss still explain themselves in the header.</p>
+<div class="row">
+<figure class="pick"><img data-src="info-closeup-pin" alt=""><figcaption><b>Pin up close <span class="tag">pick</span></b><code>?info=closeup</code> The rack moves right; the pin stands big on the left with each band named beside it.</figcaption></figure>
+<figure><img data-src="info-callout-pin" alt=""><figcaption><b>Callout on the pin</b><code>?info=callout</code> A bubble points at the tapped pin; the rack keeps its full size.</figcaption></figure>
+<figure><img data-src="info-strip-pin" alt=""><figcaption><b>Strip on the rack</b><code>?info=strip</code> A strip on the rack's top edge; the rack moves down to make room.</figcaption></figure>
+</div>
+<div class="row">
+<figure class="pick"><img data-src="info-closeup-power" alt=""><figcaption><b>Pin up close</b>Power picked</figcaption></figure>
+<figure><img data-src="info-callout-power" alt=""><figcaption><b>Callout on the pin</b>Power picked</figcaption></figure>
+<figure><img data-src="info-strip-power" alt=""><figcaption><b>Strip on the rack</b>Power picked</figcaption></figure>
+</div>
+<div class="row">
+<figure class="pick"><img data-src="info-closeup-pin-offer" alt=""><figcaption><b>Pin up close</b>Pin picked</figcaption></figure>
+<figure><img data-src="info-callout-pin-offer" alt=""><figcaption><b>Callout on the pin</b>Pin picked</figcaption></figure>
+<figure><img data-src="info-strip-pin-offer" alt=""><figcaption><b>Strip on the rack</b>Pin picked</figcaption></figure>
+</div>
+
+<h2>B. Names for the three games of a level <code>?names=</code></h2>
+<p>Used on the lane as a game opens, on the win card, on the shop's leave button and in the log.</p>
+<div class="row">
+<figure class="pick"><img data-src="names-open-league-match" alt=""><figcaption><b>Open play · League game · Match play <span class="tag">pick</span></b><code>open-league-match</code> Three things you do at an alley, casual to head-to-head; match play suits a boss that plays against you.</figcaption></figure>
+<figure><img data-src="names-practice-league-rolloff" alt=""><figcaption><b>Practice · League · Roll-off</b><code>practice-league-rolloff</code> Short; a roll-off is the extra game that settles a tie.</figcaption></figure>
+<figure><img data-src="names-qualifier-semi-final" alt=""><figcaption><b>Qualifier · Semifinal · Final</b><code>qualifier-semi-final</code> The ladder everyone knows, but a run has four finals.</figcaption></figure>
+<figure><img data-src="names-series" alt=""><figcaption><b>First game · Second game · Last game</b><code>series</code> A league night is a three-game series, and the hall already hangs a LAST GAME sign in game 3. Says nothing about the boss.</figcaption></figure>
+<figure><img data-src="names-warmup-sweeper-rolloff" alt=""><figcaption><b>Warm-up · Sweeper · Roll-off</b><code>warmup-sweeper-rolloff</code> A night bowling for a pot; a sweeper is a one-night cash event. Insider word.</figcaption></figure>
+<figure><img data-src="names-small-big-boss" alt=""><figcaption><b>Small game · Big game · Boss game</b><code>small-big-boss</code> As before, to compare.</figcaption></figure>
+</div>
+
+<h2>C. Names for the build view <code>?view=</code></h2>
+<p>The heading and the caption under the top-left button.</p>
+<div class="row">
+<figure class="pick"><img data-src="view-rack" alt=""><figcaption><b>Your rack <span class="tag">pick</span></b><code>rack</code> The ten pins you build are your rack; a bowling word nothing else on screen uses.</figcaption></figure>
+<figure><img data-src="view-gear" alt=""><figcaption><b>Your gear</b><code>gear</code> Your suggestion, but the shop already has a Gear tray, so it would name two things.</figcaption></figure>
+<figure><img data-src="view-bag" alt=""><figcaption><b>Your bag</b><code>bag</code> What a bowler carries the ball in; fits ball and gear more than pins.</figcaption></figure>
+<figure><img data-src="view-locker" alt=""><figcaption><b>Locker</b><code>locker</code> League bowlers keep their kit in one; reads as storage.</figcaption></figure>
+<figure><img data-src="view-kit" alt=""><figcaption><b>Your kit</b><code>kit</code> Plain and short; more general sport than bowling.</figcaption></figure>
+</div>
+<div class="row">
+<figure class="pick"><img data-src="view-rack-button" alt=""><figcaption><b>Your rack</b>Button</figcaption></figure>
+<figure><img data-src="view-gear-button" alt=""><figcaption><b>Your gear</b>Button</figcaption></figure>
+<figure><img data-src="view-bag-button" alt=""><figcaption><b>Your bag</b>Button</figcaption></figure>
+<figure><img data-src="view-locker-button" alt=""><figcaption><b>Locker</b>Button</figcaption></figure>
+<figure><img data-src="view-kit-button" alt=""><figcaption><b>Your kit</b>Button</figcaption></figure>
+</div>
+</main>
+<script>
+function show(s){document.querySelectorAll('img[data-src]').forEach(i=>{i.src=i.dataset.src+'-'+s+'.png';});
+  document.querySelectorAll('.size button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.s===s?'true':'false'));}
+document.querySelectorAll('.size button').forEach(b=>b.addEventListener('click',()=>show(b.dataset.s)));
+show('390x700');
+</script>
+</body>
+</html>

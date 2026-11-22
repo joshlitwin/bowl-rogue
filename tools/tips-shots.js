@@ -8,7 +8,7 @@ const chrome=process.env.CHROME||'google-chrome';fs.mkdirSync(out,{recursive:tru
 const KIT=`
 var play=function(n,stop){for(let i=0;i<n&&g.mode==='aim';i++){g.sx=180;g.ex=180;g.bx=180;g.bend=0;g.ready=true;g.phase=.25;throwBall();let j=0;while(!g.sim.done&&j++<3000)tick(g.sim);g.mode='settle';resolve();
   if(stop&&stop())return true;let k=0;while(g.mode==='step'&&k++<10)stepAnim(1);if(stop&&stop())return true;}return false;};
-var freeze=function(){loop=function(ts){lastT=ts;draw();paintLoops(ts);requestAnimationFrame(loop);};};
+var freeze=function(){loop=function(ts){lastT=ts;draw();requestAnimationFrame(loop);};};
 var quiet=function(){g.toastT=0;toastEl.style.opacity=0;};
 var winNow=function(){run.target=1;g.frames[0].balls.push(500);play(1);};`;
 const S={
@@ -17,24 +17,21 @@ const S={
   'break-through':`for(let i=0;i<9;i++){run.target=999;if(play(1,()=>TIP&&TIP.k==='broke'&&g.mode==='step'))break;}freeze();g.step.t=.5;stepAnim(0);quiet();`,
   'early-finish':`play(2);winNow();`,
   'first-shop':`winNow();$('winNext').click();`,
-  'first-pick-loop':`winNow();$('winNext').click();run.cash=30;showShop();const o=run.offers.find(o=>o.kind==='pow'&&o.t==='quick')||run.offers.find(o=>o.kind==='pow');pending=null;[...$('shopPows').children][run.offers.filter(x=>x.kind==='pow').indexOf(o)].click();`,
+  'first-pick':`winNow();$('winNext').click();run.cash=30;showShop();const o=run.offers.find(o=>o.kind==='pow'&&o.t==='quick')||run.offers.find(o=>o.kind==='pow');pending=null;[...$('shopPows').children][run.offers.filter(x=>x.kind==='pow').indexOf(o)].click();`,
   'powers-on-lane':`winNow();$('winNext').click();run.rack[0].pw=['quick'];run.rack[1].pw=['spark','spark'];run.rack[4].pw=['rent'];run.bought=true;skipAsk=true;$('shopNext').click();freeze();TIP.t=.1;quiet();`,
   'power-first-effect':`run.rack.forEach(it=>it.pw=['quick']);startGame();tipSeen('advance')||(TIPS.seen.advance=1);run.target=999;for(let i=0;i<4;i++){if(play(1,()=>TIP&&TIP.k==='fx:quick'))break;}freeze();g.step&&(g.step.t=.3,stepAnim(0));TIP.t=.7;quiet();`,
-  'build-loop':`run.rack[0].pw=['quick','quick'];run.rack[2].pw=['lantern'];openBuild();$('rackPows').querySelector('.pwchip').click();`,
+  'build-power':`run.rack[0].pw=['quick','quick'];run.rack[2].pw=['lantern'];openBuild();$('rackPows').querySelector('.pwchip').click();`,
   'build-tips-again':`run.rack[0].pw=['quick'];openBuild();$('rackTips').click();`,
   'boss-sweep-first-ball':`run.bosses[0]='sweep';run.game=2;startGame();showIntro();$('introGo').click();freeze();TIP.t=.7;TIP.tick(TIP.t);quiet();`,
   'boss-tentacle-first-ball':`run.bosses[0]='tentacle';run.game=2;startGame();showIntro();$('introGo').click();freeze();TIP.t=.35;TIP.tick(TIP.t);quiet();`,
   'boss-short-first-ball':`run.bosses[0]='short';run.game=2;startGame();showIntro();$('introGo').click();freeze();TIP.t=.4;quiet();`,
   'boss-bolted-first-ball':`run.bosses[0]='bolted';run.game=2;startGame();showIntro();$('introGo').click();freeze();TIP.t=.5;quiet();`,
   'gate-first-shop':`winNow();$('winNext').click();`,
-  // every power's loop, its four frames left to right (rows: the powers in shop order)
-  'power-loops-sheet':`freeze();const d=document.createElement('div');d.style.cssText='position:fixed;inset:0;z-index:9;background:#1d100a;display:grid;grid-template-columns:repeat(4,auto);gap:6px 10px;align-content:center;justify-content:center';
-    Object.keys(POWERS).forEach(k=>{for(let f=0;f<4;f++){const cv=document.createElement('canvas');cv.width=28;cv.height=26;cv.style.cssText='width:56px;height:52px;image-rendering:pixelated';d.appendChild(cv);paintLoop(cv,k,1,f);}});document.body.appendChild(d);`,
 };
 const QS={'gate-first-shop':'?tips=on&gate=on'};
 const names=process.argv.slice(2).length?process.argv.slice(2):Object.keys(S);
 const tmp=fs.mkdtempSync(path.join(os.tmpdir(),'tipshots-'));
-for(const name of names){const html=page.replace('</body>',`<script>${KIT}\nsetTimeout(()=>{try{${S[name]};draw();paintLoops(performance.now());}catch(e){document.title='ERR '+e.message;console.error(e);}},150);</script></body>`);
+for(const name of names){const html=page.replace('</body>',`<script>${KIT}\nsetTimeout(()=>{try{${S[name]};draw();}catch(e){document.title='ERR '+e.message;console.error(e);}},150);</script></body>`);
   const f=path.join(tmp,name+'.html');fs.writeFileSync(f,html);
   for(const [w,h] of [[390,700],[360,600]]){const shot=path.join(out,`${name}-${w}x${h}.png`),prof=fs.mkdtempSync(path.join(tmp,'p-'));
     try{execFileSync(chrome,['--headless=new','--no-sandbox','--disable-gpu','--hide-scrollbars','--force-device-scale-factor=2',`--user-data-dir=${prof}`,`--window-size=${w},${h}`,'--virtual-time-budget=3000',`--screenshot=${shot}`,'file://'+f+(QS[name]||'?tips=on')],{stdio:'pipe',timeout:60000});

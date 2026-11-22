@@ -209,5 +209,12 @@ After three rounds of names (`docs/design/branding/`, history in `toronto-histor
 ## Cover page (22 November, branch `brand/cover`)
 The front page is now a single pixel-art scene drawn in code: the hall after close, one lane lit, a rack of ten under its lamp, the neon "Temperance Lanes" sign over the pins with "A bowling roguelike" painted under it, a ball return at the edge, and on tall phones two windows onto Yonge Street at night. The only copy is the name, the line, Play (Continue · game N of 12 with a save) and Labs. The only motion is the LANES tube flickering now and then, off under reduced motion. The slogan is gone from every description (front page, game page, manifest). The share card (`assets/share.png`) and the icon (the lit head pin, `tools/make-icons.js`) are redrawn from the same art. Details and screenshots: `docs/design/cover/`.
 
+## UI round 2 (22 November, branch `ui/round-2`)
+From Josh's phone screenshots. UI only; rules, numbers, the throw and the save are unchanged (seeded powers bot identical). Details, options and the review board: `docs/design/ui-round-2/`.
+- Win card redrawn in the game's look: the back-wall panel (score, TL disc, target), coins into the cash, twelve run pips, next game and target, the level's boss (tap for its rule).
+- Powers are neck bands again everywhere (glyphs and power loops removed; boss pictures stay). Slow, Shield, Bomb and Toll carry a pixel pattern. Pins show three band places, empty ones as grooves.
+- Shop: no Build button; tap a pin in the rack for its info, shown by the rack. Build button top left is a rack-of-ten glyph with the view's name. Back wall disc reads TL; the night neon reads BOWL.
+- Open for Josh: `?info=` closeup (default), callout, strip; `?names=` six sets (default open-league-match: Open play, League game, Match play); `?view=` rack (default), gear, bag, locker, kit.
+
 ## Next
 Josh plays Advancing Ten-Pin with powers and pastes logs. Check: does he build one pin up or spread powers; does Shield earn its place (bots say no); is the cap of 32 the right ceiling; is the bottom of level 1 still where runs end. Before powers: did the best throw change between balls; did he leave pins to grow on purpose; did each boss hurt the way he played. The fix list in `docs/IDEATION.md` (level-up versus replace, dead pieces) still stands.
