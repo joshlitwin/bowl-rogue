@@ -22,8 +22,8 @@ Read `docs/STATE.md` first. It says what is decided, what is open, and what is n
 - Nothing here has automated coverage of real touch input; say so when reporting.
 
 ## Publishing
-- Josh wants to test from URLs, not Claude artifacts. The root `index.html` sends the site's front page straight to the current version (now the Boss Lab); `labs/index.html` links to the game and every lab. The repo is served as-is by GitHub Pages from `main`.
-- When you add a lab, add its link to `labs/index.html` and its row to `README.md`. When a new version becomes the one to play, point the root `index.html` at it.
+- Josh wants to test from URLs, not Claude artifacts. The root `index.html` is the styled front page: one card per mode (Five-Pin = Boss Lab, Ten-Pin, Classic = Five-Pin Run) and a link to `labs/`, which lists the game and every lab. The repo is served as-is by GitHub Pages from `main`.
+- When you add a lab, add its link to `labs/index.html` and its row to `README.md`. When a new version becomes the one to play, point its card on the root `index.html` at it.
 - Pages was switched on 21 November 2026: `main` at the root, served at https://joshlitwin.github.io/bowl-rogue/. Work on a branch only shows there once it is merged to `main`.
 
 ## Commits
