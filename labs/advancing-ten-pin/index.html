@@ -736,7 +736,7 @@ function startGame(){run.target=tgtOf(run.game);run.tips=0;
   if(OPT.layout&&run.game>0)run.layout=run.nextLayout||randLayout();run.nextLayout=null;run.layoutPaid=0;
   BOSS=bossOf(run.game);RACK=layoutSpots(run.layout,run.rack.length);run.offerNote=run.seen.join(' / ');run.seen=[];
   const sr=startRange(),sx0=clamp(180,sr[0],sr[1]);
-  g={bx:180,zoneAt:.2,ready:false,t0:performance.now(),pend:null,frame:0,frames:Array.from({length:12},()=>({balls:[],marks:[]})),chain:0,netUsed:false,pins:boardStart(run.rack),lastLine:null,breaks:0,rackBalls:0,sx:sx0,ex:180,bend:0,power:1,phase:.5,mode:'aim',sim:null,trail:[],intended:null,err:0,toast:null,toastT:0,wait:0,stopped:0};
+  g={bx:180,zoneAt:.2,ready:false,t0:performance.now(),pend:null,frame:0,pops:[],live:0,frames:Array.from({length:12},()=>({balls:[],marks:[]})),chain:0,netUsed:false,pins:boardStart(run.rack),lastLine:null,breaks:0,rackBalls:0,sx:sx0,ex:180,bend:0,power:1,phase:.5,mode:'aim',sim:null,trail:[],intended:null,err:0,toast:null,toastT:0,wait:0,stopped:0};
   ['over','win','shop','rackSheet','log'].forEach(id=>$(id).hidden=true);if(BOSS&&BOSS.tent){BOSS.tent={c:[-1,0,1][Math.floor(Math.random()*3)],k:0};BOSS.posts=[{x:colX(BOSS.tent.c),y:rowY(0),r:13}];g.pins=boardStart(run.rack).filter(p=>Math.hypot(p.x-BOSS.posts[0].x,p.y-BOSS.posts[0].y)>=40);g.pins=g.pins.concat(refill(g.pins,run.rack.slice(g.pins.length)));}
   else if(BOSSES.tentacle.posts)delete BOSSES.tentacle.posts;
   if(!BOSS){g.toast='boss';$('toast').innerHTML=`<strong>${kindOf3(run.game)} game</strong><b>beat ${run.target} · boss: ${bossOf(run.game-run.game%3+2).name}</b>`;g.toastT=2.6;}topBar();strip();board();hint();setBtn();
@@ -753,6 +753,8 @@ const tri=p=>4*Math.abs((((p%1)+1)%1)-.5)-1;
 function zone(){return Math.min(.6,T.win/1000*4*needleHz());}
 function fixBend(){const mid=(g.sx+g.ex)/2;g.bend=clamp(2*(g.bx-mid),-T.bend,T.bend);g.bx=mid+g.bend/2;}
 function needleHz(){return T.speed*(1+T.risk*Math.abs(g.bend)/T.bend)*POW[g.power].needle;}
+function liveTot(){return total()+(g&&(g.mode==='roll'||g.mode==='settle')?g.live||0:0);}
+function liveScore(){const t=liveTot();$('tot').textContent=t;$('fill').style.width=Math.min(100,t/run.target*100)+'%';}
 function total(){let t=0;g.frames.forEach(f=>f.balls.forEach(v=>t+=v));return t;}
 function board(){let h='';
   for(let i=0;i<ballsLeftMax();i++){const f=g.frames[i];let m='';for(let k=0;k<ballsIn(i);k++)m+=`<span>${f.marks[k]||''}</span>`;
@@ -780,7 +782,7 @@ $('swap').addEventListener('click',()=>{if(!run.hook||g.mode!=='aim')return;run.
 const NK={Gold:'gold',Wing:'wing',Domino:'domino',Twin:'twin',Trophy:'trophy',Bomb:'bomb',Picket:'picket',Leader:'leader',Buddy:'buddy',Wallflower:'wall',Sweeper:'sweep',Crown:'crown',Tip:'tip'},NM={leader:1,buddy:1,wall:1,sweep:1,crown:1};
 function chip(n){const w=n.split(' '),k=NK[w[0]],v=/^[+×]/.test(w[w.length-1])?w[w.length-1]:'';
   return `<span class="${!k||NM[k]?'mu':k==='tip'?'ca':'pt'}">${k?`<img src="${icon(k)}" alt="${w[0]}">`:w[0]+' '}${v}</span>`;}
-function resolve(){const fell=g.pins.filter(p=>p.down),left=g.pins.filter(p=>!p.down),r=scoreAdv(fell,left,run.gear,{chain:g.chain||0,ball:g.frame+1,max:ballsLeftMax(),sweep:run.ball==='sweep'});
+function resolve(){g.live=0;const fell=g.pins.filter(p=>p.down),left=g.pins.filter(p=>!p.down),r=scoreAdv(fell,left,run.gear,{chain:g.chain||0,ball:g.frame+1,max:ballsLeftMax(),sweep:run.ball==='sweep'});
   g.chain=r.strike?(g.chain||0)+1:0;
   if(r.cash){const c=Math.min(r.cash,3-run.tips);if(c>0){run.tips+=c;run.cash+=c;topBar();}}
   const sofar=total()+r.score,last=g.frame>=ballsLeftMax()-1||sofar>=run.target&&run.target>0,bctx=last?null:{gear:run.gear,netUsed:g.netUsed,rush:run.ball==='rush',brake:run.ball==='brake'&&!g.brakeUsed,toll:run.ball==='toll',seed:run.ball==='seed',strike:r.strike},st=last?null:advance(left,fell,null,g.frame+1,bctx);if(bctx&&bctx.brake)g.brakeUsed=true;if(st&&st.netUsed){g.netUsed=true;r.notes.push('Net');}
@@ -995,7 +997,7 @@ const px=(k,x,y,w,h,col)=>{k.fillStyle=col;k.fillRect(Math.round(x),Math.round(y
 function disc(k,cx,cy,r,col){k.fillStyle=col;for(let y=-r;y<=r;y++){const w=Math.floor(Math.sqrt(r*r-y*y+.6));k.fillRect(cx-w,cy+y,w*2+1,1);}}
 function ringPx(k,cx,cy,rx,ry,col){k.fillStyle=col;const n=Math.ceil((rx+ry)*5);for(let i=0;i<n;i++){const a=i/n*6.28319;k.fillRect(Math.round(cx+Math.cos(a)*rx),Math.round(cy+Math.sin(a)*ry),1,1);}}
 function plotLine(k,x0,y0,x1,y1,col){const n=Math.max(1,Math.ceil(Math.max(Math.abs(x1-x0),Math.abs(y1-y0))));k.fillStyle=col;for(let i=0;i<=n;i++)k.fillRect(Math.round(x0+(x1-x0)*i/n),Math.round(y0+(y1-y0)*i/n),1,1);}
-const FONT={'0':'111101101101111','1':'010110010010111','2':'111001111100111','3':'111001111001111','4':'101101111001001','5':'111100111001111','6':'111100111101111','7':'111001001001001','8':'111101111101111','9':'111101111001111',A:'111101111101101',B:'110101110101110',C:'111100100100111',D:'110101101101110',E:'111100111100111',F:'111100111100100',G:'111100101101111',H:'101101111101101',I:'111010010010111',K:'101101110101101',L:'100100100100111',M:'101111111101101',N:'111101101101101',O:'111101101101111',P:'111101111100100',R:'111101110101101',S:'111100111001111',T:'111010010010010',U:'101101101101111',V:'101101101101010',W:'101101111111101',X:'101101010101101',Y:'101101010010010','/':'001001010100100','-':'000000111000000',' ':'000000000000000'};
+const FONT={'+':'000010111010000','x':'000101010101000','0':'111101101101111','1':'010110010010111','2':'111001111100111','3':'111001111001111','4':'101101111001001','5':'111100111001111','6':'111100111101111','7':'111001001001001','8':'111101111101111','9':'111101111001111',A:'111101111101101',B:'110101110101110',C:'111100100100111',D:'110101101101110',E:'111100111100111',F:'111100111100100',G:'111100101101111',H:'101101111101101',I:'111010010010111',K:'101101110101101',L:'100100100100111',M:'101111111101101',N:'111101101101101',O:'111101101101111',P:'111101111100100',R:'111101110101101',S:'111100111001111',T:'111010010010010',U:'101101101101111',V:'101101101101010',W:'101101111111101',X:'101101010101101',Y:'101101010010010','/':'001001010100100','-':'000000111000000',' ':'000000000000000'};
 function txt(k,s,x,y,col,m){m=m||1;k.fillStyle=col;for(const ch of s){const f=FONT[ch]||FONT[' '];for(let i=0;i<15;i++)if(f[i]==='1')k.fillRect(x+(i%3)*m,y+((i/3)|0)*m,m,m);x+=4*m;}}
 function sprite(rows,pal){const w=Math.max(...rows.map(r=>r.length)),k=mk(w,rows.length),q=k.getContext('2d');rows.forEach((r,y)=>{for(let x=0;x<r.length;x++){const col=pal[r[x]];if(col){q.fillStyle=col;q.fillRect(x,y,1,1);}}});return k;}
 function turned(s,flip){const k=mk(s.height,s.width),q=k.getContext('2d');if(flip){q.translate(0,s.width);q.rotate(-Math.PI/2);}else{q.translate(s.height,0);q.rotate(Math.PI/2);}q.drawImage(s,0,0);return k;}
@@ -1168,7 +1170,7 @@ function hallComp(q,o,cm,s){const lane=cm.id==='lane',im=q.getImageData(0,0,LW,L
       for(let i=0;i<=6;i++)plotLine(q,56+i*11,67,78+i*4,55,'#06200f');for(const y of [55,59,63,67])px(q,56+(67-y)*.3|0,y,68-(67-y)*.6|0,1,'#06200f');}}
   else{if(s>=1)for(let x=1;x<180;x+=3)px(q,x,2,1,1,'#0d2e19');if(s>=2)px(q,0,5,180,1,'#3fd67a');}}
 // what moves: the big score, its bar, a cursor, one cell of memory lighting at a time; in game 9 something from above gets into the signal
-function liveComp(o,cm,s,t){if(cm.id!=='lane')return;const R=o.dispR,str=total()+'/'+run.target,big=str.length*8-2<=R[2]-4,f=Math.min(1,total()/run.target);
+function liveComp(o,cm,s,t){if(cm.id!=='lane')return;const R=o.dispR,str=liveTot()+'/'+run.target,big=str.length*8-2<=R[2]-4,f=Math.min(1,total()/run.target);
   px(c,R[0],R[1],R[2],R[3],'#000201');const tw=big?str.length*8-2:str.length*4-1,tx=R[0]+Math.floor((R[2]-tw)/2);txt(c,str,tx,R[1]+(big?2:4),'#3fd67a',big?2:1);
   px(c,37,44,Math.round(106*f),1,f>=1?'#ffc83a':'#3fd67a');
   if(still)return;
@@ -1257,7 +1259,7 @@ function draw(){
   c.setTransform(1,0,0,1,0,0);c.globalAlpha=1;c.imageSmoothingEnabled=false;
   const hg=hallStep(o);
   if(fx)drawFx(cm);else c.drawImage(hallBg(o,cm,hg).cv,0,0);
-  if(lane){const L=o.dispL,R=o.dispR,s=total()+'/'+run.target;
+  if(lane){const L=o.dispL,R=o.dispR,s=liveTot()+'/'+run.target;
     px(c,L[0],L[1],L[2],L[3],L[4]);txt(c,String(Math.min(ballsLeftMax(),g.frame+1)),L[0]+Math.floor((L[2]-7)/2),L[1]+Math.floor((L[3]-5)/2),L[5]);
     px(c,R[0],R[1],R[2],R[3],R[4]);txt(c,s,R[0]+Math.floor((R[2]-(s.length*4-1))/2),R[1]+Math.floor((R[3]-5)/2),R[5]);}
   if(!fx)hallLive(o,cm,hg,(lastT-HALL.t0)/1000);
@@ -1290,19 +1292,31 @@ function draw(){
     px(c,X-4,Y,2,1,o.hi);px(c,X-3,Y-1,1,3,o.hi);px(c,X+3,Y,2,1,o.hi);px(c,X+3,Y-1,1,3,o.hi);c.globalAlpha=1;
     if(!run.thrown){label(o,'AIM',aimPos.X+aimPos.rx+8,aimPos.Y-2);label(o,'BEND',X+11,Y-2);if(ballPos)label(o,'START',ballPos.X+ballPos.r+4,ballPos.Y-2);}
   }
+  for(const q of g.pops)drawPop(cm,q);
   drawNeedle(o);
 }
+// a pin's value pops above it the moment it falls: bigger, brighter and longer as the value climbs; a ring bursts out at 16 and up
+function popLife(v){return v>=16?1.3:v>=4?1.05:.8;}
+function drawPop(cm,q){const a=cm.proj(q.x,q.y),v=q.v,big=v>=16,mid=v>=4,m=v>=64?3:mid?2:1,life=popLife(v),t=q.t,u=Math.min(1,t/.12);
+  const s='+'+v,w=s.length*4*m-m,rise=(mid?18:12)*Math.min(1,t/life*1.6),X=Math.round(a.X-w/2),Y=Math.round(a.Y-26-rise-(mid?4*(1-u):0));
+  const col=big?(Math.floor(t*14)%2?'#ffffff':'#ff5a3a'):mid?'#ffd866':v>=2?'#fff8e8':'#e8d8b8',edge=big?'#5a0e06':mid?'#6a3a08':'#2a160e';
+  c.globalAlpha=t>life-.25?Math.max(0,(life-t)/.25):1;
+  if(big&&t<.5){const r=Math.round(6+t*40);ringPx(c,Math.round(a.X),Math.round(a.Y-12),r,Math.round(r*.6),'#ffd866');}
+  for(const [dx,dy] of [[-1,0],[1,0],[0,-1],[0,1],[1,1]])txt(c,s,X+dx,Y+dy,edge,m);
+  txt(c,s,X,Y,col,m);c.globalAlpha=1;}
 
 const toastEl=$('toast');
 let lastT=0,acc=0;
 function loop(ts){const dt=Math.min(.05,(ts-lastT)/1000||0);lastT=ts;
   if(g.mode==='aim'&&g.ready)g.phase+=needleHz()*dt;
   if(g.mode==='roll'){acc+=dt;while(acc>1/240){tick(g.sim);acc-=1/240;}
+    for(const p of g.sim.pins)if(p.down&&!p.popped){p.popped=true;g.live=(g.live||0)+p.v;g.pops.push({x:p.x,y:p.y,v:p.v,t:0});liveScore();}
     const b=g.sim.ball;if(!b.out)g.trail.push({x:b.x,y:b.y});
     if(g.sim.done){g.mode='settle';g.wait=.55;}}
   else if(g.mode==='settle'){g.wait-=dt;if(g.wait<=0)resolve();}
   else if(g.mode==='step')stepAnim(still?1:dt);
   if(g.toastT>0)g.toastT-=dt;
+  for(const q of g.pops)q.t+=dt;g.pops=g.pops.filter(q=>q.t<popLife(q.v));
   toastEl.style.opacity=g.toast&&g.toastT>0?Math.min(1,g.toastT*2):0;
   if(fx){fx.t+=dt;if(!fx.flip&&fx.t>=.9){fx.flip=true;setChrome(fx.to);}
     if(fx.t>=(still?1.9:2.7)){stage=fx.to;fx=null;}}

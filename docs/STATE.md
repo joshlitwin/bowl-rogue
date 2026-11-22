@@ -158,5 +158,8 @@ What the run bot found (`npm run advancing-run-bot`, 200 lines a ball, 60 ms spr
 - Ripen build (Runner, Glass, Anchor, Slow, Shield, Toll; Hothouse, Last stand, Catch net) was weakest: lost at Sweep bar (game 6) and in game 7. Its gear rarely showed up in the shop (one random gear of twelve per shop). Ripening may need a boost; check against Josh's play first.
 - Bosses do kill the build they target (Sweep bar 31 of 210 against ripen; Bolted rack and the tentacle ended both strike runs).
 
+### Arcade scoring (22 November, Josh's ask)
+Pins score the moment they fall: each one pops its value above itself (+1 small and plain; +4 to +8 bigger and gold; +16 and up large, flashing, with a ring), and the score bar and the back-wall panel count up while the ball rolls. Strike ×, Rent and Crowd land at the end of the ball. Sound per value is planned for when sound comes in. "Step" is now "advance" in every player-facing text.
+
 ## Next
 Josh plays Advancing Ten-Pin (and the Advancing Rack Lab) and pastes logs. Check: did the best throw change between balls; did he ever leave pins to grow on purpose; did each boss hurt the way he played. Then a shop for this mode (pieces that favour striking or ripening). The fix list in `docs/IDEATION.md` (big shop pin art, level-up versus replace, dead pieces) still stands.
