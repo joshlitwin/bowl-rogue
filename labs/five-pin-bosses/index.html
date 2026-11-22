@@ -363,6 +363,8 @@ button.slot:active{transform:translateY(1px)}
 #shop .slot{height:46px;grid-template-rows:31px 12px;background:radial-gradient(ellipse 13px 4px at 50% 30px,var(--spot) 97%,transparent)}
 #shop .slot img{width:15px;height:30px}
 #shop .rackmap{gap:0}
+/* short phones: the result row at the top costs height, so the rack-map spots get a little shorter */
+@media (max-height:640px){#shop .slot{height:41px;grid-template-rows:27px 11px;background:radial-gradient(ellipse 12px 4px at 50% 26px,var(--spot) 97%,transparent)}#shop .slot img{width:13px;height:26px}#shop .slot b{font-size:10px}}
 #shop .strip .buy{min-height:40px}
 .nudge .offer:not(.poor):not(.got){animation:nudge .4s steps(6) 2}
 @media (min-height:660px){
@@ -442,16 +444,19 @@ button.slot:active{transform:translateY(1px)}
 const G={L:60,R:300,BACK:30,FOUL:540,SY:520,EY:160,WL:38,WR:322};
 // spots: headpin, left 3, right 3, left corner, right corner, then the two you can buy: back centre (between the corners), left flank (headpin row, in line with the left corner)
 const SPOTS=[{x:180,y:160,v:5},{x:134,y:120,v:3},{x:226,y:120,v:3},{x:88,y:80,v:2},{x:272,y:80,v:2},{x:180,y:80,v:3},{x:88,y:160,v:3}];
-// a layout moves spots, never closer together than the standard rack (61 px, headpin to a 3-pin)
+// a layout moves spots, never closer together than the standard rack (61 px, headpin to a 3-pin).
+// k grows each level (1, 1.5, 2, 2.5), so the same layout is more extreme later; whole-rack shifts can't grow (the corners would leave the lane), so their headpin comes forward instead
 const LAYOUTS={
   standard:{name:'Standard',move:()=>[0,0]},
-  left:{name:'Shifted left',move:()=>[-16,0]},
-  right:{name:'Shifted right',move:()=>[16,0]},
-  headfwd:{name:'Headpin forward',move:i=>i===0?[0,30]:[0,0]},
-  headleft:{name:'Headpin left',move:i=>i===0?[-22,20]:[0,0]},
-  headright:{name:'Headpin right',move:i=>i===0?[22,20]:[0,0]}
+  left:{name:'Shifted left',move:(i,k)=>[-16,i===0?(k-1)*40:0]},
+  right:{name:'Shifted right',move:(i,k)=>[16,i===0?(k-1)*40:0]},
+  headfwd:{name:'Headpin forward',move:(i,k)=>i===0?[0,30*k]:[0,0]},
+  headleft:{name:'Headpin left',move:(i,k)=>i===0?[-22*k,20*k]:[0,0]},
+  headright:{name:'Headpin right',move:(i,k)=>i===0?[22*k,20*k]:[0,0]}
 };
-function layoutSpots(id,n){return SPOTS.slice(0,n).map((p,i)=>{const m=LAYOUTS[id].move(i);return{x:p.x+m[0],y:p.y+m[1],v:p.v};});}
+const LAYK=[1,1.5,2,2.5];
+function layScale(gi){return LAYK[Math.min(3,Math.floor(gi/3))];}
+function layoutSpots(id,n,k){return SPOTS.slice(0,n).map((p,i)=>{const m=LAYOUTS[id].move(i,k||1);return{x:p.x+m[0],y:p.y+m[1],v:p.v};});}
 let RACK=layoutSpots('standard',5);
 // boss rules. posts stop the ball (pins bounce off them); bolted pins fall to the ball, but only to a very hard hit from another pin (boltK, against KNOCK for a plain pin); a start side limits where the ball can start
 const BOSSES={
@@ -541,7 +546,7 @@ function scoreFrames(fr){const flat=[].concat(...fr);let idx=0,tot=0;const out=[
 //SIM-END
 
 const OPT=(()=>{let q;try{q=new URLSearchParams(location.search);}catch(e){q=new URLSearchParams('');}return{layout:q.get('layout')!=='0',balls:q.get('balls')!=='0',spots:q.get('spots')!=='0'};})();
-const FRAMES=3,TARGETS=[120,170,220,380,540,700,950,1250,1550,1800,2250,2700],NIGHT_FROM=3;
+const FRAMES=3,TARGETS=[120,170,200,340,480,620,850,1100,1400,1600,2000,2400],NIGHT_FROM=3;
 const STAGES=['rec','night','computer','arrival'];
 function stageOf(gi){return STAGES[Math.min(3,Math.floor(gi/3))];}
 // four levels; in each, a small game, a big game and a boss game
@@ -642,8 +647,8 @@ function scoreBall(fell,left,fresh){const cleared=left.length===0&&fell.length>0
   return{pts,m,score:Math.round(pts*m),strike,cleared,notes};}
 function newRun(){runNo++;run={n:runNo,game:0,target:TARGETS[0],cash:0,rack:[0,1,2,3,4].map(()=>newItem('plain')),layout:'standard',seen:[],ballStock:[],nextLayout:null,layoutOpts:[],layoutPaid:0,gear:{},ball:'house',bosses:(a=>{for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a.slice(0,4);})(Object.keys(BOSSES)),offers:[],rerolls:0,thrown:false,tips:0};applyKit();stage='rec';fx=null;setChrome('rec');startGame();}
 function startGame(){run.target=TARGETS[run.game];run.tips=0;
-  if(OPT.layout&&run.game>0)run.layout=run.nextLayout||randLayout();run.nextLayout=null;run.layoutPaid=0;
-  BOSS=bossOf(run.game);RACK=layoutSpots(run.layout,run.rack.length);run.offerNote=run.seen.join(' / ');run.seen=[];
+  if(OPT.layout&&run.game>0)run.layout=bossOf(run.game)?'standard':run.nextLayout||randLayout();run.nextLayout=null;run.layoutPaid=0;
+  BOSS=bossOf(run.game);RACK=layoutSpots(run.layout,run.rack.length,layScale(run.game));run.offerNote=run.seen.join(' / ');run.seen=[];
   const sr=startRange(),sx0=clamp(180,sr[0],sr[1]);
   g={bx:180,zoneAt:.2,ready:false,t0:performance.now(),pend:null,frame:0,frames:Array.from({length:FRAMES},()=>({balls:[],marks:[]})),pins:rackRun(),rackBalls:0,sx:sx0,ex:180,bend:0,power:1,phase:.5,mode:'aim',sim:null,trail:[],intended:null,err:0,toast:null,toastT:0,wait:0,stopped:0};
   ['over','win','shop','rackSheet','log'].forEach(id=>$(id).hidden=true);topBar();strip();board();hint();setBtn();
@@ -753,7 +758,9 @@ function rollOffers(){
     run.ballOffers=run.ballStock.map(k=>({kind:'ball',t:k,name:BALLOFFERS[k].name,text:BALLOFFERS[k].text,cost:BALLOFFERS[k].cost,bought:false}));}else run.ballOffers=[];
   const gear=Object.keys(GEAR).filter(k=>!run.gear[k]&&!(OPT.balls&&k==='big'));
   run.gearOffer=gear.length?(k=>({kind:'gear',t:k,name:GEAR[k].name,text:GEAR[k].text,cost:GEAR[k].cost,bought:false}))(pickOut(gear)):null;
-  if(OPT.layout){const a=randLayout(),b=randLayout([a]),c=randLayout([a,b]);run.layoutOpts=[{id:a,cost:0},{id:b,cost:LAYCOST},{id:c,cost:LAYCOST}];run.nextLayout=a;run.layoutPaid=0;
+  // a boss game always uses the standard rack: the boss rule is that game's twist (some boss and layout pairs leave no strike line)
+  if(OPT.layout&&bossOf(run.game+1)){run.layoutOpts=[{id:'standard',cost:0}];run.nextLayout='standard';run.layoutPaid=0;run.seen.push('next rack: Standard (boss game)');}
+  else if(OPT.layout){const a=randLayout(),b=randLayout([a]),c=randLayout([a,b]);run.layoutOpts=[{id:a,cost:0},{id:b,cost:LAYCOST},{id:c,cost:LAYCOST}];run.nextLayout=a;run.layoutPaid=0;
     run.seen.push('next rack: '+LAYOUTS[a].name+' free; '+LAYOUTS[b].name+' $'+LAYCOST+'; '+LAYOUTS[c].name+' $'+LAYCOST);}
   run.seen.push('balls: '+(run.ballOffers.map(o=>o.name+' $'+o.cost).join('; ')||'none')+' | gear: '+(run.gearOffer?run.gearOffer.name+' $'+run.gearOffer.cost:'none'));
   rollPins();}
@@ -765,7 +772,7 @@ function drawMap(el,onTap,selI,o,lay){el.innerHTML='';el.className='rackmap'+(o?
   const n=run.rack.length,ghost=onTap===shopTap&&OPT.spots&&n<SPOTS.length&&!o?n:-1,L=LAYOUTS[lay||run.layout];
   const rows=[[3,5,4],[1,2],[6,0,-1]].map(r=>r.filter(i=>i<n||i===ghost));rows.forEach((row,r)=>{const d=document.createElement('div');d.className='maprow '+(row.includes(0)?(row.includes(6)?'r2':'r0'):row.includes(1)?'r1':'r2');
     row.forEach(i=>{if(i<0){const e=document.createElement('div');e.className='slot';e.style.visibility='hidden';d.appendChild(e);return;}
-      const m=L.move(i),tf=m[0]||m[1]?`translate(${Math.round(m[0]*1.4)}px,${Math.round(m[1]*.35)}px)`:'';
+      const m=L.move(i,layScale(onTap===shopTap?run.game+1:run.game)),tf=m[0]||m[1]?`translate(${Math.round(clamp(m[0]*1.4,-36,36))}px,${Math.round(clamp(m[1]*.35,-10,0))}px)`:'';
       if(i===ghost){const b=document.createElement('button');b.type='button';b.className='slot ghost'+(pick&&pick.kind==='spot'?' sel':'');b.style.transform=tf;
         b.innerHTML=`<i class="v">${SLOTV[i]}</i><span class="plus">+</span><i class="lv"></i><b>$${SPOTCOST[i]}</b>`;b.setAttribute('aria-label',`Buy a pin at ${SLOTN[i]}, worth ${SLOTV[i]}, $${SPOTCOST[i]}`);
         b.addEventListener('click',()=>{pending=null;sel=null;gsel=null;pick=pick&&pick.kind==='spot'?null:{kind:'spot',t:'p'+SLOTV[i],name:SLOTN[i]+' pin',text:`Adds a plain pin, worth ${SLOTV[i]}.`,cost:SPOTCOST[i]};showShop();});d.appendChild(b);return;}
@@ -784,7 +791,7 @@ function buy(o){if(run.cash<o.cost)return;run.cash-=o.cost;run.bought=true;
   run.seen.push('bought '+o.name+' $'+o.cost);pick=null;topBar();showShop();}
 // a small picture of a layout: where your pins will stand (filled), over the standard spots (hollow); drawn from layoutSpots
 function rackDiagram(id){const n=run.rack.length,W=96,H=30,X=x=>Math.round((x-60)/240*W),Y=y=>Math.round((y-62)/(200-62)*H),d=4;
-  const at=layoutSpots(id,n),base=layoutSpots('standard',n);
+  const at=layoutSpots(id,n,layScale(run.game+1)),base=layoutSpots('standard',n);
   return `<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" aria-hidden="true"><rect width="${W}" height="${H}" fill="var(--deck)"/>`
     +[24,48,72].map(x=>`<rect x="${x}" width="1" height="${H}" fill="var(--deck-line)"/>`).join('')
     +(id==='standard'?'':base.map(p=>`<rect x="${X(p.x)-d/2+.5}" y="${Y(p.y)-d/2+.5}" width="${d-1}" height="${d-1}" fill="none" stroke="var(--deck-dim)" stroke-width="1"/>`).join(''))
