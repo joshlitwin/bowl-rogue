@@ -212,10 +212,6 @@ body[data-stage="arrival"]{--deck:#141024;--deck-line:#1e1834;--deck-ink:#f0eeff
 .strip .buy{flex:none;margin-left:auto;padding:8px 10px;border-radius:6px;border:2px solid var(--accent);background:var(--accent);color:var(--ink);font-family:var(--display);font-size:13px;font-weight:700}
 .strip .buy b{font-family:var(--num);font-weight:400}
 .strip .buy:disabled{background:transparent;color:var(--dim);border-color:var(--dim);text-decoration:line-through}
-.slot.ghost{border:2px dashed var(--deck-dim);background:transparent}
-.slot.ghost .plus{font-family:var(--display);font-size:24px;font-weight:700;line-height:1;color:var(--deck-dim)}
-.slot.ghost b{color:var(--deck-ink)}
-.slot.ghost.sel{border-style:solid;border-color:var(--deck-ink)}
 @keyframes nudge{25%{transform:translateY(-4px)}75%{transform:translateY(2px)}}
 /* one fixed detail strip */
 .strip{flex:none;height:54px;display:flex;align-items:center;gap:9px;padding:5px 9px;border-radius:6px;background:var(--ink);color:var(--chalk);overflow:hidden}
@@ -238,29 +234,9 @@ body[data-stage="arrival"]{--deck:#141024;--deck-line:#1e1834;--deck-ink:#f0eeff
 .tally b small{font-size:13px;color:var(--dim)}
 .tally span{font-family:var(--num);font-size:12px;line-height:1;white-space:nowrap;color:var(--accent);border:2px solid var(--accent);border-radius:4px;padding:4px 5px}
 .tally span i{font-style:normal;font-family:var(--display);font-size:12px;color:var(--dim);margin-right:5px}
-/* the rack as the bowler sees it: corners at the back, headpin at the front */
+/* the rack as the bowler sees it: one pixel canvas in perspective, headpin nearest (drawn by drawMap) */
 .deck{position:relative;flex:1 1 auto;min-height:190px;display:flex;border-radius:6px;padding:6px 8px;border:2px solid var(--ink);background:repeating-linear-gradient(90deg,var(--deck) 0 25px,var(--deck-line) 25px 26px)}
 .sheet:not(#shop) .deck{flex:none;height:200px}
-.rackmap{flex:1;display:flex;flex-direction:column;justify-content:space-around;gap:2px}
-.maprow{display:flex;justify-content:space-between}
-.maprow.r1{justify-content:center;gap:24px}
-.maprow.r0{justify-content:center}
-/* ten pins: four centred rows with one gap, so the rows form the triangle */
-.rackmap.ten{justify-content:space-evenly}.maprow.trow{justify-content:center;gap:4px}.rackmap.ten .slot{width:66px;height:44px;grid-template-columns:1fr 14px 1fr;grid-template-rows:28px 12px}.rackmap.ten .slot img{width:14px;height:28px}.rackmap.ten .slot b{font-size:10px}
-.slot{position:relative;width:92px;height:58px;display:grid;grid-template-columns:1fr 18px 1fr;grid-template-rows:36px 14px;align-items:center;justify-items:center;padding:1px 2px;border:2px solid transparent;border-radius:6px;background:radial-gradient(ellipse 15px 5px at 50% 35px,var(--spot) 97%,transparent);color:var(--deck-ink)}
-.slot img{width:18px;height:36px;image-rendering:pixelated}
-.slot .v{font-style:normal;font-family:var(--num);font-size:11px;line-height:1;justify-self:end;margin-right:7px;align-self:end;margin-bottom:5px;color:var(--deck-dim)}
-.slot .lv{display:flex;flex-direction:column-reverse;gap:2px;justify-self:start;margin-left:7px;align-self:end;margin-bottom:5px}
-.slot .lv u{width:7px;height:5px;background:transparent;border:1px solid var(--deck-dim)}
-.slot .lv u.on{background:var(--deck-ink);border-color:var(--deck-ink)}
-.slot .lv u.up{background:var(--tag);border-color:var(--tag);animation:blink .5s steps(2) infinite}
-.slot b{grid-column:1/-1;font-family:var(--display);font-size:12px;font-weight:700;line-height:1;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.slot.plain b{font-weight:500;color:var(--deck-dim)}
-button.slot:active{transform:translateY(1px)}
-.slot.sel{border-color:var(--deck-ink);background-color:rgba(255,255,255,.22)}
-.swap .slot:not(.sel)::after{content:"⇄";position:absolute;top:1px;right:4px;font-size:15px;line-height:1;color:var(--deck-ink)}
-.place .slot{border:2px dashed var(--deck-ink);background-color:rgba(255,255,255,.16)}
-.place .slot::before{content:"";position:absolute;top:0;left:50%;margin-left:-24px;border:5px solid transparent;border-top:7px solid var(--tag);border-bottom:0;animation:bob .7s steps(3) infinite}
 .placing .deck{box-shadow:0 0 0 3px var(--accent)}
 @keyframes bob{50%{transform:translateY(4px)}}
 @keyframes blink{50%{opacity:.25}}
@@ -299,9 +275,6 @@ button.slot:active{transform:translateY(1px)}
   .offer{height:72px;padding:6px 6px}.offer strong{font-size:13px}.offer img{width:18px;height:36px}.lays button{height:44px;font-size:12.5px}
   .strip{height:58px}.strip p{font-size:12.5px}
   .deck{min-height:256px}.sheet:not(#shop) .deck{height:262px}
-  .slot{width:100px;height:80px;grid-template-columns:1fr 27px 1fr;grid-template-rows:56px 16px;background:radial-gradient(ellipse 21px 6px at 50% 53px,var(--spot) 97%,transparent)}
-  .slot img{width:27px;height:54px}.slot b{font-size:13px}.slot .v{font-size:13px}.slot .lv u{width:9px;height:6px}
-  .maprow.r1{gap:16px}.place .slot::before{margin-left:-28px}
 }
 /* ---------- shop shelves: each kind of thing for sale on its own framed tray ---------- */
 #shop .box{gap:6px}
@@ -352,9 +325,6 @@ button.slot:active{transform:translateY(1px)}
 .ltray .lays button:disabled b{text-decoration:line-through}
 #shop .strip{height:48px}
 #shop .deck{min-height:0;padding:3px 28px 11px}
-#shop .slot{width:80px}
-#shop .slot{height:54px;grid-template-rows:34px 14px;background:radial-gradient(ellipse 15px 5px at 50% 33px,var(--spot) 97%,transparent)}
-#shop .slot img{width:17px;height:34px}
 #shop .row button.main{flex:1}
 .tray .offer img{align-self:center}
 .ptray .offer{height:62px;padding-top:11px}
@@ -363,9 +333,6 @@ button.slot:active{transform:translateY(1px)}
 .gtray .offer{justify-content:center;padding-top:11px}
 #shop .strip{height:44px}
 #shop .row button{padding:9px 8px}
-#shop .slot{height:46px;grid-template-rows:31px 12px;background:radial-gradient(ellipse 13px 4px at 50% 30px,var(--spot) 97%,transparent)}
-#shop .slot img{width:15px;height:30px}
-#shop .rackmap{gap:0}
 #shop .strip .buy{min-height:40px}
 .nudge .offer:not(.poor):not(.got){animation:nudge .4s steps(6) 2}
 @media (min-height:660px){
@@ -379,21 +346,24 @@ button.slot:active{transform:translateY(1px)}
   #shop .strip{height:54px}#shop .row button{padding:11px 8px}
   .btray .offer{border-radius:28px 6px 6px 28px}.btray .offer .cradle{width:42px;height:42px}
   .ltray .lays svg{height:32px}.ltray .lays button{font-size:11px}
-  #shop .slot{width:88px}
   #shop .strip{height:54px}
-  #shop .slot{height:56px;grid-template-columns:1fr 20px 1fr;grid-template-rows:40px 13px;background:radial-gradient(ellipse 16px 5px at 50% 38px,var(--spot) 97%,transparent)}
-  #shop .slot img{width:20px;height:40px}
 }
 @media (prefers-reduced-motion:reduce){.sheet *{animation:none!important;transition:none!important}}
 .goal .marks{color:var(--chalk)}
-/* ten pins in the shop: four short rows */
-#shop .rackmap.ten .slot{width:64px;height:40px;grid-template-columns:1fr 13px 1fr;grid-template-rows:26px 11px;background:radial-gradient(ellipse 11px 3px at 50% 25px,var(--spot) 97%,transparent)}
-#shop .rackmap.ten .slot img{width:13px;height:26px}#shop .rackmap.ten .slot b{font-size:10px}#shop .rackmap.ten{justify-content:space-evenly}
 #rackBtn.ten{gap:1px;padding:2px 4px 1px}#rackBtn.ten span,#rackBtn.ten img{width:11px;height:22px}
-/* ten rows share the map's height equally; in the shop the spots drop their name (the pin's colours show it) to fit four rows */
-.rackmap.ten .maprow{flex:1 1 0;min-height:0;align-items:center}
-#shop .rackmap.ten .slot{height:32px;grid-template-rows:22px 0;background:radial-gradient(ellipse 10px 3px at 50% 21px,var(--spot) 97%,transparent)}#shop .rackmap.ten .slot b{display:none}#shop .rackmap.ten .slot img{width:11px;height:22px}#shop .rackmap.ten .slot .v,#shop .rackmap.ten .slot .lv{margin-bottom:2px}
 #over .deck{display:flex}.cell.sweep{box-shadow:inset 0 -3px 0 #c8321f}.toast p .pt{margin-right:4px}.toast .neg{color:#ff6a52;font-weight:700;font-size:20px}
+/* the rack canvas fills the deck; invisible labelled buttons sit over each pin for keyboard and screen readers, finger taps go to the nearest pin */
+.deck{overflow:hidden}
+.rackmap{position:absolute;inset:0}
+.rackmap canvas{position:absolute;left:0;top:0;border-radius:0;touch-action:manipulation}
+.rackmap .spot{position:absolute;padding:0;border:0;border-radius:6px;background:transparent;pointer-events:none}
+/* pins for sale: each card a little stage, the pin standing on the wood with its name on a cream plate */
+.ptray .offer{height:var(--card,96px);display:flex;flex-direction:column;justify-content:flex-start;gap:0;padding:0;overflow:visible;border:2px solid var(--ink);background:var(--paper);box-shadow:0 3px 0 rgba(0,0,0,.4)}
+.ptray .offer canvas{flex:1;width:100%;min-height:0;border-radius:4px 4px 0 0;touch-action:manipulation}
+.ptray .offer strong{flex:none;display:block;width:100%;padding:2px 2px 3px;font-size:12px;line-height:1.1;color:var(--paper-ink);border-top:2px solid var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+@media (min-height:660px){.ptray{--card:118px}.ptray .offer strong{font-size:13px}}
+/* short phones: the bigger pin cards leave room for a strip that holds two lines of text under the name */
+@media (max-height:659px){#shop .strip{height:52px;padding:3px 9px}#shop .strip h3{line-height:1.1}#shop .strip p,#shop .strip.go p{font-size:12px;line-height:1.2}}
 </style>
 </head>
 <body data-stage="rec">
@@ -825,9 +795,9 @@ function endGame(){const t=total(),won=t>=run.target,final=run.game===TARGETS.le
   $('overTrack').innerHTML=TARGETS.map((v,i)=>`<span class="${i<run.game||(won&&i===run.game)?'won':i===run.game?'lost':''}">${tgtOf(i)}</span>`).join('');
   run.end={t,target:run.target};osel=null;ogsel=null;showOver();}
 let osel=null,ogsel=null;
-function showOver(){drawMap($('overMap'),i=>{osel=osel===i?null:i;ogsel=null;showOver();},osel);
+function showOver(){$('over').hidden=false;drawMap($('overMap'),i=>{osel=osel===i?null:i;ogsel=null;showOver();},osel);
   drawGear($('overGear'),k=>{ogsel=ogsel===k?null:k;osel=null;showOver();},ogsel);
-  const m=$('overMsg');m.className='strip'+(osel===null&&!ogsel?' tally big':'');m.innerHTML=osel!==null?pinInfo(osel):ogsel?gearInfo(ogsel):`<b>${run.end.t}<small> / ${run.end.target}</small></b>`;$('over').hidden=false;}
+  const m=$('overMsg');m.className='strip'+(osel===null&&!ogsel?' tally big':'');m.innerHTML=osel!==null?pinInfo(osel):ogsel?gearInfo(ogsel):`<b>${run.end.t}<small> / ${run.end.target}</small></b>`;}
 $('again').addEventListener('click',newRun);
 
 // ---------- shop and rack ----------
@@ -874,22 +844,93 @@ function rollOffers(){
     run.seen.push('next rack: '+LAYOUTS[a].name+' free; '+LAYOUTS[b].name+' $'+LAYCOST+'; '+LAYOUTS[c].name+' $'+LAYCOST);}
   run.seen.push('balls: '+(run.ballOffers.map(o=>o.name+' $'+o.cost).join('; ')||'none')+' | gear: '+(run.gearOffer?run.gearOffer.name+' $'+run.gearOffer.cost:'none'));
   rollPins();}
-// a rack spot: worth of the spot, the pin, level pips (next pip blinks when offer o would level it up), name
-function slotHTML(i,o){const it=run.rack[i],plain=it.t==='plain';
-  const pips='';
-  return `<i class="v">${SLOTV[i]}</i><img src="${icon(kindOf(it,i))}" alt=""><i class="lv">${pips}</i><b>${short(PINS[it.t].name)}</b>`;}
-function drawMap(el,onTap,selI,o,lay){el.innerHTML='';el.className='rackmap'+(o?' place':selI!==null&&selI!==undefined&&onTap===shopTap?' swap':'');
-  const n=run.rack.length,ghost=onTap===shopTap&&OPT.spots&&n<SPOTS.length&&!o?n:-1,L=LAYOUTS[lay||run.layout];
-  el.classList.add('ten');const rows=[[6,7,8,9],[3,4,5],[1,2],[0]];rows.forEach((row,r)=>{const d=document.createElement('div');d.className='maprow trow';
-    row.forEach(i=>{if(i<0){const e=document.createElement('div');e.className='slot';e.style.visibility='hidden';d.appendChild(e);return;}
-      const m=L.move(i),tf=m[0]||m[1]?`translate(${Math.round(m[0]*1.4)}px,${Math.round(m[1]*.35)}px)`:'';
-      if(i===ghost){const b=document.createElement('button');b.type='button';b.className='slot ghost'+(pick&&pick.kind==='spot'?' sel':'');b.style.transform=tf;
-        b.innerHTML=`<i class="v">${SLOTV[i]}</i><span class="plus">+</span><i class="lv"></i><b>$${SPOTCOST[i]}</b>`;b.setAttribute('aria-label',`Buy a pin at ${SLOTN[i]}, worth ${SLOTV[i]}, $${SPOTCOST[i]}`);
-        b.addEventListener('click',()=>{pending=null;sel=null;gsel=null;pick=pick&&pick.kind==='spot'?null:{kind:'spot',t:'p'+SLOTV[i],name:SLOTN[i]+' pin',text:`Adds a plain pin, worth ${SLOTV[i]}.`,cost:SPOTCOST[i]};showShop();});d.appendChild(b);return;}
-      const it=run.rack[i],b=document.createElement(onTap?'button':'div');if(onTap)b.type='button';
-      b.className='slot'+(selI===i?' sel':'')+(it.t==='plain'?' plain':'');b.innerHTML=slotHTML(i,o);if(tf)b.style.transform=tf;
-      b.setAttribute('aria-label',`${SLOTN[i]}, worth ${SLOTV[i]}: ${PINS[it.t].name}${it.lv>1?', level '+it.lv:''}`);
-      if(onTap)b.addEventListener('click',()=>onTap(i));d.appendChild(b);});el.appendChild(d);});}
+// ---------- big pins for the shop, drawn in code: a real pin's turned profile, lit from front-left-above, seen a little from above ----------
+// half-width along the pin (0 top, 1 base) relative to the belly, from the regulation profile; neck pinched a touch for legibility
+const PROF=[[0,0],[.018,.3],[.05,.46],[.1,.54],[.158,.53],[.217,.46],[.275,.37],[.33,.35],[.375,.47],[.425,.61],[.517,.83],[.608,.965],[.7,1],[.75,.975],[.85,.83],[.95,.6],[1,.44]];
+function prof(t){t=Math.max(0,Math.min(1,t));let i=0;while(i<PROF.length-2&&PROF[i+1][0]<t)i++;
+  const p0=PROF[Math.max(0,i-1)],p1=PROF[i],p2=PROF[i+1],p3=PROF[Math.min(PROF.length-1,i+2)],u=(t-p1[0])/(p2[0]-p1[0]||1);
+  const a=p1[1],b=.5*(p2[1]-p0[1]),c=.5*(p3[1]-p1[1]),d=p2[1];   // Catmull-Rom on the radius
+  return Math.max(0,(2*a-2*d+b+c)*u*u*u+(-3*a+3*d-2*b-c)*u*u+b*u+a);}
+const PLV=(()=>{const v=[-.46,-.5,.73],n=Math.hypot(...v);return v.map(x=>x/n);})();
+const SIN_EL=.42,BAND=[.28,.365],BAND_EL=.22,PIN_OUT='#3b261c',PCACHE={};   // SIN_EL: how far above the pins we look, which curves the band and the base
+// colours: PAL for each pin type; a plain pin is the Rec Room pin with the red neck band
+const bigPal=k=>k==='plain'||k==='p5'?Object.assign({},THEME.rec.pin,{R:THEME.rec.band[5][0],r:THEME.rec.band[5][1]}):PAL[k];
+function bigPin(H,key){H=Math.max(12,Math.round(H));const id=key+H;if(PCACHE[id])return PCACHE[id];
+  const pal=bigPal(key),belly=H*.168,W=2*Math.ceil(belly)+4,cx=W/2,pad=2,extra=Math.ceil(belly*.44*SIN_EL)+1,CH=H+pad+extra+1;
+  const k=mk(W,CH),q=k.getContext('2d'),hwAt=y=>belly*prof(y/H);
+  const inside=(x,y)=>{if(y<0)return false;const yy=y-pad,dx=x+.5-cx;
+    if(yy<H)return Math.abs(dx)<=hwAt(yy+.5);
+    const hw=belly*prof(1),e=hw*SIN_EL;if(Math.abs(dx)>hw)return false;return yy+.5-H<=e*Math.sqrt(1-(dx/hw)**2);};   // the base seen from above: an ellipse under the last row
+  const metal=key==='anchor',glass=key==='glass';
+  for(let y=0;y<CH;y++)for(let x=0;x<W;x++){let col=null;
+    if(inside(x,y)){const yy=Math.min(H-.5,y-pad+.5),hw=Math.max(.6,hwAt(yy)),u=Math.max(-1,Math.min(1,(x+.5-cx)/hw)),cz=Math.sqrt(1-u*u);
+      const s=(hwAt(yy+1)-hwAt(yy-1))/2,nl=Math.hypot(u,s,cz),I=(u*PLV[0]-s*PLV[1]+cz*PLV[2])/nl;
+      const tc=(yy-hw*BAND_EL*cz)/H;   // where this pixel sits on the turned surface, so the neck band curves round the pin
+      if(tc>=BAND[0]&&tc<BAND[1])col=I>.42?pal.R:pal.r;
+      else if(metal)col=I>.8?pal.w:I>.62?pal.m:I>.4?pal.l:I>.18?pal.m:pal.d;   // Anchor: chrome
+      else if(glass)col=(u>-.62&&u<-.3)?'#ffffff':I>.55?pal.w:I>.3?pal.l:I>.12?pal.m:pal.l;   // Glass: a glint, lit through
+      else col=I>.6?pal.w:I>.38?pal.l:I>.15?pal.m:pal.d;}
+    else if(inside(x-1,y)||inside(x+1,y)||inside(x,y-1)||inside(x,y+1))col=glass?pal.d:PIN_OUT;
+    if(col){q.fillStyle=col;q.fillRect(x,y,1,1);}}
+  return PCACHE[id]={cv:k,w:W,h:CH,base:pad+H,baseHW:belly*prof(1)};}
+// the floor under them: boards running away from you to a point above the top edge; light wood in the Rec Room, the deck's colours later
+const ART=2;   // one art pixel is 2 CSS pixels, as on the lane
+const FLOORS={rec:{hi:'#f0cf86',base:'#dba552',mid:'#d39c4e',seam:'#b97a36',sh:'#a8662e',ring:'#d83a2a',sel:'#2a160e'},
+  night:{hi:'#2a3470',base:'#0c1030',mid:'#10153a',seam:'#1c2458',sh:'#05071a',ring:'#ff4fa8',sel:'#f2f6ff'},
+  computer:{hi:'#1f5a34',base:'#020a05',mid:'#04100a',seam:'#0a2414',sh:'#000000',ring:'#3fd67a',sel:'#c8ffd8'},
+  arrival:{hi:'#3a3260',base:'#141024',mid:'#19142c',seam:'#262040',sh:'#08060e',ring:'#d4ff3a',sel:'#f0eeff'}};
+const floorPal=()=>FLOORS[document.body.dataset.stage]||FLOORS.rec,FLOORC={};
+function fitArt(cv,w,h,up){const r=up?Math.ceil:Math.floor,W=Math.max(16,r(w/ART)),H=Math.max(16,r(h/ART));cv.width=W;cv.height=H;cv.style.width=W*ART+'px';cv.style.height=H*ART+'px';return[W,H];}
+function drawFloor(q,W,H,vy,board,wd){const id=[W,H,vy,board,wd.base].join();let k=FLOORC[id];
+  if(!k){k=FLOORC[id]=mk(W,H);const c=k.getContext('2d');
+    for(let y=0;y<H;y++){const f=(H-vy)/(y-vy);
+      for(let x=0;x<W;x++){const xb=(x+.5-W/2)*f/board,xb1=(x+1.5-W/2)*f/board,bi=Math.floor(xb);let col=(bi&1)?wd.base:wd.mid;
+        if(Math.floor(xb1)!==bi)col=wd.seam;
+        else{const gg=Math.sin(bi*12.9898+Math.floor(y*f/5)*78.233)*43758.5453;if(gg-Math.floor(gg)>.96&&Math.abs(xb-bi-.5)<.12)col=wd.hi;}   // a short grain line now and then
+        c.fillStyle=col;c.fillRect(x,y,1,1);}}}
+  q.drawImage(k,0,0);}
+function floorShadow(q,bx,by,sp,wd){const rx=sp.baseHW*2.1+1.5,ry=Math.max(1.5,rx*.42),ox=rx*.28;
+  for(let y=Math.floor(by-ry-2);y<=by+ry+1;y++)for(let x=Math.floor(bx-rx-2);x<=bx+rx+ox+2;x++){
+    const dx=(x+.5-bx-ox)/(rx+.5),dy=(y+.5-by+ry*.35)/(ry+.5),r=dx*dx+dy*dy;
+    if(r<=1){q.fillStyle=r<=.5||((x+y)&1)?wd.sh:wd.seam;q.fillRect(x,y,1,1);}}}
+function floorRing(q,bx,by,sp,col,dash,phase){const rx=sp.baseHW*2.6+3,ry=Math.max(3,rx*.42),n=Math.ceil((rx+ry)*4),seen={};q.fillStyle=col;
+  for(let i=0;i<n;i++){const a=i/n*Math.PI*2,x=Math.round(bx+Math.cos(a)*rx-.5),y=Math.round(by+1+Math.sin(a)*ry-.5),kk=x+','+y;if(seen[kk])continue;seen[kk]=1;
+    if(dash&&((Math.floor(i/(n/24))+phase)&1))continue;q.fillRect(x,y,1,1);}}
+// a pin for sale on its card: floor, shadow, the pin as tall as the card allows below the price tag
+function drawCard(cv,key){cv.style.width='';cv.style.height='';const r=cv.getBoundingClientRect(),[W,H]=fitArt(cv,r.width,r.height),q=cv.getContext('2d');
+  drawFloor(q,W,H,-H*1.6,7,FLOORS.rec);
+  const sp=bigPin(Math.max(12,Math.min(H-11,Math.floor((W-6)/.37))),key),bx=W/2,by=H-3;
+  floorShadow(q,bx,by,sp,FLOORS.rec);q.drawImage(sp.cv,Math.round(bx-sp.w/2),Math.round(by-sp.base));}
+// your ten in perspective: headpin nearest, back row smaller and higher; sized to fill the deck
+function layoutRack(W,H,L){const D=7,el=.85,se=Math.sin(el),ce=Math.cos(el),DEPTH=.693,SPC=1.02,f=z=>D/(D+z*DEPTH);
+  const top=3,bot=7,kH=(H-top-bot-2)/(3*DEPTH*se*f(3)+ce*f(3)*1.02),kW=(W-12)/(3*SPC*f(3)+.34*f(3)),k=Math.max(6,Math.min(kH,kW));   // art pixels per pin height; the largest that fits
+  const yb0=H-bot-Math.max(0,((H-top-bot-2)-k*(3*DEPTH*se*f(3)+ce*f(3)*1.02))*.45);
+  return SPOTS.map((p,i)=>{const m=L.move(i),X=(p.x+m[0]-180)/PS,Z=(230-p.y-m[1])/PR,s=f(Z);   // X in pin spacings, Z in rows back from the headpin
+    return{i,x:W/2+X*SPC*k*s,y:Math.round(yb0-Z*DEPTH*se*k*s),ph:Math.max(10,Math.round(k*ce*s)),w:SPC*k*s};}).filter(g=>run.rack[g.i]).sort((a,b)=>a.y-b.y);}
+// el._map holds drawMap's arguments, so the canvas can be repainted (dashes marching, resize) without rebuilding the buttons
+let mapPhase=0;
+function paintMap(el){const [,selI,o,lay]=el._map,cv=el.querySelector('canvas'),[W,H]=fitArt(cv,el.clientWidth,el.clientHeight,true),q=cv.getContext('2d'),wd=floorPal();
+  const order=layoutRack(W,H,LAYOUTS[lay||run.layout]||LAYOUTS.standard),spr=g=>bigPin(g.ph,kindOf(run.rack[g.i],g.i));
+  drawFloor(q,W,H,-H*1.15,11,wd);
+  for(const g of order){const sp=spr(g),x=Math.round(g.x);floorShadow(q,x,g.y,sp,wd);   // shadows and rings under every pin, then the pins back to front
+    if(o)floorRing(q,x,g.y,sp,wd.ring,true,mapPhase);else if(selI===g.i)floorRing(q,x,g.y,sp,wd.sel,false,0);}
+  for(const g of order){const sp=spr(g);q.drawImage(sp.cv,Math.round(g.x-sp.w/2),g.y-sp.base);}
+  return order;}
+// o: a pin being placed (dashed rings on every spot); selI: the selected spot (solid ring); no onTap: read-only
+// the pins overlap in perspective, so a finger goes to the pin whose body is nearest the tap; the buttons over each pin carry the labels and the keyboard
+function drawMap(el,onTap,selI,o,lay){el.className='rackmap'+(o?' place':'');el._map=[onTap,selI,o,lay];el.innerHTML='<canvas aria-hidden="true"></canvas>';el._hit=[];
+  if(!el._tap){el._tap=1;el.addEventListener('click',e=>{const f=el._map[0];if(!f||e.target.classList.contains('spot'))return;const r=el.getBoundingClientRect(),x=e.clientX-r.left,y=e.clientY-r.top;let best=null,bd=1.6;
+    for(const h of el._hit){const d=Math.hypot((x-h.x)/h.rx,(y-h.y)/h.ry);if(d<bd){bd=d;best=h.i;}}if(best!==null)f(best);});}
+  for(const g of paintMap(el)){const it=run.rack[g.i],sp=bigPin(g.ph,kindOf(it,g.i)),b=document.createElement(onTap?'button':'div'),w=Math.max(sp.w+6,g.w*.92);
+    el._hit.push({i:g.i,x:g.x*ART,y:(g.y-sp.base*.45)*ART,rx:g.w*ART/2,ry:sp.base*ART*.6});
+    b.className='spot';Object.assign(b.style,{left:(g.x-w/2)*ART+'px',width:w*ART+'px',top:(g.y-sp.base-2)*ART+'px',height:(sp.base+6)*ART+'px'});
+    b.setAttribute('aria-label',`${SLOTN[g.i]}, worth ${SLOTV[g.i]}: ${PINS[it.t].name}${it.lv>1?', level '+it.lv:''}`);
+    if(onTap){b.type='button';b.setAttribute('aria-pressed',selI===g.i?'true':'false');b.addEventListener('click',()=>onTap(g.i));}else b.setAttribute('role','img');
+    el.appendChild(b);}}
+setInterval(()=>{const el=$('shopMap');if(still||!pending||$('shop').hidden||!el._map)return;mapPhase^=1;paintMap(el);},450);
+function repaintSheets(){for(const id of ['shopMap','rackMap','overMap']){const el=$(id);if(el._map&&!el.closest('.sheet').hidden)drawMap(el,...el._map);}
+  if(!$('shop').hidden)$('shopList').querySelectorAll('.offer:not(.got) canvas').forEach(c=>drawCard(c,c.dataset.t));}
+window.addEventListener('resize',repaintSheets);if(document.fonts&&document.fonts.ready)document.fonts.ready.then(repaintSheets);
 function drawGear(el,onTap,selK){el.innerHTML='';if(run.hook){const w=document.createElement('span');w.innerHTML=`<img src="${gicon(run.hook)}" alt="${BALLOFFERS[run.hook].name}">`;el.appendChild(w);}Object.keys(GEAR).filter(k=>run.gear[k]).forEach(k=>{const b=document.createElement('button');b.type='button';b.className=selK===k?'sel':'';
   b.setAttribute('aria-label',GEAR[k].name);b.innerHTML=`<img src="${gicon(k)}" alt="">`;b.addEventListener('click',()=>onTap(k));el.appendChild(b);});}
 function pinInfo(i){const it=run.rack[i];return `<img src="${icon(kindOf(it,i))}" alt=""><div><h3>${short(PINS[it.t].name)}<small>Starts on the ${SLOTN[i]}</small></h3><p>${rich(PINS[it.t].text(it.lv))}</p></div>`;}
@@ -906,7 +947,7 @@ function rackDiagram(id){const n=run.rack.length,W=96,H=30,X=x=>Math.round((x-60
     +[24,48,72].map(x=>`<rect x="${x}" width="1" height="${H}" fill="var(--deck-line)"/>`).join('')
     +(id==='standard'?'':base.map(p=>`<rect x="${X(p.x)-d/2+.5}" y="${Y(p.y)-d/2+.5}" width="${d-1}" height="${d-1}" fill="none" stroke="var(--deck-dim)" stroke-width="1"/>`).join(''))
     +at.map((p,i)=>`<rect x="${X(p.x)-d/2-1}" y="${Y(p.y)-d/2-1}" width="${d+2}" height="${d+2}" fill="var(--paper-ink)"/><rect x="${X(p.x)-d/2}" y="${Y(p.y)-d/2}" width="${d}" height="${d}" fill="${i===0?'var(--tag)':'var(--paper)'}"/>`).join('')+'</svg>';}
-function showShop(){const box=$('shop').firstElementChild,el=$('shopList'),chip=$('shopCash'),p=run.pay;
+function showShop(){const box=$('shop').firstElementChild,el=$('shopList'),chip=$('shopCash'),p=run.pay;$('shop').hidden=false;   // shown first, so the canvases can measure themselves
   box.classList.toggle('placing',!!pending);box.classList.remove('nudge');const bEl=$('shopBalls'),gEl=$('shopGearBuy');[el,bEl,gEl].forEach(e=>e.innerHTML='');
   if(chip.textContent!=='$'+run.cash){chip.textContent='$'+run.cash;chip.classList.remove('bump');void chip.offsetWidth;chip.classList.add('bump');}
   if(p&&p.fresh){p.fresh=false;chip.insertAdjacentHTML('beforeend',`<span class="fly">+$${p.earn}</span>`);}
@@ -914,12 +955,13 @@ function showShop(){const box=$('shop').firstElementChild,el=$('shopList'),chip=
     b.className='offer '+o.kind+(o.bought?' got':'')+(on?' pend':'')+(poor?' poor':'');b.disabled=o.bought||poor;
     b.setAttribute('aria-label',o.bought?o.name+', sold':`${o.name}, $${o.cost}. ${o.text}`);
     const tag=`<span class="c">${on?'×':'$'+o.cost}</span>`;
-    b.innerHTML=o.kind==='pin'?`${tag}<img src="${icon(o.t)}" alt=""><strong>${short(o.name)}</strong>`
+    b.innerHTML=o.kind==='pin'?`${tag}<canvas data-t="${o.t}" aria-hidden="true"></canvas><strong>${short(o.name)}</strong>`
       :o.kind==='ball'?`${tag}<i class="cradle"><img class="gear" src="${gicon(o.t)}" alt=""></i><strong>${o.name.replace(' ball','')}</strong>`
       :`${tag}<img class="gear" src="${gicon(o.t)}" alt=""><strong>${o.name}</strong>`;
     b.addEventListener('click',()=>{if(o.bought)return;sel=null;gsel=null;
       if(o.kind==='pin'){pick=null;pending=pending===o?null:o;}else{pending=null;pick=pick===o?null:o;}
       showShop();});(o.kind==='pin'?el:o.kind==='ball'?bEl:gEl).appendChild(b);});
+  el.querySelectorAll('.offer:not(.got) canvas').forEach(c=>drawCard(c,c.dataset.t));
   $('shopBallTray').hidden=!run.ballOffers.length;$('shopGearTray').hidden=!run.gearOffer;$('shopBallTray').parentNode.hidden=!run.ballOffers.length&&!run.gearOffer;
   $('shopBallTray').parentNode.classList.toggle('solo',!run.ballOffers.length||!run.gearOffer);
   const lays=$('shopLays');$('shopLayTray').hidden=!OPT.layout;lays.innerHTML='';
@@ -935,7 +977,7 @@ function showShop(){const box=$('shop').firstElementChild,el=$('shopList'),chip=
   if(pick)$('shopBuy').addEventListener('click',()=>buy(pick));
   drawMap($('shopMap'),shopTap,sel,pending,OPT.layout?run.nextLayout:run.layout);drawGear($('shopGear'),k=>{gsel=gsel===k?null:k;sel=null;pending=null;pick=null;showShop();},gsel);
   const rc=2+run.rerolls,rb=$('shopReroll');rb.innerHTML=`<b>$${rc}</b><span class="ro">⟳</span>Reroll`;rb.setAttribute('aria-label',`Reroll pins, $${rc}`);rb.disabled=run.cash<rc;
-  skipAsk=false;{const n=run.game+1,bo=bossOf(n);$('shopNext').innerHTML=`${bo?'Boss · '+bo.name:kindOf3(n)+' game'} · beat <b>${tgtOf(n)}</b><i class="tri r"></i>`;}$('shop').hidden=false;}
+  skipAsk=false;{const n=run.game+1,bo=bossOf(n);$('shopNext').innerHTML=`${bo?'Boss · '+bo.name:kindOf3(n)+' game'} · beat <b>${tgtOf(n)}</b><i class="tri r"></i>`;}}
 function shopTap(i){gsel=null;pick=null;
   if(pending){const o=pending,it=run.rack[i];run.cash-=o.cost;run.rack[i]=newItem(o.t);o.bought=true;run.bought=true;run.seen.push('bought '+o.name+' $'+o.cost+' at '+SLOTN[i]);pending=null;sel=null;topBar();showShop();return;}
   if(sel===null)sel=i;else if(sel===i)sel=null;else{const a=run.rack[sel];run.rack[sel]=run.rack[i];run.rack[i]=a;sel=null;}
@@ -944,12 +986,11 @@ $('shopReroll').addEventListener('click',()=>{const rc=2+run.rerolls;if(run.cash
 let skipAsk=false;
 $('shopNext').addEventListener('click',e=>{if(!skipAsk&&!run.bought&&run.offers.some(o=>run.cash>=o.cost)){skipAsk=true;e.currentTarget.textContent='Leave with nothing?';$('shop').firstElementChild.classList.add('nudge');return;}if(OPT.layout)run.seen.push('chose rack: '+LAYOUTS[run.nextLayout].name);if(!run.bought)run.seen.push('bought nothing');pending=null;pick=null;sel=null;gsel=null;run.game++;startGame();if(run.game%3===0&&run.game>0)startFx(stageOf(run.game));});
 let rsel=null,rgsel=null;
-function showRack(){const m=$('rackMsg');$('rackCash').textContent='$'+run.cash;
+function showRack(){const m=$('rackMsg');$('rackCash').textContent='$'+run.cash;$('rackSheet').hidden=false;
   drawMap($('rackMap'),i=>{rsel=rsel===i?null:i;rgsel=null;showRack();},rsel,null,run.layout);
   drawGear($('rackGear'),k=>{rgsel=rgsel===k?null:k;rsel=null;showRack();},rgsel);
   m.className='strip'+(rsel===null&&!rgsel?' tally':'');
-  m.innerHTML=rsel!==null?pinInfo(rsel):rgsel?gearInfo(rgsel):'<span>Pins double each ball</span><span><i>Strike</i>×2</span>';
-  $('rackSheet').hidden=false;}
+  m.innerHTML=rsel!==null?pinInfo(rsel):rgsel?gearInfo(rgsel):'<span>Pins double each ball</span><span><i>Strike</i>×2</span>';}
 $('rackBtn').addEventListener('click',()=>{rsel=null;rgsel=null;showRack();});
 $('rackClose').addEventListener('click',()=>$('rackSheet').hidden=true);
 
