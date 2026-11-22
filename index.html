@@ -46,6 +46,7 @@ footer a:focus-visible,footer a:hover{color:var(--chalk)}
 <main>
   <header class="sign"><div class="disc" aria-hidden="true">5</div><h1>bowl-rogue<small>a bowling roguelike</small></h1></header>
   <nav class="modes" aria-label="Modes">
+    <a class="mode" href="labs/advancing-rack/"><div class="deck" data-rack="adv"></div><div class="txt"><strong>Advancing Rack</strong><span>Pins you leave step closer and grow.</span><em>New · 6 games</em></div><i class="go" aria-hidden="true"></i></a>
     <a class="mode" href="labs/five-pin-bosses/"><div class="deck" data-rack="five"></div><div class="txt"><strong>Five-Pin</strong><span>Four levels of small, big and boss games. The hall changes as you go.</span><em>12 games · bosses</em></div><i class="go" aria-hidden="true"></i></a>
     <a class="mode" href="labs/ten-pin/"><div class="deck" data-rack="ten"></div><div class="txt"><strong>Ten-Pin</strong><span>A full rack, two balls a frame. Spares count.</span><em>12 games · bosses</em></div><i class="go" aria-hidden="true"></i></a>
     <a class="mode alt" href="game/"><div class="deck" data-rack="classic"></div><div class="txt"><strong>Classic</strong><span>The first Five-Pin Run: six games, strikes compound.</span><em>6 games</em></div><i class="go" aria-hidden="true"></i></a>
@@ -64,6 +65,7 @@ function rackSVG(pins){const W=48,H=30,s=[];
 const RACKS={
   five:[[24,27,5],[16,21,3],[32,21,3],[8,15,2],[40,15,2]],
   classic:[[24,27,5],[16,21,3],[32,21,3],[8,15,2],[40,15,2]],
+  adv:[[11,31,2],[37,27,5],[24,23,3],[16,17,2],[32,17,2],[9,11,2],[24,11,2],[39,11,2]],
   ten:[[24,29,5],[19,24,3],[29,24,3],[14,19,2],[24,19,2],[34,19,2],[9,14,2],[19,14,2],[29,14,2],[39,14,2]]
 };
 document.querySelectorAll('.deck').forEach(d=>d.innerHTML=rackSVG(RACKS[d.dataset.rack].map(p=>p.slice())));
