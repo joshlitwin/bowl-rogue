@@ -25,7 +25,7 @@ Read `docs/STATE.md` first. It says what is decided, what is open, and what is n
 - Nothing here has automated coverage of real touch input; say so when reporting.
 
 ## Publishing
-- Josh wants to test from URLs, not Claude artifacts. The root `index.html` is the styled front page with one card, the game (Advancing Ten-Pin, `labs/advancing-ten-pin/`; the card shows Continue when a run is saved), and a link to `labs/`, which lists every other mode and lab. The repo is served as-is by GitHub Pages from `main`.
+- Josh wants to test from URLs, not Claude artifacts. The root `index.html` is the pixel-art cover (one Play button) leading to the game (Advancing Ten-Pin, `labs/advancing-ten-pin/`; the card shows Continue when a run is saved), and a link to `labs/`, which lists every other mode and lab. The repo is served as-is by GitHub Pages from `main`.
 - When you add a lab, add its link to `labs/index.html` and its row to `README.md`. When a new version becomes the one to play, point the root `index.html` card at it.
 - Icons, manifest and share card live in `assets/` and are linked from the root `index.html` and the game's head (og:image uses the absolute Pages URL). Keep the save key `advten-save` as it is.
 - Advancing Ten-Pin saves the run in `localStorage` (`advten-save`) at each ball, on the win card and in the shop. If you change what `run` or a pin holds, keep `saveRun`/`loadRun` in step and run `npm run save-test`.
