@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Shop mock: illustrated pins</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@500;700&family=Silkscreen&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#1d100a;--panel:#3a2016;--chalk:#f3e2b8;--dim:#c9a878;--accent:#d86a28;
+  --paper:#f3e2b8;--paper-ink:#2a160e;--paper-dim:#7a4a2c;--tag:#d83a2a;--tag-ink:#fff8e8;
+  --deck-ink:#2a160e;--deck-dim:#6b3f1e;
+  --wood-hi:#f2d6a2;--wood:#e4bb80;--wood-lo:#c99a5e;
+  --body:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --display:"Pixelify Sans",system-ui,sans-serif;
+  --num:"Silkscreen",ui-monospace,Menlo,monospace;
+}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0}
+body{background:var(--ink);color:var(--chalk);font-family:var(--body);overflow:hidden;-webkit-user-select:none;user-select:none;-webkit-tap-highlight-color:transparent}
+button{font-family:inherit;color:inherit;cursor:pointer}
+button:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+
+.sheet{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;padding:20px 8px 22px}
+.box{position:relative;background:var(--panel);border-radius:10px;width:100%;max-width:380px;height:100%;max-height:660px;padding:10px;display:flex;flex-direction:column;gap:6px;overflow:hidden;border:3px solid var(--ink);box-shadow:inset 0 0 0 2px rgba(255,255,255,.07)}
+
+/* header */
+.shead{flex:none;display:flex;align-items:center;gap:8px;min-height:30px}
+.tally{flex:1;min-width:0;height:34px;display:flex;align-items:center;justify-content:center;gap:7px;border-radius:6px;background:var(--ink);white-space:nowrap}
+.tally b{font-family:var(--num);font-weight:400;font-size:17px}
+.tally b small{font-size:13px;color:var(--dim)}
+.tally span{font-family:var(--num);font-size:11px;line-height:1;color:var(--accent);border:2px solid var(--accent);border-radius:4px;padding:3px 4px}
+.tally span i{font-style:normal;font-family:var(--display);color:var(--dim);margin-right:4px}
+.chip{font-family:var(--num);font-weight:400;font-size:20px;line-height:1;color:var(--ink);background:var(--accent);padding:5px 9px 6px;border-radius:5px;box-shadow:0 3px 0 rgba(0,0,0,.4)}
+
+/* trays */
+.tray{position:relative;flex:none;border:2px solid var(--ink);border-radius:6px;background:rgba(0,0,0,.3);padding:13px 6px 6px;margin-top:2px;box-shadow:inset 0 -4px 0 rgba(0,0,0,.3),inset 0 2px 0 rgba(255,255,255,.05)}
+.ttag{position:absolute;top:-7px;left:8px;padding:1px 4px;border-radius:3px;background:var(--panel);font-family:var(--display);font-size:9px;font-weight:700;line-height:1;letter-spacing:.12em;text-transform:uppercase;color:var(--dim)}
+.tag{position:absolute;top:-11px;left:50%;transform:translateX(-50%);z-index:2;font-family:var(--num);font-weight:400;font-size:12px;line-height:1;padding:3px 5px 4px;min-width:30px;text-align:center;border-radius:4px;background:var(--tag);color:var(--tag-ink);box-shadow:0 2px 0 rgba(0,0,0,.45)}
+
+/* pins: a display shelf. Cream backdrop, light wood floor, one big pin standing on each card */
+.ptray{display:grid;grid-template-columns:1fr 1fr 1fr 50px;gap:6px}
+.pcard{position:relative;height:96px;padding:0;border:2px solid var(--paper-dim);border-radius:6px;
+  background:linear-gradient(180deg,#f7ead0 0,var(--paper) 58%,#e9d3a6 70%,var(--wood-hi) 70.5%,var(--wood) 84%,var(--wood-lo) 100%);
+  box-shadow:0 3px 0 rgba(0,0,0,.4);transition:transform .12s,opacity .12s}
+.pcard svg{position:absolute;left:0;right:0;top:9px;bottom:17px;width:100%;height:calc(100% - 26px);overflow:visible}
+.pcard strong{position:absolute;left:0;right:0;bottom:2px;font-family:var(--display);font-size:11.5px;font-weight:700;line-height:1.1;color:var(--paper-ink);text-align:center;white-space:nowrap}
+.pcard.pend{transform:translateY(-3px);border-color:var(--accent);box-shadow:0 0 0 3px var(--accent),0 6px 0 rgba(0,0,0,.4);z-index:1}
+.pcard.pend .tag{background:var(--ink);color:var(--chalk)}
+.placing .pcard:not(.pend):not(.got){opacity:.35}
+.pcard.poor{opacity:.5;box-shadow:none}.pcard.poor .tag{background:var(--paper-dim);color:var(--paper);text-decoration:line-through}
+.pcard.got{background:transparent;border:2px dashed var(--dim);box-shadow:none}
+.pcard.got>*{visibility:hidden}
+.pcard.got::after{content:"SOLD";position:absolute;inset:0;display:grid;place-items:center;font-family:var(--display);font-weight:700;font-size:11px;letter-spacing:.15em;color:var(--dim)}
+.reroll{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;padding:6px 2px 3px;border:2px solid var(--dim);border-radius:6px;background:var(--panel);color:var(--chalk);font-family:var(--display);font-size:11px;font-weight:700;line-height:1}
+.reroll .ro{font-size:20px;line-height:.8}
+.reroll:active{transform:translateY(1px)}
+
+/* balls and gear */
+.trays{flex:none;display:grid;grid-template-columns:2fr 1fr;gap:6px}
+.btray .offers{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.bcard{position:relative;height:46px;display:flex;align-items:center;gap:6px;padding:3px 6px 3px 4px;border:2px solid var(--ink);border-radius:23px 6px 6px 23px;background:var(--panel);box-shadow:0 3px 0 rgba(0,0,0,.45);font-family:var(--display);font-size:12px;font-weight:700;color:var(--chalk);text-align:left}
+.bcard svg{flex:none;width:34px;height:34px}
+.gcard{position:relative;width:100%;height:46px;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:1px;padding:7px 3px 3px;border:2px dashed var(--paper-dim);border-radius:4px 4px 12px 12px;background:var(--dim);box-shadow:0 3px 0 rgba(0,0,0,.45);font-family:var(--display);font-size:11.5px;font-weight:700;color:var(--paper-ink)}
+.gcard svg{width:20px;height:20px}
+.bcard.pend,.gcard.pend{box-shadow:0 0 0 3px var(--accent),0 3px 0 rgba(0,0,0,.45)}
+
+/* the one detail strip */
+.strip{flex:none;height:48px;display:flex;align-items:center;gap:9px;padding:4px 9px;border-radius:6px;background:var(--ink);color:var(--chalk);overflow:hidden}
+.strip.idle{visibility:hidden}
+.strip svg{flex:none;width:18px;height:44px;overflow:visible}
+.strip div{min-width:0}
+.strip h3{margin:0;font-family:var(--display);font-size:15px;font-weight:700;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.strip h3 small{font-family:var(--body);font-weight:400;font-size:11px;color:var(--dim);margin-left:7px}
+.strip p{margin:0;font-size:11.5px;line-height:1.25;color:var(--dim)}
+.strip.go{background:var(--accent);color:var(--ink)}
+.strip.go p{color:var(--ink);font-weight:700;font-size:12.5px}
+.strip .arrow{margin-left:auto;margin-right:4px;display:inline-block;border:6px solid transparent;border-top:9px solid currentColor;border-bottom:0;animation:bob .7s steps(3) infinite}
+.strip .buy{flex:none;margin-left:auto;padding:8px 10px;border-radius:6px;border:2px solid var(--accent);background:var(--accent);color:var(--ink);font-family:var(--display);font-size:13px;font-weight:700}
+.strip .buy b{font-family:var(--num);font-weight:400}
+@keyframes bob{50%{transform:translateY(4px)}}
+
+/* your ten: the pin deck seen from the foul line, slightly above */
+.deck{position:relative;flex:1 1 auto;min-height:0;border-radius:6px;border:2px solid var(--ink);overflow:hidden;background:var(--wood)}
+.deck>svg{position:absolute;inset:0;width:100%;height:100%;display:block}
+.placing .deck{box-shadow:0 0 0 3px var(--accent)}
+.spot{cursor:pointer;outline:none}
+.spot .ring{fill:none;stroke-width:2;visibility:hidden}
+.spot.sel .ring{visibility:visible;stroke:var(--deck-ink)}
+.placing .spot .ring{visibility:visible;stroke:var(--tag);stroke-dasharray:5 4}
+.spot:focus-visible .ring{visibility:visible;stroke:var(--accent)}
+.shelf{position:absolute;right:7px;bottom:7px;display:flex;gap:4px}
+.shelf span{width:28px;height:28px;display:grid;place-items:center;border:2px solid var(--deck-dim);border-radius:5px;background:rgba(42,22,14,.14)}
+.shelf svg{width:20px;height:20px}
+
+.row{flex:none;display:flex}
+.main{flex:1;padding:11px 8px;border-radius:8px;border:2px solid var(--accent);background:var(--accent);color:var(--ink);font-family:var(--display);font-size:15px;font-weight:700;box-shadow:0 3px 0 rgba(0,0,0,.4);white-space:nowrap}
+.main b{font-family:var(--num);font-weight:400}
+.main i{display:inline-block;border:5px solid transparent;border-left:8px solid currentColor;border-right:0;margin-left:5px}
+.placing .main{background:transparent;color:var(--chalk);border-color:var(--dim);box-shadow:none}
+
+@media (min-height:660px){
+  .pcard{height:122px}
+  .pcard strong{font-size:13px;bottom:3px}
+  .pcard svg{top:10px;bottom:19px;height:calc(100% - 29px)}
+  .bcard,.gcard{height:50px}
+  .strip{height:54px}.strip p{font-size:12.5px}
+}
+</style>
+</head>
+<body>
+<!-- shared paint for every pin on the page: one body and one band gradient per pin type, from PAL -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs id="defs"></defs></svg>
+
+<div class="sheet"><div class="box" id="box">
+  <div class="shead"><div class="tally"><b>120<small> / 90</small></b><span><i>Won</i>+$8</span></div><b class="chip" id="cash">$30</b></div>
+  <div class="tray ptray"><span class="ttag">Pins</span><div style="display:contents" id="offers"></div><button class="reroll" id="reroll" type="button"><span class="tag">$2</span><span class="ro">⟳</span>Reroll</button></div>
+  <div class="trays">
+    <div class="tray btray"><span class="ttag">Balls</span><div class="offers" id="balls"></div></div>
+    <div class="tray gtray"><span class="ttag">Gear</span><div id="gear"></div></div>
+  </div>
+  <div class="strip idle" id="msg" aria-live="polite"></div>
+  <div class="deck" id="deck"><svg id="rack" role="group" aria-label="Your ten pins"></svg><div class="shelf"><span id="shelfBall"></span></div></div>
+  <div class="row"><button class="main" id="next" type="button">Big game · beat <b>110</b><i></i></button></div>
+</div></div>
+
+<script>
+// ---------- pin types: names, prices, effects and colours as in labs/advancing-ten-pin (PINS, PAL) ----------
+const PAL={
+  plain:{w:'#fff8e8',l:'#efe2c4',m:'#d2bf9a',d:'#a58f6e',R:'#d83a2a',r:'#9c2218'},   // the rec-room house pin: white, red band
+  slow:{w:'#e8d8a8',l:'#c8b078',m:'#9a8050',d:'#6a5430',R:'#3f8f6a',r:'#286248'},
+  spark:{w:'#fff2b0',l:'#ffd866',m:'#e8a020',d:'#b06c10',R:'#d83a2a',r:'#9c2218'},
+  shield:{w:'#fff8e8',l:'#efe2c4',m:'#d2bf9a',d:'#a58f6e',R:'#2c6fb0',r:'#1c4a7a'},
+  runner:{w:'#ffd0a0',l:'#ff9e50',m:'#e86a20',d:'#a84410',R:'#fff8e8',r:'#d2bf9a'},
+  anchor:{w:'#eef2f8',l:'#c4ccd8',m:'#8e98aa',d:'#5e687a',R:'#ffd866',r:'#e8a020'},
+  glass:{w:'#b8f0f0',l:'#7fd8d8',m:'#3fb0b4',d:'#1f7a80',R:'#fff8e8',r:'#d2bf9a'},
+  bomb:{w:'#6a6a72',l:'#4a4a52',m:'#30303a',d:'#1c1c24',R:'#ff4a2a',r:'#b02a14'},
+  huddle:{w:'#ffd8e0',l:'#ff9eb4',m:'#e0607e',d:'#a8344e',R:'#fff8e8',r:'#d2bf9a'},
+  crown:{w:'#9a6ad8',l:'#7444b8',m:'#52288e',d:'#341464',R:'#ffd866',r:'#e8a020'},
+  rent:{w:'#ecd8ff',l:'#c8a8f0',m:'#9a78d0',d:'#6a4ca0',R:'#5a2f8a',r:'#3c1c64'},
+  crowd:{w:'#c8e0ff',l:'#8ab8f0',m:'#4a84d0',d:'#2a559a',R:'#fff8e8',r:'#d2bf9a'},
+  toll:{w:'#b8f0c0',l:'#78d890',m:'#3fae62',d:'#1f7a3c',R:'#ffd866',r:'#e8a020'}
+};
+const PINS={
+  plain:{name:'Plain',text:'Doubles each ball it stands.'},
+  slow:{name:'Slow',cost:4,text:'Advances every other ball, doubling every ball, up to 64.'},
+  spark:{name:'Spark',cost:5,text:'+1 Mult when you knock it down fresh (worth 1).'},
+  shield:{name:'Shield',cost:5,text:'Stands back up after its first hit, each time it comes back.'},
+  runner:{name:'Runner',cost:6,text:'Advances two rows a ball and grows ×4.'},
+  anchor:{name:'Anchor',cost:5,text:'Never advances. Doubles up to 32.'},
+  glass:{name:'Glass',cost:6,text:'Grows ×3 a ball, up to 81. Any pin that touches it knocks it down.'},
+  bomb:{name:'Bomb',cost:6,text:'Falling, it knocks down every pin near it.'},
+  huddle:{name:'Huddle',cost:4,text:'Pins come back packed close around it.'},
+  crown:{name:'Crown',cost:7,text:'A strike that takes it on the front two rows is ×3.'},
+  rent:{name:'Rent',cost:4,text:'+2 points each ball it stays up. Never grows; breaking through is free.'},
+  crowd:{name:'Crowd',cost:7,text:'+1 point per pin left up, each ball it stays up.'},
+  toll:{name:'Toll',cost:4,text:'$1 when you take it on the front row, up to $3 a game.'}
+};
+const SLOTN=['1 pin (headpin)','2 pin','3 pin','4 pin','5 pin','6 pin','7 pin','8 pin','9 pin','10 pin'];
+
+// ---------- the pin: a real ten-pin profile (15 in tall, 4.77 in at the belly, 1.8 in at the neck), 100 units tall, base at y=0 ----------
+const PROFILE=[[0,6.6],[3,8.8],[10,12.4],[20,15],[30,15.9],[40,15.2],[50,12.6],[58,9.4],[64,6.8],[67,6.1],[72,6.4],[80,7.9],[86,8.9],[90,9.1],[94,8.5],[97,6.9],[99,4.1],[100,0]];
+function pinPath(){
+  // Catmull-Rom through the profile, sampled, right side up then left side down
+  const pts=[];const P=PROFILE;
+  for(let i=0;i<P.length-1;i++){const p0=P[Math.max(0,i-1)],p1=P[i],p2=P[i+1],p3=P[Math.min(P.length-1,i+2)];
+    for(let t=0;t<1;t+=.25){const t2=t*t,t3=t2*t,f=(a,b,c,d)=>.5*(2*b+(-a+c)*t+(2*a-5*b+4*c-d)*t2+(-a+3*b-3*c+d)*t3);pts.push([f(p0[0],p1[0],p2[0],p3[0]),f(p0[1],p1[1],p2[1],p3[1])]);}}
+  pts.push(P[P.length-1]);
+  const R=pts.map(([y,x])=>`${x.toFixed(2)},${(-y).toFixed(2)}`),L=pts.slice().reverse().map(([y,x])=>`${(-x).toFixed(2)},${(-y).toFixed(2)}`);
+  return `M${L[L.length-1]} Q0,2.6 ${R[0]} L${R.slice(1).join(' L')} L${L.slice(1).join(' L')}Z`;
+}
+const PATH=pinPath();
+// the neck band, its edges curving down at the front because we look from slightly above
+const BAND='M-12,-72 Q0,-69.6 12,-72 L12,-62 Q0,-59.6 -12,-62Z';
+
+function buildDefs(){
+  let s=`<clipPath id="pinclip" clipPathUnits="userSpaceOnUse"><path d="${PATH}"/></clipPath>
+  <radialGradient id="shadow"><stop offset="0" stop-color="#2a1206" stop-opacity=".5"/><stop offset=".55" stop-color="#2a1206" stop-opacity=".2"/><stop offset="1" stop-color="#2a1206" stop-opacity="0"/></radialGradient>
+  <radialGradient id="shine"><stop offset="0" stop-color="#fff" stop-opacity=".85"/><stop offset=".6" stop-color="#fff" stop-opacity=".3"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></radialGradient>
+  <linearGradient id="foot" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#3a1c0a" stop-opacity="0"/><stop offset="1" stop-color="#3a1c0a" stop-opacity=".32"/></linearGradient>
+  <linearGradient id="turn" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#000" stop-opacity=".1"/><stop offset=".3" stop-color="#000" stop-opacity="0"/><stop offset=".62" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".28"/></linearGradient>`;
+  for(const k in PAL){const c=PAL[k];
+    s+=`<linearGradient id="b-${k}" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="${c.m}"/><stop offset=".14" stop-color="${c.l}"/><stop offset=".32" stop-color="${c.w}"/><stop offset=".5" stop-color="${c.w}"/><stop offset=".72" stop-color="${c.l}"/><stop offset=".9" stop-color="${c.m}"/><stop offset="1" stop-color="${c.d}"/></linearGradient>`;
+    s+=`<linearGradient id="n-${k}" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="${c.r}"/><stop offset=".25" stop-color="${c.R}"/><stop offset=".55" stop-color="${c.R}"/><stop offset="1" stop-color="${c.r}"/></linearGradient>`;}
+  document.getElementById('defs').innerHTML=s;}
+
+// one standing pin, base centred at (x,y), h px tall; flat=true drops the floor shadow (for the strip)
+function pin(t,x,y,h,flat){const s=h/100,c=PAL[t];
+  return `<g transform="translate(${x.toFixed(1)},${y.toFixed(1)}) scale(${s.toFixed(4)})">`
+   +(flat?'':`<ellipse cx="5" cy="1.2" rx="27" ry="6.5" fill="url(#shadow)"/><ellipse cx="1" cy=".6" rx="10" ry="2.6" fill="#2a1206" opacity=".35"/>`)
+   +`<path d="${PATH}" fill="url(#b-${t})"/>`
+   +`<g clip-path="url(#pinclip)"><path d="${BAND}" fill="url(#n-${t})"/><rect x="-17" y="-101" width="34" height="102" fill="url(#turn)"/><rect x="-17" y="-16" width="34" height="16" fill="url(#foot)"/></g>`
+   +`<ellipse cx="-7.2" cy="-33" rx="2.4" ry="14" fill="url(#shine)"/><ellipse cx="-3.2" cy="-89" rx="1.7" ry="4" fill="url(#shine)"/>`
+   +`<path d="${PATH}" fill="none" stroke="${c.d}" stroke-opacity=".55" stroke-width="1" vector-effect="non-scaling-stroke"/></g>`;}
+
+// ---------- the run, as a mock ----------
+const STOCK=['runner','huddle','anchor','crown','rent','crowd','toll','glass','slow','bomb','spark','shield'];
+let roll=0,cash=30,pending=null,sel=null,pick=null;
+const rack=['plain','shield','spark','plain','bomb','glass','plain','toll','plain','slow'];
+let offers=[];
+function deal(){offers=[0,1,2].map(j=>{const t=STOCK[(roll*3+j)%STOCK.length];return{t,cost:PINS[t].cost,bought:false};});roll++;}
+deal();
+const BALLS=[{k:'heavy',name:'Heavy',cost:10,c:['#5c1418','#8f1e22','#c63a2e','#ef7a4a']},{k:'light',name:'Light',cost:10,c:['#a58f6e','#d2bf9a','#efe2c4','#fff8e8']}];
+const GEAR={k:'overtime',name:'Overtime',cost:8,text:'12 balls a game. Breaking through costs double.'};
+const BALLTEXT={heavy:'Hits harder; pins fly further.',light:'Bends further on the same handle.'};
+function ball(c,r){return `<svg viewBox="-20 -20 40 40" aria-hidden="true"><defs><radialGradient id="bg-${c[1].slice(1)}" cx=".36" cy=".32" r=".75"><stop offset="0" stop-color="${c[3]}"/><stop offset=".35" stop-color="${c[2]}"/><stop offset=".8" stop-color="${c[1]}"/><stop offset="1" stop-color="${c[0]}"/></radialGradient></defs>
+  <circle r="${r}" fill="url(#bg-${c[1].slice(1)})"/><circle cx="-4" cy="-6" r="2.3" fill="${c[0]}"/><circle cx="3" cy="-7" r="2.3" fill="${c[0]}"/><circle cx="-1" cy="1.5" r="2.8" fill="${c[0]}"/></svg>`;}
+const CLOCK=`<svg viewBox="-12 -12 24 24" aria-hidden="true"><circle r="10" fill="#fff8e8" stroke="#2a160e" stroke-width="2.2"/><path d="M0,-6 L0,0 L4.5,2.5" fill="none" stroke="#2a160e" stroke-width="2.2" stroke-linecap="round"/></svg>`;
+
+const $=id=>document.getElementById(id);
+function render(){
+  $('box').classList.toggle('placing',!!pending);
+  $('cash').textContent='$'+cash;
+  // pins tray
+  $('offers').innerHTML='';
+  offers.forEach(o=>{const b=document.createElement('button');b.type='button';const on=pending===o,poor=!o.bought&&!on&&cash<o.cost;
+    b.className='pcard'+(o.bought?' got':'')+(on?' pend':'')+(poor?' poor':'');b.disabled=o.bought||poor;
+    b.setAttribute('aria-label',o.bought?PINS[o.t].name+' pin, sold':`${PINS[o.t].name} pin, $${o.cost}. ${PINS[o.t].text}`);
+    b.innerHTML=`<span class="tag">${on?'×':'$'+o.cost}</span><svg viewBox="-34 -103 68 108" preserveAspectRatio="xMidYMax meet" aria-hidden="true">${pin(o.t,0,0,100)}</svg><strong>${PINS[o.t].name}</strong>`;
+    b.onclick=()=>{sel=null;pick=null;pending=pending===o?null:o;render();};$('offers').appendChild(b);});
+  // balls and gear
+  $('balls').innerHTML='';BALLS.forEach(x=>{const b=document.createElement('button');b.type='button';b.className='bcard'+(pick===x?' pend':'');
+    b.innerHTML=`<span class="tag">$${x.cost}</span>${ball(x.c,16)}${x.name}`;b.onclick=()=>{pending=null;sel=null;pick=pick===x?null:x;render();};$('balls').appendChild(b);});
+  $('gear').innerHTML='';{const b=document.createElement('button');b.type='button';b.className='gcard'+(pick===GEAR?' pend':'');b.innerHTML=`<span class="tag">$${GEAR.cost}</span>${CLOCK}${GEAR.name}`;
+    b.onclick=()=>{pending=null;sel=null;pick=pick===GEAR?null:GEAR;render();};$('gear').appendChild(b);}
+  $('shelfBall').innerHTML=ball(['#2a0e10','#8f1e22','#c63a2e','#ef7a4a'],17);
+  // strip
+  const m=$('msg'),mini=t=>`<svg viewBox="-17 -102 34 104" aria-hidden="true">${pin(t,0,0,100,true)}</svg>`;
+  if(pending){m.className='strip go';m.innerHTML=`${mini(pending.t)}<div><h3>${PINS[pending.t].name}</h3><p>${PINS[pending.t].text}</p></div><span class="arrow"></span>`;}
+  else if(pick){m.className='strip';const tx=pick===GEAR?GEAR.text:BALLTEXT[pick.k];m.innerHTML=`<div><h3>${pick.name}</h3><p>${tx}</p></div><button type="button" class="buy">Buy <b>$${pick.cost}</b></button>`;}
+  else if(sel!==null){m.className='strip';m.innerHTML=`${mini(rack[sel])}<div><h3>${PINS[rack[sel]].name}<small>${SLOTN[sel]}</small></h3><p>${PINS[rack[sel]].text}</p></div>`;}
+  else{m.className='strip idle';m.innerHTML='';}
+  drawRack();}
+
+// ---------- your ten, in perspective ----------
+// lane units: pitch 1 between neighbours, rows 0.866 deep. k is the perspective scale per row (front 1, back 0.78).
+const ROWS=[[0],[1,2],[3,4,5],[6,7,8,9]],XOF=[0,-.5,.5,-1,0,1,-1.5,-.5,.5,1.5],ROW=[0,1,1,2,2,2,3,3,3,3];
+function drawRack(){const svg=$('rack'),W=svg.clientWidth||300,H=svg.clientHeight||190;svg.setAttribute('viewBox',`0 0 ${W} ${H}`);
+  const kOf=d=>1/(1+d*.0942/ .866);                 // d in lane units of depth; back row (2.6 deep) lands at 0.78
+  // pin height: as tall as the deck allows (1.5 heights from back top to front base), capped so the back row keeps its spacing on the width
+  // the rows sit a full pin height deep on screen, so every pin's head and band clear the pins in front of it
+  const hp=Math.min((H-26)/1.8,(W-30)/2.2),P=Math.min(hp*1.12,(W-24-hp*.25)/2.34),T=hp*1.0,A=T/(1-kOf(3*.866));
+  const base0=H-Math.max(10,(H-hp*1.8)/2+6),Yh=base0-A,cx=W/2;
+  const X=(lx,k)=>cx+P*lx*k,Y=k=>Yh+A*k;
+  // floor: light maple, lighter toward us, boards running away to the vanishing point
+  let s=`<defs><linearGradient id="floor" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#c99a5e"/><stop offset=".45" stop-color="#ddb377"/><stop offset="1" stop-color="#f0d29c"/></linearGradient>
+    <radialGradient id="pool" cx=".5" cy=".62" r=".7"><stop offset="0" stop-color="#fff6e0" stop-opacity=".35"/><stop offset="1" stop-color="#fff6e0" stop-opacity="0"/></radialGradient></defs>
+    <rect width="${W}" height="${H}" fill="url(#floor)"/><rect width="${W}" height="${H}" fill="url(#pool)"/>`;
+  const kTop=(0-Yh)/A,kBot=(H-Yh)/A,bw=P/5.5;
+  for(let i=-24;i<=24;i++){const x0=cx+bw*i*kBot,x1=cx+bw*i*kTop;s+=`<line x1="${x0.toFixed(1)}" y1="${H}" x2="${x1.toFixed(1)}" y2="0" stroke="#9a6a36" stroke-opacity="${i%4?.12:.22}" stroke-width="1"/>`;}
+  // pins back to front so nearer pins stand in front
+  const order=[6,7,8,9,3,4,5,1,2,0];
+  order.forEach(i=>{const d=ROW[i]*.866,k=kOf(d),x=X(XOF[i],k),y=Y(k),h=hp*k,t=rack[i];
+    s+=`<g class="spot${sel===i?' sel':''}" data-i="${i}" tabindex="0" role="button" aria-label="${SLOTN[i]}: ${PINS[t].name} pin">`
+      +`<ellipse class="ring" cx="${x.toFixed(1)}" cy="${(y+1).toFixed(1)}" rx="${(h*.26).toFixed(1)}" ry="${(h*.075).toFixed(1)}"/>`
+      +pin(t,x,y,h)
+      +`<rect x="${(x-h*.2).toFixed(1)}" y="${(y-h).toFixed(1)}" width="${(h*.4).toFixed(1)}" height="${(h*1.06).toFixed(1)}" fill="transparent"/></g>`;});
+  svg.innerHTML=s;
+  svg.querySelectorAll('.spot').forEach(g=>{const i=+g.dataset.i;g.onclick=()=>tap(i);g.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();tap(i);}};});}
+function tap(i){pick=null;
+  if(pending){cash-=pending.cost;rack[i]=pending.t;pending.bought=true;pending=null;sel=null;render();return;}
+  if(sel===null)sel=i;else if(sel===i)sel=null;else{[rack[sel],rack[i]]=[rack[i],rack[sel]];sel=null;}
+  render();}
+$('reroll').onclick=()=>{if(cash<2)return;cash-=2;pending=null;deal();render();};
+buildDefs();render();
+addEventListener('resize',drawRack);
+// ?place opens the shop mid-placement (first offer picked), for screenshots
+if(location.search.includes('place')){pending=offers[0];render();}
+</script>
+</body>
+</html>

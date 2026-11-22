@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Shop art mock: big pixel pins</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@500;700&family=Silkscreen&display=swap" rel="stylesheet">
+<style>
+/* Mock of the Advancing Ten-Pin shop with big upright pixel pins. Colours, fonts and shop chrome follow labs/advancing-ten-pin. */
+:root{
+  --ink:#1d100a;--panel:#3a2016;--chalk:#f3e2b8;--dim:#c9a878;--accent:#d86a28;--coin:#ffd866;
+  --paper:#f3e2b8;--paper-ink:#2a160e;--paper-dim:#7a4a2c;
+  --deck:#c98f52;--deck-ink:#2a160e;--deck-dim:#6b3f1e;--tag:#d83a2a;--tag-ink:#fff8e8;
+  --body:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --display:"Pixelify Sans",system-ui,sans-serif;
+  --num:"Silkscreen",ui-monospace,Menlo,monospace;
+}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0}
+body{background:var(--ink);color:var(--chalk);font-family:var(--body);overflow:hidden;-webkit-user-select:none;user-select:none;-webkit-tap-highlight-color:transparent}
+button{font-family:inherit;color:inherit;cursor:pointer}
+button:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+canvas{display:block;image-rendering:pixelated}
+
+.sheet{position:fixed;inset:0;background:var(--ink);display:flex;align-items:center;justify-content:center;padding:max(20px,calc(env(safe-area-inset-top) + 10px)) 8px max(22px,calc(env(safe-area-inset-bottom) + 10px))}
+.box{background:var(--panel);border-radius:10px;width:100%;max-width:380px;height:100%;max-height:660px;padding:10px;display:flex;flex-direction:column;gap:6px;overflow:hidden;border:3px solid var(--ink);box-shadow:inset 0 0 0 2px rgba(255,255,255,.07)}
+
+/* header: last game's result and cash */
+.shead{flex:none;display:flex;align-items:center;gap:8px;height:34px}
+.tally{flex:1;min-width:0;height:100%;display:flex;align-items:center;justify-content:center;gap:7px;border-radius:6px;background:var(--ink)}
+.tally b{font-family:var(--num);font-weight:400;font-size:17px;white-space:nowrap}.tally b small{font-size:12px;color:var(--dim)}
+.tally span{font-family:var(--num);font-size:11px;line-height:1;white-space:nowrap;color:var(--accent);border:2px solid var(--accent);border-radius:4px;padding:3px 4px}
+.tally span i{font-style:normal;font-family:var(--display);color:var(--dim);margin-right:5px}
+.chip{font-family:var(--num);font-weight:400;font-size:20px;line-height:1;color:var(--ink);background:var(--accent);padding:5px 9px 6px;border-radius:5px;box-shadow:0 3px 0 rgba(0,0,0,.4)}
+
+/* trays */
+.tray{position:relative;flex:none;border:2px solid var(--ink);border-radius:6px;background:rgba(0,0,0,.3);padding:13px 6px 6px;margin-top:2px;box-shadow:inset 0 -4px 0 rgba(0,0,0,.3),inset 0 2px 0 rgba(255,255,255,.05)}
+.ttag{position:absolute;top:-7px;left:8px;padding:1px 4px;border-radius:3px;background:var(--panel);font-family:var(--display);font-size:9px;font-weight:700;line-height:1;letter-spacing:.12em;text-transform:uppercase;color:var(--dim)}
+.offers{display:grid;gap:6px}
+.offer{position:relative;border-radius:6px;padding:0;text-align:center;transition:transform .12s,opacity .12s}
+.offer .c{position:absolute;top:-11px;left:50%;transform:translateX(-50%);z-index:2;min-width:30px;font-family:var(--num);font-size:12px;line-height:1;padding:3px 5px 4px;border-radius:4px;background:var(--tag);color:var(--tag-ink);box-shadow:0 2px 0 rgba(0,0,0,.45)}
+.offer.pend{transform:translateY(-3px);box-shadow:0 0 0 3px var(--accent),0 6px 0 rgba(0,0,0,.4);z-index:1}
+.offer.pend .c{background:var(--ink);color:var(--chalk)}
+.placing .offer:not(.pend):not(.got){opacity:.35}
+.offer.got{background:transparent!important;border:2px dashed var(--dim)!important;box-shadow:none}
+.offer.got>*{visibility:hidden}
+.offer.got::after{content:"SOLD";position:absolute;inset:0;display:grid;place-items:center;font-family:var(--display);font-weight:700;font-size:11px;letter-spacing:.15em;color:var(--dim)}
+
+/* pins: each offer is a little stage, the pin standing on the wood with its name on a cream plate */
+.ptray{display:grid;grid-template-columns:1fr 50px;gap:6px}
+.ptray .offers{grid-template-columns:repeat(3,1fr)}
+.ptray .offer{height:var(--card,96px);display:flex;flex-direction:column;overflow:visible;border:2px solid var(--ink);background:var(--paper);box-shadow:0 3px 0 rgba(0,0,0,.4)}
+.ptray .offer canvas{flex:1;width:100%;min-height:0;border-radius:4px 4px 0 0}
+.ptray .offer strong{flex:none;display:block;padding:2px 2px 3px;font-family:var(--display);font-size:12px;font-weight:700;line-height:1.1;color:var(--paper-ink);border-top:2px solid var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#reroll{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;padding:6px 2px 3px;border:2px solid var(--dim);border-radius:6px;background:var(--panel);font-family:var(--display);font-size:11px;font-weight:700;line-height:1}
+#reroll .ro{font-size:20px;line-height:.8}
+#reroll b{position:absolute;top:-11px;left:50%;transform:translateX(-50%);font-family:var(--num);font-weight:400;font-size:12px;line-height:1;padding:3px 5px 4px;border-radius:4px;background:var(--tag);color:var(--tag-ink);box-shadow:0 2px 0 rgba(0,0,0,.45)}
+
+/* balls and gear, as in the lab */
+.trays{flex:none;display:grid;grid-template-columns:2fr 1fr;gap:6px}
+.btray .offers{grid-template-columns:1fr 1fr}
+.btray .offer{height:46px;display:flex;align-items:center;gap:6px;padding:4px 6px 4px 5px;border:2px solid var(--ink);border-radius:23px 6px 6px 23px;background:var(--panel);box-shadow:0 3px 0 rgba(0,0,0,.45)}
+.cradle{flex:none;width:34px;height:34px;border-radius:50%;display:grid;place-items:center;background:var(--deck);box-shadow:inset 0 0 0 2px var(--ink),inset 0 -5px 0 rgba(0,0,0,.18)}
+.cradle img,.gtray img,.shelf img{width:22px;height:22px;image-rendering:pixelated}
+.btray strong,.gtray strong{font-family:var(--display);font-size:12px;font-weight:700;line-height:1.1;text-align:left}
+.gtray .offer{height:46px;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:1px;padding:8px 3px 3px;border:2px dashed var(--paper-dim);border-radius:4px 4px 12px 12px;background:var(--dim);color:var(--paper-ink);box-shadow:0 3px 0 rgba(0,0,0,.45)}
+.gtray .offer::before{content:"";position:absolute;top:5px;left:6px;width:6px;height:6px;border-radius:50%;background:var(--ink)}
+.gtray strong{text-align:center}
+
+/* the info strip: what you tapped */
+.strip{flex:none;height:50px;display:flex;align-items:center;gap:9px;padding:4px 9px;border-radius:6px;background:var(--ink);overflow:hidden}
+.strip.idle{visibility:hidden}
+.strip canvas{flex:none}
+.strip div{min-width:0}
+.strip h3{margin:0;font-family:var(--display);font-size:15px;font-weight:700;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.strip h3 small{font-family:var(--body);font-weight:400;font-size:11px;color:var(--dim);margin-left:7px}
+.strip p{margin:0;font-size:11.5px;line-height:1.25;color:var(--dim)}
+.strip p b{color:var(--chalk)}
+.strip.go{background:var(--accent);color:var(--ink)}
+.strip.go p{color:var(--ink);font-weight:700}
+.strip.go p b{color:var(--ink)}
+.tri{flex:none;margin-left:auto;margin-right:4px;width:0;height:0;border:6px solid transparent;border-top:9px solid currentColor;border-bottom:0;animation:bob .7s steps(3) infinite}
+@keyframes bob{50%{transform:translateY(4px)}}
+
+/* your ten: one pixel canvas, the rack in perspective; taps land on invisible buttons over each pin */
+.deck{position:relative;flex:1 1 auto;min-height:0;border-radius:6px;border:2px solid var(--ink);background:#dba552;overflow:hidden}
+.placing .deck{box-shadow:0 0 0 3px var(--accent)}
+.deck canvas{position:absolute;left:0;top:0}
+.spot{position:absolute;padding:0;border:0;background:transparent}
+.shelf{position:absolute;right:6px;bottom:6px;display:flex;gap:4px}
+.shelf span{width:26px;height:26px;display:grid;place-items:center;border:2px solid var(--deck-dim);border-radius:5px;background:rgba(0,0,0,.14)}
+
+.next{flex:none;height:44px;border:2px solid var(--accent);border-radius:8px;background:var(--accent);color:var(--ink);font-family:var(--display);font-size:15px;font-weight:700;box-shadow:0 3px 0 rgba(0,0,0,.4)}
+.next b{font-family:var(--num);font-weight:400}
+.next i{display:inline-block;width:0;height:0;border:5px solid transparent;border-left:8px solid currentColor;border-right:0;margin-left:5px}
+.placing .next{background:transparent;color:var(--chalk);border-color:var(--dim);box-shadow:none}
+
+@media (min-height:660px){
+  .box{gap:8px}
+  .ptray{--card:118px}
+  .btray .offer,.gtray .offer{height:50px}
+  .strip{height:56px}.strip p{font-size:12.5px}
+  .ptray .offer strong{font-size:13px}
+}
+@media (prefers-reduced-motion:reduce){.tri{animation:none}}
+</style>
+</head>
+<body>
+<div class="sheet"><div class="box" id="box">
+  <div class="shead"><div class="tally"><b>120<small> / 90</small></b><span><i>Won</i>+$8</span></div><b class="chip" id="cash">$30</b></div>
+  <div class="tray ptray"><span class="ttag">Pins</span><div class="offers" id="pinOffers"></div><button id="reroll" type="button" aria-label="Reroll pins, $2"><b>$2</b><span class="ro">⟳</span>Reroll</button></div>
+  <div class="trays">
+    <div class="tray btray"><span class="ttag">Balls</span><div class="offers" id="balls"></div></div>
+    <div class="tray gtray"><span class="ttag">Gear</span><div class="offers" id="gear"></div></div>
+  </div>
+  <div class="strip idle" id="msg" aria-live="polite"></div>
+  <div class="deck" id="deck"><canvas id="floor" aria-hidden="true"></canvas><div id="spots"></div><div class="shelf" id="shelf"></div></div>
+  <button class="next" id="next" type="button">Big game · beat <b>110</b><i></i></button>
+</div></div>
+<script>
+// ---------- data: names, prices and colours as in labs/advancing-ten-pin ----------
+const PINS={
+  plain:{name:'Plain',text:'Doubles each ball it stands.'},
+  slow:{name:'Slow',cost:4,text:'Advances every other ball, doubling every ball, up to 64.'},
+  spark:{name:'Spark',cost:5,text:'+1 Mult when you knock it down fresh (worth 1).'},
+  shield:{name:'Shield',cost:5,text:'Stands back up after its first hit, each time it comes back.'},
+  runner:{name:'Runner',cost:6,text:'Advances two rows a ball and grows ×4.'},
+  anchor:{name:'Anchor',cost:5,text:'Never advances. Doubles up to 32.'},
+  glass:{name:'Glass',cost:6,text:'Grows ×3 a ball, up to 81. Any pin that touches it knocks it down.'},
+  bomb:{name:'Bomb',cost:6,text:'Falling, it knocks down every pin near it.'},
+  huddle:{name:'Huddle',cost:4,text:'Pins come back packed close around it.'},
+  crown:{name:'Crown',cost:7,text:'A strike that takes it on the front two rows is ×3.'},
+  rent:{name:'Rent',cost:4,text:'+2 points each ball it stays up. Never grows; breaking through is free.'},
+  crowd:{name:'Crowd',cost:7,text:'+1 point per pin left up, each ball it stays up.'},
+  toll:{name:'Toll',cost:4,text:'$1 when you take it on the front row, up to $3 a game.'}
+};
+const P0={
+  plain:{w:'#fff8e8',l:'#efe2c4',m:'#d2bf9a',d:'#a58f6e',R:'#d83a2a',r:'#9c2218'},
+  gold:{w:'#fff2b0',l:'#ffd866',m:'#e8a020',d:'#b06c10',R:'#d83a2a',r:'#9c2218'},
+  wing:{w:'#fff8e8',l:'#efe2c4',m:'#d2bf9a',d:'#a58f6e',R:'#2c6fb0',r:'#1c4a7a'},
+  twin:{w:'#b8f0f0',l:'#7fd8d8',m:'#3fb0b4',d:'#1f7a80',R:'#fff8e8',r:'#d2bf9a'},
+  trophy:{w:'#eef2f8',l:'#c4ccd8',m:'#8e98aa',d:'#5e687a',R:'#ffd866',r:'#e8a020'},
+  leader:{w:'#ffd0a0',l:'#ff9e50',m:'#e86a20',d:'#a84410',R:'#fff8e8',r:'#d2bf9a'},
+  wall:{w:'#ecd8ff',l:'#c8a8f0',m:'#9a78d0',d:'#6a4ca0',R:'#5a2f8a',r:'#3c1c64'},
+  sweep:{w:'#e8d8a8',l:'#c8b078',m:'#9a8050',d:'#6a5430',R:'#3f8f6a',r:'#286248'},
+  crown:{w:'#9a6ad8',l:'#7444b8',m:'#52288e',d:'#341464',R:'#ffd866',r:'#e8a020'},
+  bomb:{w:'#6a6a72',l:'#4a4a52',m:'#30303a',d:'#1c1c24',R:'#ff4a2a',r:'#b02a14'},
+  tip:{w:'#b8f0c0',l:'#78d890',m:'#3fae62',d:'#1f7a3c',R:'#ffd866',r:'#e8a020'},
+  picket:{w:'#ffd8e0',l:'#ff9eb4',m:'#e0607e',d:'#a8344e',R:'#fff8e8',r:'#d2bf9a'},
+  buddy:{w:'#c8e0ff',l:'#8ab8f0',m:'#4a84d0',d:'#2a559a',R:'#fff8e8',r:'#d2bf9a'}
+};
+const PAL={plain:P0.plain,slow:P0.sweep,spark:P0.gold,shield:P0.wing,runner:P0.leader,anchor:P0.trophy,glass:P0.twin,bomb:P0.bomb,huddle:P0.picket,crown:P0.crown,rent:P0.wall,crowd:P0.buddy,toll:P0.tip};
+const OUT='#3b261c';
+// the light wood of the deck (the Rec Room lane ramp)
+const WOOD={hi:'#f0cf86',base:'#dba552',mid:'#cf9748',seam:'#b97a36',sh:'#a8662e',core:'#8a4e26'};
+
+// ---------- the big pin: a turned profile, lit from front-left-above, seen a little from above ----------
+// half-width along the pin (0 top, 1 base) relative to the belly, from the regulation profile; neck pinched a touch for legibility
+const PROF=[[0,0],[.018,.3],[.05,.46],[.1,.54],[.158,.53],[.217,.46],[.275,.37],[.33,.35],[.375,.47],[.425,.61],[.517,.83],[.608,.965],[.7,1],[.75,.975],[.85,.83],[.95,.6],[1,.44]];
+function prof(t){t=Math.max(0,Math.min(1,t));let i=0;while(i<PROF.length-2&&PROF[i+1][0]<t)i++;
+  const p0=PROF[Math.max(0,i-1)],p1=PROF[i],p2=PROF[i+1],p3=PROF[Math.min(PROF.length-1,i+2)],u=(t-p1[0])/(p2[0]-p1[0]||1);
+  // Catmull-Rom on the radius
+  const a=p1[1],b=.5*(p2[1]-p0[1]),c=.5*(p3[1]-p1[1]),d=p2[1];
+  return Math.max(0,(2*a-2*d+b+c)*u*u*u+(-3*a+3*d-2*b-c)*u*u+b*u+a);}
+const BAYER=[[0,2],[3,1]];
+const LV=(()=>{const v=[-.46,-.5,.73],n=Math.hypot(...v);return v.map(x=>x/n);})();
+const SIN_EL=.42;          // how far above the pins we look: curves the band and the base
+const BAND=[.255,.345];
+const PCACHE={};
+function pinSprite(H,key){const id=key+H;if(PCACHE[id])return PCACHE[id];
+  const pal=PAL[key],belly=H*.168,W=2*Math.ceil(belly)+4,cx=W/2,pad=2,extra=Math.ceil(belly*.44*SIN_EL)+1,CH=H+pad+extra+1;
+  const k=document.createElement('canvas');k.width=W;k.height=CH;const q=k.getContext('2d');
+  const hwAt=y=>belly*prof(y/H);
+  const inside=(x,y)=>{if(y<0)return false;const yy=y-pad;const dx=x+.5-cx;
+    if(yy<H){const hw=hwAt(yy+.5);return Math.abs(dx)<=hw;}
+    // the base seen from above: an ellipse under the last row
+    const hw=belly*prof(1),e=hw*SIN_EL;if(Math.abs(dx)>hw)return false;return yy+.5-H<=e*Math.sqrt(1-(dx/hw)**2);};
+  const metal=key==='anchor',glass=key==='glass';
+  for(let y=0;y<CH;y++)for(let x=0;x<W;x++){
+    if(inside(x,y)){const yy=Math.min(H-.5,y-pad+.5),hw=Math.max(.6,hwAt(yy)),u=Math.max(-1,Math.min(1,(x+.5-cx)/hw)),cz=Math.sqrt(1-u*u);
+      const s=(hwAt(yy+1)-hwAt(yy-1))/2,nl=Math.hypot(u,s,cz),I=(u*LV[0]-s*LV[1]+cz*LV[2])/nl+(BAYER[y&1][x&1]-1.5)*.03;
+      // where this pixel sits on the turned surface, once the ellipse of the cross-section is taken out
+      const tc=(yy-hw*SIN_EL*cz)/H;let col;
+      if(tc>=BAND[0]&&tc<BAND[1])col=I>.42?pal.R:pal.r;
+      else if(metal)col=I>.8?pal.w:I>.62?pal.m:I>.4?pal.l:I>.18?pal.m:pal.d;
+      else if(glass)col=(u>-.62&&u<-.3)?'#ffffff':I>.55?pal.w:I>.3?pal.l:I>.12?pal.m:pal.l;
+      else col=I>.6?pal.w:I>.38?pal.l:I>.15?pal.m:pal.d;
+      q.fillStyle=col;q.fillRect(x,y,1,1);}
+    else if(inside(x-1,y)||inside(x+1,y)||inside(x,y-1)||inside(x,y+1)){q.fillStyle=glass?pal.d:OUT;q.fillRect(x,y,1,1);}}
+  return PCACHE[id]={cv:k,w:W,h:CH,base:pad+H,baseHW:belly*prof(1),belly};}
+
+// ---------- floor ----------
+function px(q,x,y,c){q.fillStyle=c;q.fillRect(x,y,1,1);}
+// boards run away from you and meet at a point above the top edge
+function drawFloor(q,W,H,vy,board){
+  for(let y=0;y<H;y++){const f=(H-vy)/(y-vy);
+    for(let x=0;x<W;x++){const xb=(x+.5-W/2)*f/board,xb1=(x+1.5-W/2)*f/board,bi=Math.floor(xb);
+      let c=(bi&1)?WOOD.base:WOOD.mid;
+      if(Math.floor(xb1)!==bi)c=WOOD.seam;
+      else{const g=Math.sin(bi*12.9898+Math.floor(y*f/3)*78.233)*43758.5453;const r=g-Math.floor(g);
+        if(r>.93&&((x+y)&1))c=WOOD.hi;}
+      // far floor a shade darker, dithered
+      const d=y/H;if(d<.18&&c!==WOOD.seam&&((x+y)&1)&&d<.18*(BAYER[y&1][x&1]+1)/4.5)c=WOOD.seam;
+      px(q,x,y,c);}}}
+function shadow(q,bx,by,sp){const rx=sp.baseHW*2.1+1.5,ry=Math.max(1.5,rx*.42),ox=rx*.28;
+  for(let y=Math.floor(by-ry-2);y<=by+ry+1;y++)for(let x=Math.floor(bx-rx-2);x<=bx+rx+ox+2;x++){
+    const dx=(x+.5-bx-ox)/(rx+.5),dy=(y+.5-by+ry*.35)/(ry+.5),r=dx*dx+dy*dy;
+    if(r<=.45)px(q,x,y,WOOD.sh);else if(r<=1&&((x+y)&1))px(q,x,y,WOOD.seam);}}
+function ring(q,bx,by,sp,col,dash,phase){const rx=sp.baseHW*2.6+3,ry=Math.max(3,rx*.42),n=Math.ceil((rx+ry)*4);const seen={};
+  for(let i=0;i<n;i++){const a=i/n*Math.PI*2,x=Math.round(bx+Math.cos(a)*rx-.5),y=Math.round(by+1+Math.sin(a)*ry-.5),kk=x+','+y;if(seen[kk])continue;seen[kk]=1;
+    if(dash&&((Math.floor(i/(n/24))+phase)&1))continue;px(q,x,y,col);}}
+
+// ---------- the run shown in the mock ----------
+const EARLY=location.hash==='#early';
+// spots 0-9 as numbered in ten-pin (1 headpin ... 7-10 back row); every pin type is on show unless #early
+let rack=EARLY?['plain','plain','toll','plain','plain','plain','plain','plain','plain','plain']
+  :['crown','toll','anchor','slow','plain','glass','rent','huddle','bomb','crowd'];
+let offers=['runner','shield','spark'].map(t=>({t,cost:PINS[t].cost,bought:false}));
+let cash=30,pending=null,sel=null,phase=0;
+const SPOTXZ=[[0,0],[-.5,1],[.5,1],[-1,2],[0,2],[1,2],[-1.5,3],[-.5,3],[.5,3],[1.5,3]];
+const SLOTN=['headpin','2 pin','3 pin','4 pin','5 pin','6 pin','7 pin','8 pin','9 pin','10 pin'];
+const S=2;   // one art pixel is 2 CSS pixels, as on the lane
+
+// ---------- glyphs for balls and gear (from the lab) ----------
+const GLYPH={
+  light:['...#####...','..#wwwww#..','.#wwwwwww#.','#wwww#w#ww#','#wwwwwwwww#','#wwwww#www#','#wwwwwwwww#','#wwwwwwwww#','.#wwwwwww#.','..#wwwww#..','...#####...'],
+  heavy:['...#####...','..#######..','.##w######.','##w##y#y###','###########','#####y#####','###########','###########','.#########.','..#######..','...#####...'],
+  overtime:['...........','.###..###..','#rrr##rrr#.','#rwr##rwr#.','.###..###..','...........','..#y#..#y#.','.#yyy##yyy#','..#y#..#y#.','...........','...........'],
+  stand:['....###....','...#www#...','...#www#...','....#w#....','...#www#...','..#wwwww#..','..#rrrrr#..','..#wwwww#..','...#####...','rr.rr.rr.rr','...........'],
+  bell:['.....#.....','....#y#....','...#yyy#...','..#ywyyy#..','..#ywyyy#..','..#yyyyy#..','.#yyyyyyy#.','#yyyyyyyyy#','###########','....#r#....','.....#.....']};
+function gicon(k){const rows=GLYPH[k],pal={'#':'#2a160e',r:'#d83a2a',w:'#fff8e8',y:'#e8a020',g:'#3f8f6a'},c=document.createElement('canvas');c.width=11;c.height=rows.length;const q=c.getContext('2d');
+  rows.forEach((r,y)=>{for(let x=0;x<r.length;x++)if(pal[r[x]]){q.fillStyle=pal[r[x]];q.fillRect(x,y,1,1);}});return c.toDataURL();}
+
+// ---------- drawing ----------
+const $=id=>document.getElementById(id);
+function fitCanvas(cv,w,h){const W=Math.max(8,Math.floor(w/S)),H=Math.max(8,Math.floor(h/S));cv.width=W;cv.height=H;cv.style.width=W*S+'px';cv.style.height=H*S+'px';return[W,H];}
+// a pin on its card: floor, shadow, pin as tall as the card allows
+function drawCard(cv,key){const r=cv.getBoundingClientRect(),[W,H]=fitCanvas(cv,r.width,r.height),q=cv.getContext('2d');
+  drawFloor(q,W,H,-H*1.6,7);
+  const ph=Math.min(H-6,Math.floor((W-6)/.37)),sp=pinSprite(ph,key),bx=W/2,by=H-3;
+  shadow(q,bx,by,sp);q.drawImage(sp.cv,Math.round(bx-sp.w/2),Math.round(by-sp.base));}
+function pinIcon(key,h){const sp=pinSprite(h,key),c=document.createElement('canvas');c.width=sp.w;c.height=sp.h;c.getContext('2d').drawImage(sp.cv,0,0);c.style.width=sp.w*S+'px';c.style.height=sp.h*S+'px';return c;}
+
+// the rack: ten pins in perspective, headpin nearest; sized to fill the deck
+let GEOM=null;
+function layoutRack(W,H){const D=6,el=.6,se=Math.sin(el),ce=Math.cos(el),DEPTH=.693,SPC=.8,f=z=>D/(D+z*DEPTH);
+  // k = art pixels per pin-height unit; take the largest that fits height and width
+  const top=3,bot=4,kH=(H-top-bot-2)/(3*DEPTH*se*f(3)+ce*f(3)*1.02),kW=(W-12)/(3*SPC*f(3)+.34*f(3)),k=Math.min(kH,kW);
+  const yb0=H-bot-Math.max(0,((H-top-bot-2)-k*(3*DEPTH*se*f(3)+ce*f(3)*1.02))*.45);
+  return SPOTXZ.map(([X,Z],i)=>{const s=f(Z),ph=Math.max(10,Math.round(k*ce*s));return{i,x:W/2+X*SPC*k*s,y:Math.round(yb0-Z*DEPTH*se*k*s),ph,w:SPC*k*s};});}
+function drawDeck(){const deck=$('deck'),cv=$('floor'),[W,H]=fitCanvas(cv,deck.clientWidth,deck.clientHeight),q=cv.getContext('2d');
+  GEOM=layoutRack(W,H);drawFloor(q,W,H,-H*1.15,11);
+  const order=GEOM.slice().sort((a,b)=>a.y-b.y);
+  // rings go under every pin, shadows under every pin, then the pins back to front
+  for(const g of order){const sp=pinSprite(g.ph,rack[g.i]);shadow(q,Math.round(g.x),g.y,sp);
+    if(pending)ring(q,Math.round(g.x),g.y,sp,'#d83a2a',true,phase);else if(sel===g.i)ring(q,Math.round(g.x),g.y,sp,'#2a160e',false,0);}
+  for(const g of order){const sp=pinSprite(g.ph,rack[g.i]);q.drawImage(sp.cv,Math.round(g.x-sp.w/2),g.y-sp.base);}
+  // tap areas over each pin; front rows last so they win where they overlap
+  const box=$('spots');box.innerHTML='';
+  for(const g of order){const b=document.createElement('button'),sp=pinSprite(g.ph,rack[g.i]);b.type='button';b.className='spot';
+    const w=Math.max(sp.w+6,g.w*.92);b.style.left=(g.x-w/2)*S+'px';b.style.width=w*S+'px';b.style.top=(g.y-sp.base-2)*S+'px';b.style.height=(sp.base+6)*S+'px';
+    b.setAttribute('aria-label',`${SLOTN[g.i]}: ${PINS[rack[g.i]].name} pin`);b.addEventListener('click',()=>tapSpot(g.i));box.appendChild(b);}}
+
+function rich(s){return s.replace(/(\+\d+ points|\+\d+ Mult|\$\d+|×\d+)/g,'<b>$1</b>');}
+function render(){$('box').classList.toggle('placing',!!pending);$('cash').textContent='$'+cash;
+  const el=$('pinOffers');el.innerHTML='';
+  offers.forEach(o=>{const b=document.createElement('button'),on=pending===o;b.type='button';b.className='offer'+(o.bought?' got':'')+(on?' pend':'');b.disabled=o.bought;
+    b.innerHTML=`<span class="c">${on?'×':'$'+o.cost}</span><canvas></canvas><strong>${PINS[o.t].name}</strong>`;
+    b.setAttribute('aria-label',o.bought?PINS[o.t].name+' pin, sold':`${PINS[o.t].name} pin, $${o.cost}. ${PINS[o.t].text}`);
+    b.addEventListener('click',()=>{if(o.bought)return;sel=null;pending=pending===o?null:o;render();});el.appendChild(b);});
+  el.querySelectorAll('.offer').forEach((b,i)=>{if(!offers[i].bought)drawCard(b.querySelector('canvas'),offers[i].t);});
+  const m=$('msg');m.className='strip'+(pending?' go':sel!==null?'':' idle');m.innerHTML='';
+  const info=pending?pending.t:sel!==null?rack[sel]:null;
+  if(info){m.appendChild(pinIcon(info,20));const d=document.createElement('div');
+    d.innerHTML=`<h3>${PINS[info].name}${!pending?`<small>On the ${SLOTN[sel]}</small>`:''}</h3><p>${rich(PINS[info].text)}</p>`;m.appendChild(d);
+    if(pending){const t=document.createElement('span');t.className='tri';m.appendChild(t);}}
+  drawDeck();}
+function tapSpot(i){
+  if(pending){if(cash<pending.cost)return;cash-=pending.cost;rack[i]=pending.t;pending.bought=true;pending=null;sel=null;render();return;}
+  if(sel===null)sel=i;else if(sel===i)sel=null;else{const a=rack[sel];rack[sel]=rack[i];rack[i]=a;sel=null;}
+  render();}
+
+// balls and gear: static, as in the lab
+$('balls').innerHTML=[['light','Light',10],['heavy','Heavy',10]].map(([k,n,c])=>`<button type="button" class="offer" aria-label="${n} ball, $${c}"><span class="c">$${c}</span><i class="cradle"><img src="${gicon(k)}" alt=""></i><strong>${n}</strong></button>`).join('');
+$('gear').innerHTML=`<button type="button" class="offer" aria-label="Overtime, $8"><span class="c">$8</span><img src="${gicon('overtime')}" alt=""><strong>Overtime</strong></button>`;
+$('shelf').innerHTML=['stand','bell'].map(k=>`<span><img src="${gicon(k)}" alt=""></span>`).join('');
+if(location.hash==='#place')pending=offers[0];
+if(location.hash==='#info')sel=4;
+const go=()=>render();
+if(document.fonts&&document.fonts.ready)document.fonts.ready.then(go);else go();
+window.addEventListener('resize',go);
+const still=window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+setInterval(()=>{if(pending&&!still){phase^=1;drawDeck();}},450);
+</script>
+</body>
+</html>
