@@ -389,17 +389,71 @@ i.pw.big{flex:none;width:22px;height:11px;border-radius:3px}
 @media (min-height:660px){.ptray{--card:118px}.ptray .offer strong{font-size:13px}}
 /* short phones: the bigger pin cards leave room for a strip that holds two lines of text under the name */
 @media (max-height:659px){#shop .strip{height:52px;padding:3px 9px}#shop .strip h3{line-height:1.1}#shop .strip p,#shop .strip.go p{font-size:12px;line-height:1.2}}
+/* ---------- glyphs: one 9x9 picture per power and per boss, shown at 2x (3x where there is room) ---------- */
+img.gl{flex:none;display:inline-block;width:18px;height:18px;image-rendering:pixelated;border-radius:2px;box-shadow:0 0 0 1px #2a160e;vertical-align:middle}
+img.gl.big{width:27px;height:27px}
+img.gl.boss{box-shadow:0 0 0 1px #2a160e,0 0 0 2px var(--go)}
+.strip h3 .slots{display:inline-flex;gap:3px;margin-left:7px;vertical-align:-3px}
+.slots img.gl{width:18px;height:18px}
+.slots i.e{display:inline-block;width:18px;height:18px;border-radius:2px;background:transparent;box-shadow:inset 0 0 0 1px var(--dim)}
+/* the level's boss, beside the target: dashed while it is still ahead, lit in the boss game; a tap shows its rule */
+#bossBtn{flex:none;width:30px;height:26px;margin:-4px 0 -4px 2px;padding:0;display:grid;place-items:center;border:2px dashed var(--dim);border-radius:4px;background:transparent;opacity:.75}
+#bossBtn.on{border:2px solid var(--go);background:var(--panel);opacity:1}
+#bossBtn img{box-shadow:none}
+.toast.wrap{white-space:normal;width:84%;grid-template-columns:1fr;text-align:center;padding:8px 12px 9px}
+.toast.wrap strong{font-family:var(--display);font-size:20px;line-height:1.2;display:flex;align-items:center;justify-content:center;gap:8px}
+.toast.wrap b{display:block;font-family:var(--body);font-size:14px;line-height:1.3;color:var(--chalk);margin-top:4px}
+/* boss intro: the boss's name, a moving picture of what it does, its rule in one line */
+#intro .box{gap:10px}
+.bosspic{position:relative;flex:none;height:210px;border-radius:6px;border:2px solid var(--ink);background:var(--ink);overflow:hidden}
+.bosspic canvas{position:absolute;left:0;top:0;border-radius:0}
+#introRule{height:auto;min-height:58px}
+#introRule p{font-size:14px;color:var(--chalk)}
+#introRule h3{font-size:13px;color:var(--dim);font-family:var(--num);font-weight:400}
+@media (min-height:660px){.bosspic{height:270px}}
+/* your build: the ten as a flat triangle (back row on top, headpin nearest), each pin with its three slots beside it */
+.bgrid{position:relative;flex:none}
+#rackGrid{display:flex;flex-direction:column;align-items:center;gap:5px;padding:8px 4px;border-radius:6px;border:2px solid var(--ink);background:repeating-linear-gradient(90deg,var(--deck) 0 25px,var(--deck-line) 25px 26px)}
+.brow{display:flex;gap:8px;justify-content:center}
+.bpin{display:flex;align-items:flex-end;gap:4px;padding:3px 4px 3px 5px;border:2px solid transparent;border-radius:6px;background:rgba(0,0,0,.16)}
+.bpin .pinimg{width:18px;height:36px;image-rendering:pixelated;margin-bottom:1px}
+.bslots{display:flex;flex-direction:column;gap:2px}
+.bslots img.gl,.bslots i.e{width:16px;height:16px}
+.bslots i.e{display:block;border-radius:2px;box-shadow:inset 0 0 0 1px var(--deck-dim);opacity:.8}
+.bpin.sel{border-color:var(--deck-ink);background:rgba(255,255,255,.28)}
+.bpin.hl{border-color:var(--accent);background:rgba(255,255,255,.2)}
+.btot{flex:none;display:flex;align-items:center;gap:6px;min-height:30px;flex-wrap:wrap}
+.btot .none{font-size:12px;color:var(--dim)}
+.pwchip{display:flex;align-items:center;gap:3px;height:28px;padding:0 5px 0 4px;border:2px solid var(--ink);border-radius:5px;background:rgba(0,0,0,.25);font-family:var(--num);font-size:12px;color:var(--chalk)}
+.pwchip.sel{border-color:var(--accent)}
+#rackPows{flex:1;min-width:0;gap:4px}
+.btot .kit{position:static;width:auto;margin-left:auto;display:flex;gap:4px;flex-wrap:nowrap}
+@media (min-height:660px){#rackGrid{gap:8px;padding:12px 4px}.bpin .pinimg{width:22px;height:44px}.bslots img.gl,.bslots i.e{width:18px;height:18px}}
+/* shop: powers wear their glyph; a power you already own says how many; the tray's own button opens your build */
+.wtray{display:grid;grid-template-columns:1fr 54px;gap:6px}
+.wtray .offer img.gl{margin:1px 0 2px}
+.wtray .offer .gw{display:flex;align-items:center;gap:3px}
+.wtray .offer .have{font-style:normal;font-family:var(--num);font-size:11px;line-height:1;color:var(--dim)}
+.wtray .offer strong{padding:0 2px}
+#shopBuild{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;padding:4px 2px 3px;border:2px solid var(--dim);border-radius:6px;background:var(--panel);color:var(--chalk);font-family:var(--display);font-size:11px;font-weight:700;line-height:1}
+#shopBuild span{display:flex;gap:1px}#shopBuild span img{width:9px;height:18px;image-rendering:pixelated}
+.tally .bchip{display:flex;align-items:center;padding:2px;border:2px solid var(--go);border-radius:4px;background:transparent}
+.tally .bchip img.gl{box-shadow:none}
+#shopNext img.gl{margin:-3px 6px 0 0}
+@media (min-height:660px){.wtray .offer img.gl{width:27px;height:27px}.wtray{grid-template-columns:1fr 60px}}
+/* win card: the level's boss, picture and rule */
+.wlist li img.gl{width:27px;height:27px}
 </style>
 </head>
 <body data-stage="rec">
 <div class="hud">
-  <button id="rackBtn" type="button" aria-label="Your rack"></button>
+  <button id="rackBtn" type="button" aria-label="Your build"></button>
   <div class="hudR">
     <div class="meta"><h1 id="title"></h1><b id="cash">$0</b><button id="camBtn" type="button" aria-label="Change view"><i></i></button></div>
     <div class="board" id="board"></div>
   </div>
 </div>
-<div class="goal" id="goal"><b id="tot">0</b><div class="bar"><i id="fill"></i><u id="bonus"><s></s><s></s><s></s><s></s><s></s><s></s></u></div><b id="tgt">0</b></div>
+<div class="goal" id="goal"><b id="tot">0</b><div class="bar"><i id="fill"></i><u id="bonus"><s></s><s></s><s></s><s></s><s></s><s></s></u></div><b id="tgt">0</b><button id="bossBtn" type="button" aria-label="Boss"></button></div>
 <div class="stage">
   <canvas id="lane" width="180" height="300" aria-label="Bowling lane. Drag the ball, the bend handle and the aim ring."></canvas>
   <div class="toast" id="toast" aria-live="polite"></div>
@@ -424,17 +478,24 @@ i.pw.big{flex:none;width:22px;height:11px;border-radius:3px}
 <div class="sheet" id="shop" hidden><div class="box">
   <div class="shead"><div class="strip tally" id="shopResult"></div><div class="strip" id="shopMsg" aria-live="polite"></div><b class="chip" id="shopCash"></b></div>
   <div class="tray ptray"><span class="ttag">Pins</span><div class="offers" id="shopList"></div><button id="shopReroll" type="button"></button></div>
-  <div class="tray wtray"><span class="ttag">Powers</span><div class="offers" id="shopPows"></div></div>
+  <div class="tray wtray"><span class="ttag">Powers</span><div class="offers" id="shopPows"></div><button id="shopBuild" type="button" aria-label="Your build"></button></div>
   <div class="trays"><div class="tray btray" id="shopBallTray"><span class="ttag">Balls</span><div class="offers" id="shopBalls"></div></div><div class="tray gtray" id="shopGearTray"><span class="ttag">Gear</span><div class="offers" id="shopGearBuy"></div></div></div>
   <div class="tray ltray" id="shopLayTray"><span class="ttag">Next rack</span><div class="lays" id="shopLays"></div></div>
   <div class="deck"><div class="rackmap" id="shopMap"></div><div class="shelf" id="shopGear"></div></div>
   <div class="row"><button class="main" id="shopNext" type="button"></button></div>
 </div></div>
 <div class="sheet" id="rackSheet" hidden><div class="box">
-  <div class="shead"><h2>Rack</h2><b class="chip" id="rackCash"></b></div>
-  <div class="deck"><div class="rackmap" id="rackMap"></div><div class="shelf" id="rackGear"></div></div>
+  <div class="shead"><h2>Your build</h2><b class="chip" id="rackCash"></b></div>
+  <div class="bgrid"><div id="rackGrid"></div><div class="shelf" id="rackGear"></div></div>
+  <div class="btot" id="rackPows"></div>
   <div class="strip" id="rackMsg" aria-live="polite"></div>
   <div class="row"><button id="rackLog" type="button">Results log</button><button id="rackNew" type="button">New run</button><button class="main" id="rackClose" type="button">Done</button></div>
+</div></div>
+<div class="sheet" id="intro" hidden><div class="box">
+  <div class="shead"><h2 id="introName"></h2><b class="chip" id="introCash"></b></div>
+  <div class="bosspic" id="introPicBox"><canvas id="introPic" aria-hidden="true"></canvas></div>
+  <div class="strip" id="introRule"></div>
+  <div class="row"><button class="main" id="introGo" type="button">Bowl<i class="tri r"></i></button></div>
 </div></div>
 <div class="sheet" id="log" hidden><div class="box">
   <h2>Results log</h2>
@@ -519,6 +580,7 @@ function stepSim(s,dt){
     const vr=(a.vx-c.vx)*nx+(a.vy-c.vy)*ny;
     if(vr>0){
       const aFixed=!a.down&&vr<(a.bolt?BOSS.boltK:(a.knock||KNOCK)),cFixed=!c.down&&vr<(c.bolt?BOSS.boltK:(c.knock||KNOCK));
+      if(aFixed&&a.bolt&&vr>=(a.knock||KNOCK))a.held=s.t;if(cFixed&&c.bolt&&vr>=(c.knock||KNOCK))c.held=s.t;   // drawing only: a bolt held a pin that would have fallen
       if(aFixed){c.vx+=(1+.5)*vr*nx;c.vy+=(1+.5)*vr*ny;}
       else if(cFixed){a.vx-=(1+.5)*vr*nx;a.vy-=(1+.5)*vr*ny;}
       else{const j=(1+REST)*vr/2;a.vx-=j*nx;a.vy-=j*ny;c.vx+=j*nx;c.vy+=j*ny;if(!a.down){a.by='pin';a.ord=s.ord=(s.ord||0)+1;}if(!c.down){c.by='pin';c.ord=s.ord=(s.ord||0)+1;}a.down=true;c.down=true;}
@@ -659,8 +721,37 @@ const POWERS={
   toll:{s:n=>`$${n} on the front row`,name:'Toll',cost:3,c:['#ff86aa','#b8406a'],text:n=>`$${n} when you take it on the front row, up to $3 a game.`,more:'Again: $2, $3'}
 };
 const pwOf=it=>(it&&it.pw)||[],pwCount=(it,k)=>pwOf(it).filter(x=>x===k).length;
-// what a pin's powers do together, one short clause each
-const pwLine=it=>[...new Set(pwOf(it))].map(k=>`<i class="pw" style="--a:${POWERS[k].c[0]};--b:${POWERS[k].c[1]}"></i>${POWERS[k].name}${pwCount(it,k)>1?' ×'+pwCount(it,k):''}`).join(' ');
+// ---------- glyphs: one 9x9 picture per power (dark mark on its band colour) and per boss (on dark, red rim); the same picture in the shop, the build, the strips ----------
+const PWG={
+  quick:['....#....','...###...','..##.##..','.##...##.','....#....','...###...','..##.##..','.##...##.','.........'],
+  head:['....#....','...###...','..#####..','.#######.','...###...','...###...','.........','#########','.........'],
+  spark:['.....###.','....###..','...###...','..######.','....###..','...###...','..###....','.###.....','.#.......'],
+  lantern:['#...#...#','.#.....#.','...###...','..#www#..','###www###','..#www#..','...###...','.#.....#.','#...#...#'],
+  slow:['#########','.#.....#.','..#...#..','...#.#...','....#....','...#.#...','..#.#.#..','.#.###.#.','#########'],
+  shield:['#########','#ww######','#w#######','#########','.#######.','.#######.','..#####..','...###...','....#....'],
+  bomb:['......r.r','.....#.r.','....#....','..####...','.######..','##w#####.','#w######.','.######..','..####...'],
+  rent:['....#....','...###...','..#####..','.#######.','#########','.##...##.','.##.#.##.','.##.#.##.','.#######.'],
+  toll:['....#....','..#####..','.##.#....','.##.#....','..#####..','....#.##.','....#.##.','..#####..','....#....']
+};
+const BOSSG={
+  short:['.........','rrrrrrrrr','....w....','...www...','..w.w.w..','....w....','.........','d.d.d.d.d','.........'],
+  sweep:['.g.....g.','.g.....g.','yryryryry','yryryryry','.........','.w.w.w.w.','.........','w.w.w.w.w','.........'],
+  bolted:['...www...','...www...','....w....','...www...','..wwwww..','..wwwww..','ggggggggg','gWgggggWg','ggggggggg'],
+  tentacle:['....vv...','...vV....','...vv....','....vV...','.....vv..','....vV...','...vvv...','..vvVv...','.vvvvvv..']
+};
+// each boss's rule in one line (player-facing; pins advance, never "step")
+const BOSSUI={short:{rule:'The red line is one row nearer, so pins break through sooner.'},sweep:{rule:'After balls 4 and 8, every standing pin is swept off for nothing.'},
+  bolted:{rule:'Only the ball knocks pins down. A pin hit by a pin stays bolted.'},tentacle:{rule:'A tentacle advances a row each ball and stops the ball dead.'}};
+const GLYC={};
+function pwIcon(k){if(GLYC['p'+k])return GLYC['p'+k];const P=POWERS[k],t=mk(9,9),q=t.getContext('2d');q.fillStyle=P.c[0];q.fillRect(0,0,9,9);
+  q.drawImage(sprite(PWG[k],{'#':k==='bomb'?'#f0eef4':'#2a160e',w:k==='bomb'?'#8a8a96':'#ffffff',r:'#ff5a2a'}),0,0);return GLYC['p'+k]=t.toDataURL();}
+function bossIcon(k){if(GLYC['b'+k])return GLYC['b'+k];const t=mk(9,9),q=t.getContext('2d');q.fillStyle='#2a160e';q.fillRect(0,0,9,9);
+  q.drawImage(sprite(BOSSG[k],{r:'#ff5a3a',w:'#f3e2b8',g:'#9aa4b4',W:'#2a2e38',v:'#b48aee',V:'#5a3a86',y:'#ffd866',d:'#7a4a2c'}),0,0);return GLYC['b'+k]=t.toDataURL();}
+const pwImg=(k,cls)=>`<img class="gl${cls?' '+cls:''}" src="${pwIcon(k)}" alt="${POWERS[k].name}">`,bossImg=(k,cls)=>`<img class="gl boss${cls?' '+cls:''}" src="${bossIcon(k)}" alt="">`;
+// the boss of game gi's level, and the game it is played in
+const lvlBoss=gi=>run.bosses[Math.floor(gi/3)],bossGame=gi=>gi-gi%3+2;
+// how many of each power the whole rack holds
+function powerCounts(){const o={};for(const it of run.rack)for(const k of pwOf(it))o[k]=(o[k]||0)+1;return o;}
 const PAL={
   gold:{w:'#fff2b0',l:'#ffd866',m:'#e8a020',d:'#b06c10',R:'#d83a2a',r:'#9c2218'},
   wing:{w:'#fff8e8',l:'#efe2c4',m:'#d2bf9a',d:'#a58f6e',R:'#2c6fb0',r:'#1c4a7a'},
@@ -762,12 +853,23 @@ function startGame(){run.target=tgtOf(run.game);run.tips=0;
   BOSS=bossOf(run.game);RACK=layoutSpots(run.layout,run.rack.length);run.offerNote=run.seen.join(' / ');run.seen=[];
   const sr=startRange(),sx0=clamp(180,sr[0],sr[1]);
   g={bx:180,zoneAt:.2,ready:false,t0:performance.now(),pend:null,frame:0,pops:[],live:0,frames:Array.from({length:12},()=>({balls:[],marks:[]})),chain:0,netUsed:false,pins:boardStart(run.rack),lastLine:null,breaks:0,rackBalls:0,sx:sx0,ex:180,bend:0,power:1,phase:.5,mode:'aim',sim:null,trail:[],intended:null,err:0,toast:null,toastT:0,wait:0,stopped:0};
-  ['over','win','shop','rackSheet','log'].forEach(id=>$(id).hidden=true);if(BOSS&&BOSS.tent){BOSS.tent={c:[-1,0,1][Math.floor(Math.random()*3)],k:0};BOSS.posts=[{x:colX(BOSS.tent.c),y:rowY(0),r:13}];g.pins=boardStart(run.rack).filter(p=>Math.hypot(p.x-BOSS.posts[0].x,p.y-BOSS.posts[0].y)>=40);g.pins=g.pins.concat(refill(g.pins,run.rack.slice(g.pins.length)));}
+  ['over','win','shop','rackSheet','log','intro'].forEach(id=>$(id).hidden=true);if(BOSS&&BOSS.tent){BOSS.tent={c:[-1,0,1][Math.floor(Math.random()*3)],k:0};BOSS.posts=[{x:colX(BOSS.tent.c),y:rowY(0),r:13}];g.pins=boardStart(run.rack).filter(p=>Math.hypot(p.x-BOSS.posts[0].x,p.y-BOSS.posts[0].y)>=40);g.pins=g.pins.concat(refill(g.pins,run.rack.slice(g.pins.length)));}
   else if(BOSSES.tentacle.posts)delete BOSSES.tentacle.posts;
-  if(!BOSS){g.toast='boss';$('toast').innerHTML=`<strong>${kindOf3(run.game)} game</strong><b>beat ${run.target} · boss: ${bossOf(run.game-run.game%3+2).name}</b>`;g.toastT=2.6;}topBar();strip();board();hint();setBtn();
+  toastEl.className='toast';
+  if(!BOSS){g.toast='boss';$('toast').innerHTML=`<strong>${kindOf3(run.game)} game</strong><b>beat ${run.target} · boss ${bossImg(lvlBoss(run.game))} ${BOSSES[lvlBoss(run.game)].name}</b>`;g.toastT=2.6;}topBar();strip();board();hint();setBtn();
   if(BOSS){g.toast='boss';$('toast').innerHTML=`<strong>${BOSS.name}</strong><b>Boss · beat ${run.target}</b>`;g.toastT=2.6;}saveRun('aim');}
+// the boss intro: shown as the boss game opens (from the shop, or reopening the page before its first ball)
+function showIntro(){const k=lvlBoss(run.game);g.toastT=0;$('introName').textContent=BOSSES[k].name;$('introCash').textContent='$'+run.cash;
+  $('introRule').innerHTML=`${bossImg(k,'big')}<div><h3>Boss · beat ${run.target}</h3><p>${BOSSUI[k].rule}</p></div>`;$('intro').hidden=false;
+  const cv=$('introPic'),t0=performance.now(),f=now=>{if($('intro').hidden)return;drawBossPic(cv,k,still?BOSSPIC[k].still:((now-t0)/1000)%BOSSPIC[k].T);if(!still)requestAnimationFrame(f);};f(t0);}
+function closeIntro(){$('intro').hidden=true;}
+$('introGo').addEventListener('click',closeIntro);
+// a rule shown over the lane for a few seconds (the boss badge)
+function ruleToast(head,line){g.toast='rule';toastEl.className='toast wrap';toastEl.innerHTML=`<strong>${head}</strong>${line?`<b>${line}</b>`:''}`;g.toastT=3.4;}
+$('bossBtn').addEventListener('click',()=>{const k=lvlBoss(run.game),on=run.game%3===2;ruleToast(`${bossImg(k)}${BOSSES[k].name}`,(on?'':`Boss in game ${bossGame(run.game)+1}. `)+BOSSUI[k].rule);});
 function topBar(){const h=$('title');h.setAttribute('aria-label',`Game ${run.game+1} of ${TARGETS.length}`);h.innerHTML=TARGETS.map((_,i)=>`<i class="${i<run.game?'won':i===run.game?'cur':''}${i%3===2?' boss':''}"></i>`).join('');
-  $('cash').textContent='$'+run.cash;$('camBtn').dataset.cam=T.cam;}
+  $('cash').textContent='$'+run.cash;$('camBtn').dataset.cam=T.cam;
+  const bk=lvlBoss(run.game),bb=$('bossBtn'),on=run.game%3===2;bb.innerHTML=`<img class="gl" src="${bossIcon(bk)}" alt="">`;bb.classList.toggle('on',on);bb.setAttribute('aria-label',(on?'Boss: ':'Boss of this level: ')+BOSSES[bk].name);}
 // the rack, left to right as it stands on the lane; the strip is the Rack button
 // the rack, left to right as it stands on the lane, each row a little lower toward the front, so the strip reads as the triangle seen from the approach
 function strip(){const el=$('rackBtn'),row=i=>i===0?3:i<3?2:i<6?1:0;el.classList.add('ten');el.innerHTML=[6,3,1,7,0,4,2,8,5,9].filter(i=>i<run.rack.length).map(i=>{const it=run.rack[i];return `<span style="top:${row(i)*5}px"${it.lv>1?` data-lv="${it.lv}"`:''}><img src="${iconOf(it)}" alt="${PINS[it.t].name}"></span>`;}).join('');}
@@ -810,11 +912,12 @@ function chip(n){const w=n.split(' '),k=NK[w[0]],v=/^[+×]/.test(w[w.length-1])?
 function resolve(){g.live=0;const fell=g.pins.filter(p=>p.down),left=g.pins.filter(p=>!p.down),r=scoreAdv(fell,left,run.gear,{chain:g.chain||0,ball:g.frame+1,max:ballsLeftMax(),sweep:run.ball==='sweep'});
   g.chain=r.strike?(g.chain||0)+1:0;
   if(r.cash){const c=Math.min(r.cash,3-run.tips);if(c>0){run.tips+=c;run.cash+=c;topBar();}}
+  const post0=BOSS&&BOSS.tent&&BOSS.posts&&BOSS.posts[0]?Object.assign({},BOSS.posts[0]):null;   // where the tentacle stood, so its advance can be drawn
   const sofar=total()+r.score,last=g.frame>=ballsLeftMax()-1||sofar>=run.target&&run.target>0,bctx=last?null:{gear:run.gear,netUsed:g.netUsed,rush:run.ball==='rush',brake:run.ball==='brake'&&!g.brakeUsed,toll:run.ball==='toll',seed:run.ball==='seed',strike:r.strike},st=last?null:advance(left,fell,null,g.frame+1,bctx);if(bctx&&bctx.brake)g.brakeUsed=true;if(st&&st.netUsed){g.netUsed=true;r.notes.push('Net');}
   const cost=st?st.cost:0,net=r.score-cost;
   const f=g.frames[g.frame];f.balls.push(net);f.marks.push(r.strike?'X':fell.length?String(fell.length):'-');
   const head=g.sim.ball.gutter?'Gutter':r.strike?'Strike!':fell.length?'':'Nothing';
-  g.toast=r.score||cost?'x':null;
+  g.toast=r.score||cost?'x':null;toastEl.className='toast';
   $('toast').innerHTML=(r.strike?'<em>X</em>':'')+`<strong>+${r.score}</strong>`+(r.m!==1?`<b><span class="pt">${r.pts}</span>×<span class="mu">${r.m}</span></b>`:'')+(cost||r.notes.length?`<p>${r.notes.map(n=>`<span class="pt">${n}</span>`).join('')}${cost>0?`<span class="neg">−${cost}</span>`:cost<0?`<span class="pt">Toll +${-cost}</span>`:''}</p>`:'')+(st&&st.swept.length?'<p><span class="neg">Swept</span></p>':'');
   g.toastT=cost?2.2:1.5;
   if(g.pend){Object.assign(g.pend,{down:fell.length,downValue:r.pts,notes:r.notes.join(' + '),swept:st?st.swept.length:0,points:r.pts,mult:r.m,score:r.score,broke:st?st.broke.length:0,cost,net,result:head||'hit',after:st?boardText(st.pins):''});if(g.pend.clean===null)g.pend.clean=fell.length;LOG.push(g.pend);g.pend=null;saveLog();}
@@ -823,15 +926,17 @@ function resolve(){g.live=0;const fell=g.pins.filter(p=>p.down),left=g.pins.filt
   // the step, animated: kept pins slide a row forward, broken ones slide on over the line and drop, fresh ones drop in at the back
   for(const p of st.kept){const o=left.find(q=>q.item===p.item);p.y0=o?o.y:p.y-ADV.STEP;}
   for(const p of st.fresh){p.y0=p.y-24;p.fresh=true;}
-  st.swept.forEach(p=>{p.y0=p.y;p.y1=p.y-30;p.broke=true;});st.broke.push(...st.swept);
   st.broke.forEach(p=>{p.y0=p.y;p.y1=p.y+ADV.STEP;p.broke=true;});
-  g.step={t:0,pins:st.pins,broke:st.broke};g.pins=st.pins.concat(st.broke);g.breaks+=st.broke.length;
+  st.swept.forEach(p=>{p.y0=p.y;p.swept=true;p.broke=true;});st.broke.push(...st.swept);
+  g.step={t:0,pins:st.pins,broke:st.broke,sweep:st.swept.length>0,barY:LINEY()+10,post0};g.pins=st.pins.concat(st.broke);g.breaks+=st.broke.length;
   g.frame++;g.mode='step';board();setBtn();
 }
-function stepAnim(dt){const S=g.step;S.t+=dt;const a=Math.min(1,S.t/.35),e=a*a*(3-2*a),b=clamp((S.t-.3)/.3,0,1);
+function stepAnim(dt){const S=g.step;S.t+=dt;const a=Math.min(1,S.t/.35),e=a*a*(3-2*a),b=clamp((S.t-(S.sweep?.75:.3))/.3,0,1);
+  if(S.sweep){const u=clamp(S.t/.7,0,1);S.barY=LINEY()+10-(LINEY()+10-(G.BACK-12))*u*u*(3-2*u);}   // the bar sweeps from the line into the pit
   for(const p of S.pins){if(p.y0===undefined)continue;if(p.fresh){p.alpha=b;p.y=p.y0+(pinY(p)-p.y0)*b;}else p.y=p.y0+(pinY(p)-p.y0)*e;}
-  for(const p of S.broke){p.y=p.y0+(p.y1-p.y0)*e;p.alpha=1-b;}
-  if(S.t>=.65){for(const p of S.pins){p.y=pinY(p);p.alpha=1;delete p.y0;}g.pins=S.pins;g.step=null;g.mode='aim';g.ready=false;g.t0=performance.now();hint();setBtn();saveRun('aim');}}
+  for(const p of S.broke){if(p.swept){p.y=Math.min(p.y0,S.barY-12);p.alpha=clamp((p.y-G.BACK)/24,0,1);}else{p.y=p.y0+(p.y1-p.y0)*e;p.alpha=1-b;}}
+  if(S.t>=(S.sweep?1.05:.65)){for(const p of S.pins){p.y=pinY(p);p.alpha=1;delete p.y0;}g.pins=S.pins;g.step=null;g.mode='aim';g.ready=false;g.t0=performance.now();hint();setBtn();saveRun('aim');
+    if(BOSS&&BOSS.sweep&&sweepWarn()){ruleToast(`${bossImg('sweep')}Sweep after this ball`,'');g.toastT=2.4;}}}
 // the win card: what you scored, each line of pay and why, what comes next; then the shop
 function showWin(){const p=run.pay,k=kindOf3(run.game),bo=BOSS,n=run.game+1,nb=bossOf(n),marks=g.frames.flatMap(f=>f.marks),balls=g.frames.flatMap(f=>f.balls);
   $('winTitle').textContent=bo?'Boss beaten':k+' game won';$('winCash').textContent='$'+run.cash;
@@ -840,7 +945,8 @@ function showWin(){const p=run.pay,k=kindOf3(run.game),bo=BOSS,n=run.game+1,nb=b
   $('winList').innerHTML=`<li><span>${bo?'Beat '+bo.name:'Won the '+k.toLowerCase()+' game'}<small>Small $${PAY[0]} · big $${PAY[1]} · boss $${PAY[2]}</small></span><b>+$${p.base}</b></li>`
     +`<li><span>${p.left} ball${p.left===1?'':'s'} left<small>+$1 each, up to $4</small></span><b>+$${p.extra}</b></li>`
     +(run.tips?`<li><span>Toll pins<small>Paid during the game</small></span><b>+$${run.tips}</b></li>`:'')
-    +`<li class="next"><span>Next: ${nb?'Boss · '+nb.name:kindOf3(n)+' game'}<small>${n%3===0?'Level '+(Math.floor(n/3)+1)+' · ':''}beat ${tgtOf(n)}</small></span><b>${n+1}/12</b></li>`;
+    +`<li class="next"><span>Next: ${nb?'Boss · '+nb.name:kindOf3(n)+' game'}<small>${n%3===0?'Level '+(Math.floor(n/3)+1)+' · ':''}beat ${tgtOf(n)}</small></span><b>${n+1}/12</b></li>`
+    +`<li>${bossImg(lvlBoss(n))}<span>${nb?'':'Boss in game '+(bossGame(n)+1)+': '}${BOSSES[lvlBoss(n)].name}<small>${BOSSUI[lvlBoss(n)].rule}</small></span></li>`;
   $('win').hidden=false;saveRun('win');}
 $('winNext').addEventListener('click',()=>{$('win').hidden=true;showShop();});
 function endGame(){const t=total(),won=t>=run.target,final=run.game===TARGETS.length-1;
@@ -856,7 +962,7 @@ function showOver(){$('over').hidden=false;clearSave();drawMap($('overMap'),i=>{
 $('again').addEventListener('click',newRun);
 
 // ---------- shop and rack ----------
-let pending=null,sel=null,gsel=null,pick=null;const ICON={};
+let pending=null,sel=null,gsel=null,pick=null,bsel=false;const ICON={};
 function icon(kind){return ICON[kind]||(ICON[kind]=buildTheme(THEME.rec).pins[kind].toDataURL());}
 function iconOf(it){const o=buildTheme(THEME.rec),k=pinKey(o,kindOf(it),it);return ICON[k]||(ICON[k]=o.pins[k].toDataURL());}
 const GLYPH={
@@ -961,13 +1067,52 @@ function drawCard(cv,key){cv.style.width='';cv.style.height='';const r=cv.getBou
   drawFloor(q,W,H,-H*1.6,7,FLOORS.rec);
   const sp=bigPin(Math.max(12,Math.min(H-11,Math.floor((W-6)/.37))),key),bx=W/2,by=H-3;
   floorShadow(q,bx,by,sp,FLOORS.rec);q.drawImage(sp.cv,Math.round(bx-sp.w/2),Math.round(by-sp.base));}
-// a power for sale: its band on its own, seen a little from above: the inside of the back half, then the front, lit from the left
-function drawBandCard(cv,k){cv.style.width='';cv.style.height='';const r=cv.getBoundingClientRect(),[W,H]=fitArt(cv,r.width,r.height),q=cv.getContext('2d'),[L,D]=POWERS[k].c;
-  q.clearRect(0,0,W,H);const rx=Math.max(5,Math.min(W*.36,H*.9)),ry=Math.max(2,rx*.38),h=Math.max(3,Math.round(rx*.42)),cx=W/2,cy=(H-h)/2+1;
-  for(let x=Math.floor(cx-rx);x<=cx+rx;x++){const u=(x+.5-cx)/rx;if(Math.abs(u)>1)continue;const e=ry*Math.sqrt(1-u*u);
-    for(let y=Math.round(cy-e);y<Math.round(cy-e)+h;y++){q.fillStyle=D;q.fillRect(x,y,1,1);}                       // back half, its inside in shade
-    for(let y=Math.round(cy+e);y<Math.round(cy+e)+h;y++){q.fillStyle=u<-.25||(u<.15&&((x+y)&1))?L:D;q.fillRect(x,y,1,1);}   // front half, lit from the left
-    q.fillStyle=PIN_OUT;q.fillRect(x,Math.round(cy+e)+h,1,1);q.fillRect(x,Math.round(cy-e)-1,1,1);}}
+// ---------- the boss intro picture: the deck from above, 96x64 art pixels scaled whole, one short loop of what the boss does ----------
+// T: loop length (s); still: the moment shown when motion is reduced
+const BOSSPIC={short:{T:3.4,still:2.2},sweep:{T:4,still:2.1},bolted:{T:3,still:1.2},tentacle:{T:3.6,still:2.5}};
+const PTOP=['..o..','.owo.','.owo.','..o..','.oRo.','owwwo','owwwo','owwwo','.ooo.'],PFELL=['..ooo.oo.','.owwwoRwo','owwwwoRwo','.owwwoRwo','..ooo.oo.'],BTOP=['..ooo..','.orrrro.','orrwrrro','orrrrro','orrrrro','.orrro.','..ooo..'];
+function drawBossPic(cv,k,t){const box=cv.parentElement,bw=box.clientWidth,bh=box.clientHeight,S=Math.max(1,Math.floor(Math.min(bw/96,bh/64))),q=cv.getContext('2d'),wd=floorPal();
+  if(cv.width!==96){cv.width=96;cv.height=64;}Object.assign(cv.style,{width:96*S+'px',height:64*S+'px',left:Math.floor((bw-96*S)/2)+'px',top:Math.floor((bh-64*S)/2)+'px'});
+  q.setTransform(1,0,0,1,0,0);q.imageSmoothingEnabled=false;
+  const R=(x,y,w,h,col)=>{q.fillStyle=col;q.fillRect(Math.round(x),Math.round(y),w,h);},ease=a=>{a=clamp(a,0,1);return a*a*(3-2*a);},lerp=(a,b,u)=>a+(b-a)*u;
+  const SP={};const spr=(rows,pal)=>{const id=rows.join()+JSON.stringify(pal);return SP[id]||(SP[id]=sprite(rows,pal));};
+  const pinAt=(x,y,a,band)=>{if(a<=0)return;q.globalAlpha=Math.min(1,a);q.drawImage(spr(PTOP,{o:'#2a160e',w:'#fff8e8',R:band||'#d83a2a'}),Math.round(x)-2,Math.round(y)-6);q.globalAlpha=1;};
+  const fellAt=(x,y)=>q.drawImage(spr(PFELL,{o:'#2a160e',w:'#fff8e8',R:'#d83a2a'}),Math.round(x)-4,Math.round(y)-2);
+  const ballAt=(x,y)=>q.drawImage(spr(BTOP,{o:'#2a160e',r:'#c63a2e',w:'#ffd9b0'}),Math.round(x)-3,Math.round(y)-3);
+  const ring=(x,y,r,col)=>{q.fillStyle=col;for(let i=0;i<24;i++){const a=i/24*6.283;q.fillRect(Math.round(x+Math.cos(a)*r),Math.round(y+Math.sin(a)*r),1,1);}};
+  const CX=c=>48+c*10,RY=r=>10+r*10;
+  // the deck: wood between dark gutters, the pit at the back, the approach in front
+  R(0,0,96,64,wd.sh);R(10,4,76,60,wd.base);for(let x=10;x<86;x+=6)R(x,4,1,60,wd.seam);R(10,4,76,1,wd.hi);R(0,0,96,4,'#0a0605');
+  const line=(y,col,dash)=>{for(let x=10;x<86;x+=dash?4:1)R(x,Math.round(y),dash?2:1,1,col);};
+  if(k!=='short'){line(55,'#d83a2a');line(56,'#9c2218');}
+  if(k==='short'){const ly=lerp(55,45,ease((t-.4)/.8));
+    if(t>.4){line(55,wd.ring,true);q.globalAlpha=.45;line(56,wd.ring,true);q.globalAlpha=1;}
+    line(ly,'#d83a2a');line(ly+1,'#9c2218');
+    if(t>.4&&t<1.6)for(const x of [26,48,70]){R(x,Math.round(ly)+3,1,1,'#fff8e8');R(x-1,Math.round(ly)+4,3,1,'#fff8e8');}   // little arrows: the line moved back
+    [[-2,1],[0,1],[2,1],[-3,2],[1,2],[-1,3]].forEach(([c,r])=>pinAt(CX(c),RY(r),1));
+    // a pin on the last row advances over the moved line: it breaks through, red, and is gone
+    const u=ease((t-1.6)/.4),py=lerp(RY(3),RY(4),u),gone=t>2.1?1-ease((t-2.4)/.5):1;if(u>=1&&Math.floor(t*6)%2)ring(CX(1),py,4,'#ff4a32');pinAt(CX(1),py,gone,u>=1?'#ff4a32':null);}
+  else if(k==='sweep'){const cur=Math.min(3,Math.floor(t/.45)),go=t>1.7,by=go?lerp(57,2,ease((t-1.7)/.9)):6;
+    for(let i=0;i<10;i++){const x=19+i*6,lit=i===cur&&t<2.8;R(x,58,5,4,'#2a160e');R(x+1,59,3,2,lit?'#fff8e8':(i===3||i===7)?'#d83a2a':wd.mid);}   // the ten balls; 4 and 8 are sweep balls
+    const pins=[[-2,1],[0,1],[2,1],[-1,2],[1,2],[-3,3],[0,3],[2,4]];
+    for(const [c,r] of pins){const y=go?Math.min(RY(r),by-4):RY(r);pinAt(CX(c),y,go?clamp((y-2)/8,0,1):1);}
+    if(t>3)[[-3,0],[-1,0],[1,0],[3,0],[0,1]].forEach(([c,r])=>pinAt(CX(c),RY(r),ease((t-3)/.5)));   // ten fresh at the back
+    // the bar: hangers from the ceiling, hazard stripes; it blinks low on ball 4, then sweeps from the line to the pit
+    if(!go&&cur===3&&Math.floor(t*5)%2===0)q.globalAlpha=.55;R(12,0,1,by,'#9aa4b4');R(83,0,1,by,'#9aa4b4');
+    for(let x=10;x<86;x++){R(x,by,1,3,((x>>2)&1)?'#ffd866':'#d83a2a');}R(10,by+3,76,1,'#2a160e');q.globalAlpha=1;}
+  else if(k==='bolted'){const pins=[[-3,1],[-1,1],[1,1],[3,1],[-2,2],[0,2],[2,2],[-1,3],[1,3]];
+    const hit=t>=.7,u=ease((t-.7)/.4),hx=lerp(CX(0),CX(-1)+4,u),hy=lerp(RY(4),RY(3)+5,u),clank=t>1.1&&t<1.8;
+    for(const [c,r] of pins){const sh=clank&&c===-1&&r===3?(Math.floor(t*30)%2?1:-1):0;R(CX(c)-3+sh,RY(r)+3,7,1,'#9aa4b4');R(CX(c)-3+sh,RY(r)+3,1,1,'#2a2e38');R(CX(c)+3+sh,RY(r)+3,1,1,'#2a2e38');pinAt(CX(c)+sh,RY(r),1);}   // every pin on a steel plate
+    if(clank){ring(CX(-1),RY(3),5+Math.floor((t-1.1)*8),'#fff8e8');}
+    R(CX(0)-3,RY(4)+3,7,1,'#9aa4b4');if(!hit)pinAt(CX(0),RY(4),1);else fellAt(hx,hy);   // the ball fells the headpin; the headpin can't fell the pin it hits
+    if(t<.7)ballAt(lerp(50,CX(0)+1,t/.7),lerp(64,RY(4)+6,t/.7));else if(t<1){q.globalAlpha=1-(t-.7)/.3;ballAt(CX(0)+2,RY(4)+5);q.globalAlpha=1;}}
+  else if(k==='tentacle'){const step=t>1&&t<1.35?ease((t-1)/.35):t>=1.35?1:0,ty=lerp(RY(1),RY(2),step),col=0;
+    for(let r=(step>=1?3:2);r<=4;r++)for(let i=0;i<2;i++)R(CX(col),RY(r)-1+i*3,1,1,'#b48aee');   // where it advances next
+    [[-3,0],[-1,0],[1,0],[3,0],[-2,1],[2,1],[-1,2],[1,2],[2,3]].forEach(([c,r])=>pinAt(CX(c),RY(r),1));
+    R(CX(col)-3,Math.round(ty)+1,7,2,'#120a1c');q.drawImage(spr(['.oo...','ovvo..','.ovo..','..ovo.','..ovo.','.ovvo.','.ovo..','ovVo..','ovVvo.','oVvVo.','oVvvVo','.oooo.'],{o:'#120a1c',V:'#5a3a86',v:'#b48aee'}),CX(col)-3,Math.round(ty)-10);
+    const bt=clamp((t-1.6)/.6,0,1),stopY=ty+7,byy=lerp(64,stopY,bt);if(t>1.6)ballAt(CX(col),byy);
+    if(t>2.2&&t<2.9)ring(CX(col),stopY-3,4+Math.floor((t-2.2)*10),'#fff8e8');}
+}
 // your ten in perspective: headpin nearest, back row smaller and higher; sized to fill the deck
 function layoutRack(W,H,L){const D=7,el=.85,se=Math.sin(el),ce=Math.cos(el),DEPTH=.693,SPC=1.02,f=z=>D/(D+z*DEPTH);
   const top=3,bot=7,kH=(H-top-bot-2)/(3*DEPTH*se*f(3)+ce*f(3)*1.02),kW=(W-12)/(3*SPC*f(3)+.34*f(3)),k=Math.max(6,Math.min(kH,kW));   // art pixels per pin height; the largest that fits
@@ -995,15 +1140,20 @@ function drawMap(el,onTap,selI,o,lay){el.className='rackmap'+(o?' place':'');el.
     if(onTap){b.type='button';b.setAttribute('aria-pressed',selI===g.i?'true':'false');b.addEventListener('click',()=>onTap(g.i));}else b.setAttribute('role','img');
     el.appendChild(b);}}
 setInterval(()=>{const el=$('shopMap');if(still||!pending||$('shop').hidden||!el._map)return;mapPhase^=1;paintMap(el);},450);
-function repaintSheets(){for(const id of ['shopMap','rackMap','overMap']){const el=$(id);if(el._map&&!el.closest('.sheet').hidden)drawMap(el,...el._map);}
-  if(!$('shop').hidden){$('shopList').querySelectorAll('.offer:not(.got) canvas').forEach(c=>drawCard(c,c.dataset.t));$('shopPows').querySelectorAll('.offer:not(.got) canvas').forEach(c=>drawBandCard(c,c.dataset.w));}}
+function repaintSheets(){for(const id of ['shopMap','overMap']){const el=$(id);if(el._map&&!el.closest('.sheet').hidden)drawMap(el,...el._map);}
+  if(!$('shop').hidden){$('shopList').querySelectorAll('.offer:not(.got) canvas').forEach(c=>drawCard(c,c.dataset.t));}}
 window.addEventListener('resize',repaintSheets);
-if(window.ResizeObserver){const mapRO=new ResizeObserver(es=>{for(const e of es){const el=e.target;if(el._map&&el._sz!==el.clientWidth+'x'+el.clientHeight&&!el.closest('.sheet').hidden)drawMap(el,...el._map);}});['shopMap','rackMap','overMap'].forEach(id=>mapRO.observe($(id)));}if(document.fonts&&document.fonts.ready)document.fonts.ready.then(repaintSheets);
+if(window.ResizeObserver){const mapRO=new ResizeObserver(es=>{for(const e of es){const el=e.target;if(el._map&&el._sz!==el.clientWidth+'x'+el.clientHeight&&!el.closest('.sheet').hidden)drawMap(el,...el._map);}});['shopMap','overMap'].forEach(id=>mapRO.observe($(id)));}if(document.fonts&&document.fonts.ready)document.fonts.ready.then(repaintSheets);
 function drawGear(el,onTap,selK){el.innerHTML='';if(run.hook){const w=document.createElement('span');w.innerHTML=`<img src="${gicon(run.hook)}" alt="${BALLOFFERS[run.hook].name}">`;el.appendChild(w);}Object.keys(GEAR).filter(k=>run.gear[k]).forEach(k=>{const b=document.createElement('button');b.type='button';b.className=selK===k?'sel':'';
   b.setAttribute('aria-label',GEAR[k].name);b.innerHTML=`<img src="${gicon(k)}" alt="">`;b.addEventListener('click',()=>onTap(k));el.appendChild(b);});}
-function pinInfo(i){const it=run.rack[i],pw=pwOf(it);return `<img src="${iconOf(it)}" alt=""><div><h3>${short(PINS[it.t].name)}<small>${SLOTN[i]}</small>${slots(it)}</h3><p>${pw.length?pwText2(it):rich(PINS[it.t].text(it.lv))}</p></div>`;}
+function pinInfo(i){const it=run.rack[i],pw=pwOf(it);return `<img src="${iconOf(it)}" alt=""><div><h3>${short(PINS[it.t].name)}${slots(it)}</h3><p>${pw.length?(it.t!=='plain'?rich(PINS[it.t].text(it.lv))+' ':'')+pwText2(it):rich(PINS[it.t].text(it.lv))}</p></div>`;}
+// one power across the rack: its rule, and which pins hold it
+function powInfo(k){const on=run.rack.map((it,i)=>[i,pwCount(it,k)]).filter(a=>a[1]);
+  return `${pwImg(k,'big')}<div><h3>${POWERS[k].name}<small>${on.length?'pin'+(on.length>1?'s ':' ')+on.map(([i,n])=>(i+1)+(n>1?' ×'+n:'')).join(', '):''}</small></h3><p>${rich(POWERS[k].text(1))} <small class="ag">${POWERS[k].more}</small></p></div>`;}
+// a boss in the info strip
+function bossInfo(k,gi){return `${bossImg(k,'big')}<div><h3>${BOSSES[k].name}<small>Boss · game ${gi+1}</small></h3><p>${BOSSUI[k].rule}</p></div>`;}
 // three slots as three little bands: filled in the power's colours, empty as outlines
-const slots=it=>`<span class="slots">${[0,1,2].map(j=>{const k=pwOf(it)[j];return k?`<i style="--a:${POWERS[k].c[0]};--b:${POWERS[k].c[1]}"></i>`:'<i class="e"></i>';}).join('')}</span>`;
+const slots=it=>`<span class="slots">${[0,1,2].map(j=>{const k=pwOf(it)[j];return k?pwImg(k):'<i class="e"></i>';}).join('')}</span>`;
 // a built pin's powers, each with what it adds up to on this pin
 const pwText2=it=>[...new Set(pwOf(it))].map(k=>`<b>${POWERS[k].name}</b> ${POWERS[k].s(pwCount(it,k))}`).join(' · ');
 function gearInfo(k){return `<img class="gear" src="${gicon(k)}" alt=""><div><h3>${GEAR[k].name}<small>Gear</small></h3><p>${rich(GEAR[k].text)}</p></div>`;}
@@ -1023,36 +1173,39 @@ function showShop(){const box=$('shop').firstElementChild,el=$('shopList'),chip=
   box.classList.toggle('placing',!!pending);box.classList.remove('nudge');const bEl=$('shopBalls'),gEl=$('shopGearBuy'),wEl=$('shopPows');[el,bEl,gEl,wEl].forEach(e=>e.innerHTML='');
   if(chip.textContent!=='$'+run.cash){chip.textContent='$'+run.cash;chip.classList.remove('bump');void chip.offsetWidth;chip.classList.add('bump');}
   if(p&&p.fresh){p.fresh=false;chip.insertAdjacentHTML('beforeend',`<span class="fly">+$${p.earn}</span>`);}
+  const have=powerCounts();
   run.offers.forEach(o=>{const b=document.createElement('button'),on=pending===o||pick===o,poor=!o.bought&&run.cash<o.cost&&!on;b.type='button';
     b.className='offer '+o.kind+(o.bought?' got':'')+(on?' pend':'')+(poor?' poor':'');b.disabled=o.bought||poor;
-    b.setAttribute('aria-label',o.bought?o.name+', sold':`${o.name}, $${o.cost}. ${o.text}`);
+    b.setAttribute('aria-label',o.bought?o.name+', sold':`${o.name}, $${o.cost}. ${o.text}${o.kind==='pow'&&have[o.t]?' You have '+have[o.t]+'.':''}`);
     const tag=`<span class="c">${on?'×':'$'+o.cost}</span>`;
     b.innerHTML=o.kind==='pin'?`${tag}<canvas data-t="${o.t}" aria-hidden="true"></canvas><strong>${short(o.name)}</strong>`
-      :o.kind==='pow'?`${tag}<canvas data-w="${o.t}" aria-hidden="true"></canvas><strong>${o.name}</strong>`
+      :o.kind==='pow'?`${tag}<span class="gw">${pwImg(o.t)}${have[o.t]&&!o.bought?`<em class="have" aria-hidden="true">×${have[o.t]}</em>`:''}</span><strong>${o.name}</strong>`
       :o.kind==='ball'?`${tag}<i class="cradle"><img class="gear" src="${gicon(o.t)}" alt=""></i><strong>${o.name.replace(' ball','')}</strong>`
       :`${tag}<img class="gear" src="${gicon(o.t)}" alt=""><strong>${o.name}</strong>`;
-    b.addEventListener('click',()=>{if(o.bought)return;sel=null;gsel=null;
+    b.addEventListener('click',()=>{if(o.bought)return;sel=null;gsel=null;bsel=false;
       if(o.kind==='pin'||o.kind==='pow'){pick=null;pending=pending===o?null:o;}else{pending=null;pick=pick===o?null:o;}
       showShop();});(o.kind==='pin'?el:o.kind==='pow'?wEl:o.kind==='ball'?bEl:gEl).appendChild(b);});
-  el.querySelectorAll('.offer:not(.got) canvas').forEach(c=>drawCard(c,c.dataset.t));wEl.querySelectorAll('.offer:not(.got) canvas').forEach(c=>drawBandCard(c,c.dataset.w));
+  el.querySelectorAll('.offer:not(.got) canvas').forEach(c=>drawCard(c,c.dataset.t));
   $('shopBallTray').hidden=!run.ballOffers.length;$('shopGearTray').hidden=!run.gearOffer;$('shopBallTray').parentNode.hidden=!run.ballOffers.length&&!run.gearOffer;
   $('shopBallTray').parentNode.classList.toggle('solo',!run.ballOffers.length||!run.gearOffer);
   const lays=$('shopLays');$('shopLayTray').hidden=!OPT.layout;lays.innerHTML='';
   if(OPT.layout)run.layoutOpts.forEach(l=>{const b=document.createElement('button'),on=run.nextLayout===l.id,cost=l.cost&&!on?l.cost:0;b.type='button';b.className=on?'on':'';
     b.disabled=!on&&run.cash+run.layoutPaid<l.cost;b.innerHTML=`${rackDiagram(l.id)}<span>${LAYOUTS[l.id].name}</span>${l.cost?`<b>$${l.cost}</b>`:''}`;b.setAttribute('aria-label',`Next rack: ${LAYOUTS[l.id].name}${l.cost?', $'+l.cost:''}`);
     b.addEventListener('click',()=>{if(on)return;run.cash+=run.layoutPaid;run.layoutPaid=l.cost;run.cash-=l.cost;run.nextLayout=l.id;topBar();showShop();});lays.appendChild(b);});
-  const m=$('shopMsg'),info=pending||pick;m.className='strip'+(pending?' go':info?' info':sel===null&&!gsel?' idle':'');
-  m.innerHTML=pending&&pending.kind==='pow'?`<i class="pw big" style="--a:${POWERS[pending.t].c[0]};--b:${POWERS[pending.t].c[1]}"></i><div><h3>${pending.name}</h3><p>${rich(pending.text)} <small class="ag">${POWERS[pending.t].more}</small></p></div><span class="arrow tri"></span>`
+  const m=$('shopMsg'),info=pending||pick;m.className='strip'+(pending?' go':info?' info':sel===null&&!gsel&&!bsel?' idle':'');
+  m.innerHTML=pending&&pending.kind==='pow'?`${pwImg(pending.t,'big')}<div><h3>${pending.name}</h3><p>${rich(pending.text)} <small class="ag">${POWERS[pending.t].more}</small></p></div><span class="arrow tri"></span>`
     :pending?`<img src="${icon(pending.t)}" alt=""><div><h3>${short(pending.name)}</h3><p>${rich(pending.text)}</p></div><span class="arrow tri"></span>`
     :pick?`<img class="gear" src="${pick.kind==='spot'?icon(pick.t):gicon(pick.t)}" alt=""><div><h3>${short(pick.name)}</h3><p>${rich(pick.text)}</p></div><button type="button" class="buy" id="shopBuy"${run.cash<pick.cost?' disabled':''}>Buy <b>$${pick.cost}</b></button>`
-    :sel!==null?pinInfo(sel):gsel?gearInfo(gsel)
+    :sel!==null?pinInfo(sel):gsel?gearInfo(gsel):bsel?bossInfo(lvlBoss(run.game+1),bossGame(run.game+1))
     :'';
-  $('shopResult').hidden=!m.classList.contains('idle');$('shopResult').innerHTML=p?`<b>${p.t}<small> / ${p.target}</small></b><span><i>Won</i>+$${p.earn}</span>`:'';   // the win card has the breakdown
+  $('shopResult').hidden=!m.classList.contains('idle');{const nk=lvlBoss(run.game+1);$('shopResult').innerHTML=(p?`<b>${p.t}<small> / ${p.target}</small></b><span><i>Won</i>+$${p.earn}</span>`:'')+`<button type="button" class="bchip" id="shopBoss" aria-label="Boss: ${BOSSES[nk].name}">${bossImg(nk)}</button>`;
+    $('shopBoss').addEventListener('click',()=>{bsel=true;sel=null;gsel=null;pending=null;pick=null;showShop();});}   // the win card has the breakdown
   if(pick)$('shopBuy').addEventListener('click',()=>buy(pick));
-  drawMap($('shopMap'),shopTap,sel,pending,OPT.layout?run.nextLayout:run.layout);drawGear($('shopGear'),k=>{gsel=gsel===k?null:k;sel=null;pending=null;pick=null;showShop();},gsel);
+  drawMap($('shopMap'),shopTap,sel,pending,OPT.layout?run.nextLayout:run.layout);drawGear($('shopGear'),k=>{gsel=gsel===k?null:k;sel=null;pending=null;pick=null;bsel=false;showShop();},gsel);
   const rc=2+run.rerolls,rb=$('shopReroll');rb.innerHTML=`<b>$${rc}</b><span class="ro">⟳</span>Reroll`;rb.setAttribute('aria-label',`Reroll pins and powers, $${rc}`);rb.disabled=run.cash<rc;
-  saveRun('shop');skipAsk=false;{const n=run.game+1,bo=bossOf(n);$('shopNext').innerHTML=`${bo?'Boss · '+bo.name:kindOf3(n)+' game'} · beat <b>${tgtOf(n)}</b><i class="tri r"></i>`;}}
-function shopTap(i){gsel=null;pick=null;
+  saveRun('shop');skipAsk=false;{const n=run.game+1,bo=bossOf(n);$('shopNext').innerHTML=`${bo?bossImg(lvlBoss(n))+bo.name:kindOf3(n)+' game'} · beat <b>${tgtOf(n)}</b><i class="tri r"></i>`;}
+  {const sb=$('shopBuild'),pi=[6,3,1,0,2,5,9].map(i=>run.rack[i]).filter(Boolean);sb.innerHTML=`<span>${pi.slice(0,3).map(it=>`<img src="${iconOf(it)}" alt="">`).join('')}</span>Build`;}}
+function shopTap(i){gsel=null;pick=null;bsel=false;
   if(pending&&pending.kind==='pow'){const o=pending,it=run.rack[i];if(pwOf(it).length>=3){sel=i;pending=null;showShop();return;}   // full: show its build instead
     run.cash-=o.cost;it.pw=pwOf(it).concat(o.t);o.bought=true;run.bought=true;run.seen.push('bought '+o.name+' $'+o.cost+' on '+SLOTN[i]);pending=null;sel=i;topBar();strip();showShop();return;}
   if(pending){const o=pending,it=run.rack[i];run.cash-=o.cost;run.rack[i]=Object.assign(newItem(o.t),{pw:pwOf(it)});o.bought=true;run.bought=true;run.seen.push('bought '+o.name+' $'+o.cost+' at '+SLOTN[i]);pending=null;sel=null;topBar();showShop();return;}
@@ -1060,14 +1213,26 @@ function shopTap(i){gsel=null;pick=null;
   showShop();}
 $('shopReroll').addEventListener('click',()=>{const rc=2+run.rerolls;if(run.cash<rc)return;run.cash-=rc;run.rerolls++;pending=null;pick=null;topBar();rollPins();showShop();});
 let skipAsk=false;
-$('shopNext').addEventListener('click',e=>{if(!skipAsk&&!run.bought&&run.offers.some(o=>run.cash>=o.cost)){skipAsk=true;e.currentTarget.textContent='Leave with nothing?';$('shop').firstElementChild.classList.add('nudge');return;}if(OPT.layout)run.seen.push('chose rack: '+LAYOUTS[run.nextLayout].name);if(!run.bought)run.seen.push('bought nothing');pending=null;pick=null;sel=null;gsel=null;run.game++;startGame();if(run.game%3===0&&run.game>0)startFx(stageOf(run.game));});
-let rsel=null,rgsel=null;
+$('shopNext').addEventListener('click',e=>{if(!skipAsk&&!run.bought&&run.offers.some(o=>run.cash>=o.cost)){skipAsk=true;e.currentTarget.textContent='Leave with nothing?';$('shop').firstElementChild.classList.add('nudge');return;}if(OPT.layout)run.seen.push('chose rack: '+LAYOUTS[run.nextLayout].name);if(!run.bought)run.seen.push('bought nothing');pending=null;pick=null;sel=null;gsel=null;bsel=false;run.game++;startGame();if(run.game%3===0&&run.game>0)startFx(stageOf(run.game));if(BOSS)showIntro();});
+$('shopMsg').addEventListener('click',e=>{if(bsel&&!e.target.closest('button')){bsel=false;showShop();}});
+$('shopBuild').addEventListener('click',()=>{pending=null;pick=null;showShop();openBuild();});
+// your build: the ten as a flat triangle, back row on top and the headpin nearest, as on the lane; each pin's three slots stacked beside it like its neck bands
+// below, every power you hold with its count, then your ball and gear. Tap a pin, a power or a piece of gear for its rule; a power lights the pins that hold it
+let rsel=null,rgsel=null,rpw=null;
+const BROWS=[[6,7,8,9],[3,4,5],[1,2],[0]];
 function showRack(){const m=$('rackMsg');$('rackCash').textContent='$'+run.cash;$('rackSheet').hidden=false;
-  drawMap($('rackMap'),i=>{rsel=rsel===i?null:i;rgsel=null;showRack();},rsel,null,run.layout);
-  drawGear($('rackGear'),k=>{rgsel=rgsel===k?null:k;rsel=null;showRack();},rgsel);
-  m.className='strip'+(rsel===null&&!rgsel?' tally':'');
-  m.innerHTML=rsel!==null?pinInfo(rsel):rgsel?gearInfo(rgsel):'<span>Pins double each ball</span><span><i>Strike</i>×2</span>';}
-$('rackBtn').addEventListener('click',()=>{rsel=null;rgsel=null;newAsk=false;$('rackNew').textContent='New run';showRack();});
+  const grid=$('rackGrid'),cnt=powerCounts();
+  grid.innerHTML=BROWS.map(r=>`<div class="brow">${r.filter(i=>run.rack[i]).map(i=>{const it=run.rack[i],pw=pwOf(it);
+    return `<button type="button" class="bpin${rsel===i?' sel':''}${rpw&&pw.includes(rpw)?' hl':''}" data-i="${i}" aria-pressed="${rsel===i}" aria-label="${SLOTN[i]}: ${PINS[it.t].name}${pw.length?', '+pw.map(k=>POWERS[k].name).join(', '):''}"><img class="pinimg" src="${iconOf(it)}" alt=""><span class="bslots">${[0,1,2].map(j=>pw[j]?pwImg(pw[j]):'<i class="e"></i>').join('')}</span></button>`;}).join('')}</div>`).join('');
+  grid.querySelectorAll('.bpin').forEach(b=>b.addEventListener('click',()=>{const i=+b.dataset.i;rsel=rsel===i?null:i;rgsel=null;rpw=null;showRack();}));
+  const pe=$('rackPows'),ks=Object.keys(POWERS).filter(k=>cnt[k]);
+  pe.innerHTML=ks.length?ks.map(k=>`<button type="button" class="pwchip${rpw===k?' sel':''}" data-k="${k}" aria-label="${POWERS[k].name}, ${cnt[k]}">${pwImg(k)}×${cnt[k]}</button>`).join(''):'<span class="none">No powers yet</span>';
+  pe.querySelectorAll('.pwchip').forEach(b=>b.addEventListener('click',()=>{const k=b.dataset.k;rpw=rpw===k?null:k;rsel=null;rgsel=null;showRack();}));
+  drawGear($('rackGear'),k=>{rgsel=rgsel===k?null:k;rsel=null;rpw=null;showRack();},rgsel);
+  m.className='strip'+(rsel===null&&!rgsel&&!rpw?' tally':'');
+  m.innerHTML=rsel!==null?pinInfo(rsel):rgsel?gearInfo(rgsel):rpw?powInfo(rpw):'<span>Pins double each ball</span><span><i>Strike</i>×2</span>';}
+function openBuild(){rsel=null;rgsel=null;rpw=null;newAsk=false;$('rackNew').textContent='New run';showRack();}
+$('rackBtn').addEventListener('click',openBuild);
 $('rackClose').addEventListener('click',()=>$('rackSheet').hidden=true);
 
 // ---------- cameras: the sim stays in flat lane units, the camera only decides where they land on screen ----------
@@ -1336,7 +1501,10 @@ function drawFx(cm){const oa=buildTheme(THEME[fx.from]),ob=buildTheme(THEME[fx.t
 
 // ---------- drawing ----------
 function drawPost(o,cm,p){const q=cm.proj(p.x,p.y),X=Math.round(q.X),Y=Math.round(q.Y),r=Math.max(3,Math.round(p.r*q.k));
-  if(BOSS&&BOSS.tent){if(cm.id==='lane'){const h=Math.round(r*2.6);px(c,X-r-1,Y+1,2*r+3,2,o.shadow);px(c,X-r,Y-h,2*r+1,h+2,'#120a1c');for(let y=0;y<h;y+=3)px(c,X-r+1,Y-h+y+1,2*r-1,2,y%6?'#3a2458':'#5a3a86');px(c,X-1,Y-h+2,2,h-3,'#7a58aa');return;}disc(c,X+1,Y+2,r,o.shadow);disc(c,X,Y,r,'#120a1c');disc(c,X,Y,r-2,'#5a3a86');return;}
+  if(BOSS&&BOSS.tent){   // the tentacle: out of a hole in the deck, pin-sized like the pins, tapering, with a curl
+    {const Y=Math.round(q.Y)+(cm.id==='lane'?0:5);px(c,X-5,Y,11,3,'#120a1c');px(c,X-4,Y+1,9,1,'#05030a');const sw=1;   // a fixed curl: nothing on the lane moves while you aim
+      for(let i=0;i<24;i++){const w=i<8?3:i<16?2:1,x=X+Math.round(Math.sin(sw+i*.32)*i/7),y=Y-i;px(c,x-w-1,y,2*w+3,1,'#120a1c');px(c,x-w,y,2*w+1,1,(i>>1)&1?'#5a3a86':'#7a58aa');px(c,x-w,y,1,1,'#b48aee');if(i%5===2&&w>1)px(c,x+w-1,y,1,1,'#e0d0ff');}
+      return;}}
   if(cm.id==='lane'){const h=Math.round(r*1.5),b=Math.max(2,Math.round(h*.3));
     px(c,X-r-1,Y+1,2*r+3,2,o.shadow);px(c,X-r+1,Y+3,2*r-1,1,o.shadow);
     px(c,X-r,Y-h,2*r+1,h+2,o.edge);px(c,X-r+1,Y+2,2*r-1,1,o.edge);px(c,X-r+1,Y-h-1,2*r-1,1,o.edge);
@@ -1345,18 +1513,41 @@ function drawPost(o,cm,p){const q=cm.proj(p.x,p.y),X=Math.round(q.X),Y=Math.roun
   disc(c,X+1,Y+2,r,o.shadow);disc(c,X,Y,r,o.edge);disc(c,X,Y,r-1,'#d83a2a');disc(c,X,Y,Math.max(1,r-3),'#f3e2b8');disc(c,X,Y,Math.max(0,r-5),'#d83a2a');}
 // a bolted pin stands on a steel plate with two bolt heads
 function drawBolt(o,cm,p){const q=cm.proj(p.x,p.y),X=Math.round(q.X),Y=Math.round(q.Y);
-  if(cm.id==='lane'){px(c,X-6,Y+1,13,3,o.edge);px(c,X-5,Y+1,11,2,'#8e98aa');px(c,X-5,Y+1,11,1,'#c4ccd8');px(c,X-4,Y+1,2,1,'#2a2e38');px(c,X+3,Y+1,2,1,'#2a2e38');return;}
+  if(cm.id==='lane'){px(c,X-7,Y,15,4,o.edge);px(c,X-6,Y,13,3,'#8e98aa');px(c,X-6,Y,13,1,'#c4ccd8');px(c,X-6,Y+1,2,2,'#eef2f8');px(c,X+5,Y+1,2,2,'#eef2f8');px(c,X-5,Y+2,1,1,'#2a2e38');px(c,X+6,Y+2,1,1,'#2a2e38');return;}
   ringPx(c,X,Y,7,7,o.edge);ringPx(c,X,Y,6,6,'#c4ccd8');px(c,X-6,Y,2,1,'#2a2e38');px(c,X+5,Y,2,1,'#2a2e38');}
 // the part of the approach a start-side boss closes: hatched
 function drawClosed(o,cm){if(!BOSS||!BOSS.side)return;const sr=startRange(),x0=BOSS.side<0?sr[1]+RB:G.L,x1=BOSS.side<0?G.R:sr[0]-RB;
   for(let y=G.SY-30;y<=G.FOUL;y+=3){const a=cm.proj(x0,y),b=cm.proj(x1,y),Y=Math.round(a.Y);for(let X=Math.round(a.X);X<=Math.round(b.X);X++)if(((X+Y)&3)===0)px(c,X,Y,1,1,o.edge);}
   const a=cm.proj(BOSS.side<0?sr[1]+RB:sr[0]-RB,G.SY-30),b=cm.proj(BOSS.side<0?sr[1]+RB:sr[0]-RB,G.FOUL);plotLine(c,Math.round(a.X),Math.round(a.Y),Math.round(b.X),Math.round(b.Y),o.handle);}
+// Short line: where the line usually is, dashed and dim; for the first balls, small arrows show it moved back
+function drawShortLine(o,cm,ly){const gy=ADV.BACKY+ADV.LASTK*ADV.STEP+30;
+  for(let x=G.L;x<=G.R;x+=10){const a=cm.proj(x,gy),b=cm.proj(Math.min(G.R,x+3),gy);plotLine(c,Math.round(a.X),Math.round(a.Y),Math.round(b.X),Math.round(b.Y),o.dim);}
+  for(let x=G.L;x<=G.R;x+=6){const a=cm.proj(x,ly),b=cm.proj(Math.min(G.R,x+3),ly);plotLine(c,Math.round(a.X),Math.round(a.Y)+1,Math.round(b.X),Math.round(b.Y)+1,'#8a1a10');}   // the moved line, doubled
+  if(g.mode==='aim'&&g.frame<2&&Math.floor(lastT/400)%2===0)for(const x of [110,180,250]){const a=cm.proj(x,(gy+ly)/2),X=Math.round(a.X),Y=Math.round(a.Y);px(c,X,Y-2,1,1,'#ff6a52');px(c,X-1,Y-1,3,1,'#ff6a52');px(c,X-2,Y,5,1,'#ff6a52');}}
+// Sweep bar: parked high over the back of the deck; it hangs low and blinks before a sweep ball, and after that ball it sweeps from the line into the pit
+const sweepWarn=()=>g.mode==='aim'&&(g.frame+1)%4===0&&g.frame<ballsLeftMax()-1;
+function sweepY(){return g.step&&g.step.sweep?g.step.barY:sweepWarn()?ADV.BACKY-12:ADV.BACKY-24;}
+function drawSweepBar(o,cm,y){const sweeping=g.step&&g.step.sweep,warn=sweepWarn();
+  if(warn&&Math.floor(lastT/350)%2)c.globalAlpha=.6;
+  const L=cm.proj(G.L+2,y),Rr=cm.proj(G.R-2,y),X0=Math.round(L.X),X1=Math.round(Rr.X),Y=Math.round(L.Y),h=warn||sweeping?5:3;
+  if(cm.id==='lane'&&!sweeping){const top=Math.max(52,Y-(warn?14:6));px(c,X0+2,top,1,Y-top,'#8e98aa');px(c,X1-2,top,1,Y-top,'#8e98aa');}   // hangers
+  px(c,X0-1,Y-h-1,X1-X0+3,h+2,'#2a160e');for(let x=X0;x<=X1;x++)px(c,x,Y-h,1,h,((x>>2)&1)?(warn||sweeping?'#ffd866':'#9a8050'):(warn||sweeping?'#d83a2a':'#6a5430'));
+  c.globalAlpha=1;}
+// Rising tentacle: dots down its column show the rows it advances into; during the advance it slides (or rises again at the back)
+function drawTentNext(o,cm){const T=BOSS.tent;if(!T)return;for(let k=T.k+1;k<=LK();k++){const a=cm.proj(colX(T.c),rowY(k)),X=Math.round(a.X),Y=Math.round(a.Y);px(c,X-1,Y,3,1,'#9a6ad8');px(c,X,Y-1,1,3,'#9a6ad8');}}
+function postNow(q){const S=g.step;if(!S||!S.post0)return q;const u=Math.min(1,S.t/.35);if(S.post0.y<=q.y)return Object.assign({},q,{y:S.post0.y+(q.y-S.post0.y)*u*u*(3-2*u)});return S.t<.3?null:q;}
 function drawPin(o,cm,p){const q=cm.proj(p.x,p.y),X=Math.round(q.X),Y=Math.round(q.Y);if(p.alpha!==undefined&&p.alpha<1)c.globalAlpha=Math.max(0,p.alpha);drawPinBody(o,cm,p,X,Y);if(p.item&&(p.item.t==='shield'||p.P&&p.P.shield)&&p.cracked&&!p.shield&&!p.down&&cm.id==='lane'){px(c,X-1,Y-15,2,3,'#1a1010');}
   if(!p.down&&!p.broke&&p.v>1&&g.mode!=='roll'&&g.mode!=='settle'){const s=String(p.v),w=s.length*4-1,ty=cm.id==='lane'?Y-24:Y-19,col=(p.k===LK()||p.stand)?'#ff6a52':p.v>=4?'#ffd866':'#fff2d8';px(c,X-Math.floor(w/2)-1,ty-1,w+2,7,'rgba(20,10,6,.72)');txt(c,s,X-Math.floor(w/2),ty,col);}
   if(!p.down&&!p.broke&&p.k===LK()&&g.mode==='aim'){const bl=Math.floor(lastT/260)%2;px(c,X-4,Y+(cm.id==='lane'?2:6),9,1,bl?'#ff4a32':'#a8231a');}
   c.globalAlpha=1;}
 function drawPinBody(o,cm,p,X,Y){if(p.bolt&&!p.down)drawBolt(o,cm,p);const K=pinKey(o,p.kind,p.item);
+  if(p.bolt&&!p.down){drawPinUp(o,cm,K,X,Y);const ly=cm.id==='lane'?Y-3:Y+1;px(c,X-4,ly,9,2,'#5e687a');px(c,X-4,ly,9,1,'#c4ccd8');   // the steel collar
+    if(g.sim&&p.held!==undefined&&g.sim.t-p.held<.45){const u=(g.sim.t-p.held)/.45,r=8+Math.round(u*8),cy=Y-(cm.id==='lane'?8:3);ringPx(c,X,cy,r,Math.round(r*.75),u<.5?'#ffd866':'#d86a28');
+      for(let i=0;i<6;i++){const a=i*1.047+.5,d=r+2;px(c,Math.round(X+Math.cos(a)*d),Math.round(cy+Math.sin(a)*d*.75),1,1,'#fff8e8');}}   // clank: a pin hit it and the bolt held
+    return;}
   if(p.down){c.drawImage(o.pins[K+(Math.cos(p.ang)<0?'l':'r')],X-9,Y-(cm.id==='lane'?7:4));return;}
+  drawPinUp(o,cm,K,X,Y);}
+function drawPinUp(o,cm,K,X,Y){
   if(cm.id==='lane'){px(c,X-3,Y,7,2,o.shadow);c.save();c.globalAlpha=.2;c.translate(0,2*Y+2);c.scale(1,-1);c.drawImage(o.pins[K],X-4,Y-17);c.restore();c.drawImage(o.pins[K],X-4,Y-17);}
   else{px(c,X-3,Y+4,8,3,o.shadow);c.drawImage(o.pins[K],X-4,Y-12);}}
 // a pin wearing powers: the neck band split into one band per filled slot, each in its power's colours
@@ -1386,7 +1577,9 @@ function draw(){
     px(c,R[0],R[1],R[2],R[3],R[4]);txt(c,s,R[0]+Math.floor((R[2]-(s.length*4-1))/2),R[1]+Math.floor((R[3]-5)/2),R[5]);}
   if(!fx)hallLive(o,cm,hg,(lastT-HALL.t0)/1000);
   drawClosed(o,cm);
-  {const ly=LINEY();for(let x=G.L;x<=G.R;x+=6){const a=cm.proj(x,ly),b=cm.proj(Math.min(G.R,x+3),ly);plotLine(c,Math.round(a.X),Math.round(a.Y),Math.round(b.X),Math.round(b.Y),'#c8321f');}}
+  {const ly=LINEY();for(let x=G.L;x<=G.R;x+=6){const a=cm.proj(x,ly),b=cm.proj(Math.min(G.R,x+3),ly);plotLine(c,Math.round(a.X),Math.round(a.Y),Math.round(b.X),Math.round(b.Y),'#c8321f');}
+    if(BOSS&&BOSS.lastk)drawShortLine(o,cm,ly);}
+  if(BOSS&&BOSS.tent&&g.mode==='aim')drawTentNext(o,cm);
 
   const act=drag?drag.which:null,al=k=>act&&act!==k?.35:1;
   let aimPos=null,bendPos=null;
@@ -1400,11 +1593,13 @@ function draw(){
     for(let i=1;i<g.trail.length;i++){const a=cm.proj(g.trail[i-1].x,g.trail[i-1].y),b=cm.proj(g.trail[i].x,g.trail[i].y);plotLine(c,a.X,a.Y+1,b.X,b.Y+1,o.dotSh);plotLine(c,a.X,a.Y,b.X,b.Y,o.trail);}}
 
   // pins and ball, far ones first
-  const ents=[];for(const p of g.pins)if(!p.gone)ents.push({y:p.y,p});if(BOSS&&BOSS.posts)for(const q of BOSS.posts)ents.push({y:q.y,q});
-  const b=g.sim?g.sim.ball:{x:g.sx,y:G.SY};if(!g.sim||!b.out)ents.push({y:b.y+.5,b});
+  const ents=[];for(const p of g.pins)if(!p.gone)ents.push({y:p.y,p});if(BOSS&&BOSS.posts)for(const q0 of BOSS.posts){const q=postNow(q0);if(q)ents.push({y:q.y,q});}
+  if(BOSS&&BOSS.sweep)ents.push({y:sweepWarn()?1e9:sweepY(),by:sweepY(),bar:1});   // lowered for a sweep ball, it hangs in front of the back row
+  const b=g.sim?g.sim.ball:{x:g.sx,y:G.SY};if(!g.sim||!b.out||b.stuck)ents.push({y:b.y+.5,b});
   ents.sort((m,n)=>m.y-n.y);let ballPos=null;
-  for(const e of ents){if(e.p)drawPin(o,cm,e.p);else if(e.q)drawPost(o,cm,e.q);else{if(g.mode==='aim')c.globalAlpha=al('ball');ballPos=drawBall(o,cm,e.b);
-    if(g.mode==='aim'&&act==='ball')ringPx(c,ballPos.X,ballPos.Y,ballPos.r+3,ballPos.r+3,o.hi);c.globalAlpha=1;}}
+  for(const e of ents){if(e.p)drawPin(o,cm,e.p);else if(e.q)drawPost(o,cm,e.q);else if(e.bar)drawSweepBar(o,cm,e.by);else{if(g.mode==='aim')c.globalAlpha=al('ball');ballPos=drawBall(o,cm,e.b);
+    if(g.mode==='aim'&&act==='ball')ringPx(c,ballPos.X,ballPos.Y,ballPos.r+3,ballPos.r+3,o.hi);c.globalAlpha=1;
+    if(e.b.stuck&&g.sim){const u=Math.min(1,(g.sim.t-(g.sim.stuckT=g.sim.stuckT||g.sim.t))/.4);if(u<1){const r=ballPos.r+2+Math.round(u*8);ringPx(c,ballPos.X,ballPos.Y-2,r,Math.round(r*.7),'#fff8e8');}}}}
 
 
   if(g.mode==='aim'){const s=cm.proj(g.bx,HY.bend),X=Math.round(s.X),Y=Math.round(s.Y);
@@ -1460,7 +1655,7 @@ function loadRun(){let d=null;try{d=JSON.parse(localStorage.getItem(SAVE)||'null
     g.pins=q.pins.filter(o=>run.rack[o.i]).map(o=>{const p=mkPin(o.c,o.k,o.v,run.rack[o.i],o.stand,{shield:o.shield,w:o.w,b:o.b});p.cracked=o.cracked;return p;});
     pending=null;pick=null;sel=null;gsel=null;board();strip();topBar();hint();setBtn();
     if(d.screen==='win'||d.screen==='shop'){g.mode='over';g.toastT=0;if(d.screen==='win')showWin();else showShop();}
-    else saveRun('aim');
+    else{saveRun('aim');if(BOSS&&g.frame===0&&!g.frames[0].balls.length)showIntro();}
     return true;}catch(e){console.error(e);clearSave();return false;}}
 // New run from the Rack sheet: a second tap confirms, since it drops the saved run
 let newAsk=false;
