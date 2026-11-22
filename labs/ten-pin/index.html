@@ -826,7 +826,7 @@ function showShop(){const box=$('shop').firstElementChild,el=$('shopList'),chip=
     :pick?`<img class="gear" src="${pick.kind==='spot'?icon(pick.t):gicon(pick.t)}" alt=""><div><h3>${short(pick.name)}</h3><p>${rich(pick.text)}</p></div><button type="button" class="buy" id="shopBuy"${run.cash<pick.cost?' disabled':''}>Buy <b>$${pick.cost}</b></button>`
     :sel!==null?pinInfo(sel):gsel?gearInfo(gsel)
     :'';
-  $('shopResult').innerHTML=p?`<b>${p.t}<small> / ${p.target}</small></b><span><i>Win</i>+$${p.base}</span>${p.extra?`<span><i>+${Math.floor((p.t/p.target-1)*100)}%</i>+$${p.extra}</span>`:''}`:'';
+  $('shopResult').innerHTML=p?`<b>${p.t}<small> / ${p.target}</small></b><span><i>Won</i>+$${p.earn}</span>`:'';   // the win card has the breakdown
   if(pick)$('shopBuy').addEventListener('click',()=>buy(pick));
   drawMap($('shopMap'),shopTap,sel,pending,OPT.layout?run.nextLayout:run.layout);drawGear($('shopGear'),k=>{gsel=gsel===k?null:k;sel=null;pending=null;pick=null;showShop();},gsel);
   const rc=2+run.rerolls,rb=$('shopReroll');rb.innerHTML=`<b>$${rc}</b><span class="ro">⟳</span>Reroll`;rb.setAttribute('aria-label',`Reroll pins, $${rc}`);rb.disabled=run.cash<rc;
