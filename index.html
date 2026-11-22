@@ -2,11 +2,71 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>bowl-rogue</title>
-<meta http-equiv="refresh" content="0; url=labs/five-pin-bosses/">
-<script>location.replace('labs/five-pin-bosses/'+location.search);</script>
-<style>body{margin:0;background:#1d100a;color:#f3e2b8;font:17px system-ui,sans-serif;display:flex;align-items:center;justify-content:center;height:100vh}a{color:#f3e2b8}</style>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@500;700&family=Silkscreen&display=swap" rel="stylesheet">
+<style>
+/* the front page: pick a mode. Rec Room '74 colours, the game's pixel fonts, one screen, no scrolling */
+:root{--ink:#1d100a;--wall:#4c2a1a;--panel:#3a2016;--chalk:#f3e2b8;--dim:#c9a878;--accent:#d86a28;--red:#d83a2a;--amber:#e8a020;--green:#3f8f6a;--wood:#c98f52;--woodline:#b47a40;
+  --display:"Pixelify Sans",system-ui,sans-serif;--num:"Silkscreen",ui-monospace,monospace;color-scheme:dark}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0}
+body{background:var(--ink);color:var(--chalk);font-family:var(--display);display:flex;flex-direction:column;overflow:hidden;-webkit-tap-highlight-color:transparent;
+  padding:max(20px,calc(env(safe-area-inset-top) + 10px)) 14px max(22px,calc(env(safe-area-inset-bottom) + 10px))}
+main{flex:1;min-height:0;width:100%;max-width:420px;margin:0 auto;display:flex;flex-direction:column;gap:12px}
+/* the sign over the lanes */
+.sign{position:relative;background:var(--wall);border:3px solid #1d100a;box-shadow:inset 0 0 0 2px #7a4a2c;border-radius:6px;padding:14px 12px 12px;display:flex;align-items:center;gap:12px;overflow:hidden}
+.sign::before,.sign::after{content:"";position:absolute;left:0;right:0;height:5px}
+.sign::before{bottom:14px;background:var(--accent)}.sign::after{bottom:9px;background:var(--chalk)}
+.disc{position:relative;z-index:1;flex:none;width:52px;height:52px;border-radius:50%;background:var(--chalk);border:3px solid #3a2016;display:grid;place-items:center;font-family:var(--num);font-size:30px;line-height:1;color:var(--red);padding:0 0 2px 5px}
+.sign h1{position:relative;z-index:1;margin:0 0 12px;font-size:30px;letter-spacing:.03em;line-height:1}
+.sign h1 small{display:block;font-family:var(--num);font-size:11px;letter-spacing:.08em;color:var(--dim);margin-top:6px}
+/* modes */
+.modes{flex:1;min-height:0;display:flex;flex-direction:column;gap:10px}
+.mode{flex:1;min-height:0;max-height:168px;display:flex;align-items:stretch;gap:12px;padding:10px;border-radius:8px;background:var(--panel);border:3px solid #1d100a;box-shadow:inset 0 0 0 2px rgba(243,226,184,.08);color:var(--chalk);text-decoration:none}
+.mode:focus-visible,.mode:hover{box-shadow:inset 0 0 0 2px var(--accent)}
+.mode:active{transform:translateY(1px)}
+.deck{flex:none;width:108px;border-radius:5px;background:repeating-linear-gradient(90deg,var(--wood) 0 11px,var(--woodline) 11px 12px);display:grid;place-items:center;border:2px solid #1d100a}
+.deck svg{width:100px;height:auto;image-rendering:pixelated;shape-rendering:crispEdges}
+.txt{flex:1;min-width:0;display:flex;flex-direction:column;justify-content:center;gap:5px}
+.txt strong{font-size:21px;line-height:1}
+.txt span{font-size:14px;line-height:1.25;color:var(--dim)}
+.txt em{align-self:flex-start;font-style:normal;font-family:var(--num);font-size:10px;letter-spacing:.06em;padding:3px 6px 2px;border-radius:3px;background:var(--accent);color:var(--ink)}
+.mode.alt em{background:transparent;color:var(--dim);box-shadow:inset 0 0 0 2px var(--dim)}
+.go{flex:none;align-self:center;width:0;height:0;border:9px solid transparent;border-left:12px solid var(--accent);border-right:0}
+footer{display:flex;justify-content:center}
+footer a{font-family:var(--num);font-size:12px;letter-spacing:.06em;color:var(--dim);text-decoration:none;padding:10px 14px}
+footer a:focus-visible,footer a:hover{color:var(--chalk)}
+@media (max-height:620px){.sign{padding:10px 10px 10px}.disc{width:42px;height:42px;font-size:24px}.sign h1{font-size:25px;margin-bottom:10px}.txt span{font-size:13px}.deck{width:92px}.deck svg{width:86px}}
+</style>
 </head>
-<body><a href="labs/five-pin-bosses/">Play</a></body>
+<body>
+<main>
+  <header class="sign"><div class="disc" aria-hidden="true">5</div><h1>bowl-rogue<small>a bowling roguelike</small></h1></header>
+  <nav class="modes" aria-label="Modes">
+    <a class="mode" href="labs/five-pin-bosses/"><div class="deck" data-rack="five"></div><div class="txt"><strong>Five-Pin</strong><span>Four levels of small, big and boss games. The hall changes as you go.</span><em>12 games · bosses</em></div><i class="go" aria-hidden="true"></i></a>
+    <a class="mode" href="labs/ten-pin/"><div class="deck" data-rack="ten"></div><div class="txt"><strong>Ten-Pin</strong><span>A full rack, two balls a frame. Spares count.</span><em>12 games · bosses</em></div><i class="go" aria-hidden="true"></i></a>
+    <a class="mode alt" href="game/"><div class="deck" data-rack="classic"></div><div class="txt"><strong>Classic</strong><span>The first Five-Pin Run: six games, strikes compound.</span><em>6 games</em></div><i class="go" aria-hidden="true"></i></a>
+  </nav>
+  <footer><a href="labs/">All labs and tests</a></footer>
+</main>
+<script>
+// each mode's rack, drawn as pixel pins seen from above-behind: back rows first, band colour by value (5 red, 3 amber, 2 green)
+const PIN=['..ww..','..ww..','.wwww.','.wwww.','.bbbb.','wwwwww','wwwwww','.wwww.'];
+const BAND={5:'#d83a2a',3:'#e8a020',2:'#3f8f6a'};
+function rackSVG(pins){const W=48,H=30,s=[];
+  pins.sort((a,b)=>a[1]-b[1]).forEach(([x,y,v])=>{PIN.forEach((row,j)=>[...row].forEach((ch,i)=>{if(ch==='.')return;
+    s.push(`<rect x="${x-3+i}" y="${y-8+j}" width="1" height="1" fill="${ch==='b'?BAND[v]:j>=5?'#efe2c4':'#fff8e8'}"/>`);}));
+    s.push(`<rect x="${x-3}" y="${y}" width="6" height="1" fill="rgba(42,22,14,.45)"/>`);});
+  return `<svg viewBox="4 5 40 26" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">${s.join('')}</svg>`;}
+const RACKS={
+  five:[[24,27,5],[16,21,3],[32,21,3],[8,15,2],[40,15,2]],
+  classic:[[24,27,5],[16,21,3],[32,21,3],[8,15,2],[40,15,2]],
+  ten:[[24,29,5],[19,24,3],[29,24,3],[14,19,2],[24,19,2],[34,19,2],[9,14,2],[19,14,2],[29,14,2],[39,14,2]]
+};
+document.querySelectorAll('.deck').forEach(d=>d.innerHTML=rackSVG(RACKS[d.dataset.rack].map(p=>p.slice())));
+</script>
+</body>
 </html>
