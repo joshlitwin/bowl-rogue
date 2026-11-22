@@ -146,5 +146,17 @@ What the bot found (`npm run advancing-bot`: an oracle that tries ~1,600 lines a
 - The best line changes almost every ball: the chosen line moves a median of 90-160 units between balls and repeats on under 10% of balls.
 - With targets on (80 ms spread, 3 runs each): the strike bot won 2 of 3 runs, the patient bot 1 of 3 (lost a small game and a Short line boss). A person can't search 1,600 lines a ball, so expect it harder in play.
 
+## Advancing Ten-Pin (built 22 November, not yet played by Josh)
+`labs/advancing-ten-pin/`: the Ten-Pin run rebuilt on the Advancing Rack board, from four blind teams (pins, balls, gear, bosses and run) plus Josh's own pins (Slow, Spark, Shield; "things that manipulate how the board reacts to you"). What shipped and what is parked: `docs/design/advancing/README.md`.
+- Your ten pins keep their type; a bought pin replaces one of your ten on the spot where it starts each game (no levels). Balls: the house ball plus one on a hook, swapped with one tap (button left of THROW).
+- A game ends when you reach the target; $1 per ball left, up to $4. Targets 90, 110, 125 / 150, 190, 210 / 220, 270, 300 / 330, 400, 450.
+- Bosses alternate ripen killers (Short line, Sweep bar) and strike killers (Bolted rack, Rising tentacle).
+
+What the run bot found (`npm run advancing-run-bot`, 200 lines a ball, 60 ms spread, 2 runs per build, targets on):
+- Strike build (Crown, Spark, Bomb, Huddle; Strike chain, Home rack, Full front) reached game 12 both runs and died there to Bolted rack and Rising tentacle.
+- Harvest build (Crowd, Rent, Crown; Harvest bell, Rebound, Full front) won one run, lost the other at Rising tentacle in level 2.
+- Ripen build (Runner, Glass, Anchor, Slow, Shield, Toll; Hothouse, Last stand, Catch net) was weakest: lost at Sweep bar (game 6) and in game 7. Its gear rarely showed up in the shop (one random gear of twelve per shop). Ripening may need a boost; check against Josh's play first.
+- Bosses do kill the build they target (Sweep bar 31 of 210 against ripen; Bolted rack and the tentacle ended both strike runs).
+
 ## Next
-Josh plays the Advancing Rack Lab and pastes logs. Check: did the best throw change between balls; did he ever leave pins to grow on purpose; did each boss hurt the way he played. Then a shop for this mode (pieces that favour striking or ripening). The fix list in `docs/IDEATION.md` (big shop pin art, level-up versus replace, dead pieces) still stands.
+Josh plays Advancing Ten-Pin (and the Advancing Rack Lab) and pastes logs. Check: did the best throw change between balls; did he ever leave pins to grow on purpose; did each boss hurt the way he played. Then a shop for this mode (pieces that favour striking or ripening). The fix list in `docs/IDEATION.md` (big shop pin art, level-up versus replace, dead pieces) still stands.
