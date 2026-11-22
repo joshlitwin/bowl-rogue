@@ -39,19 +39,24 @@ main{flex:1;min-height:0;width:100%;max-width:420px;margin:0 auto;display:flex;f
 footer{display:flex;justify-content:center}
 footer a{font-family:var(--num);font-size:12px;letter-spacing:.06em;color:var(--dim);text-decoration:none;padding:10px 14px}
 footer a:focus-visible,footer a:hover{color:var(--chalk)}
+/* one game: its card fills the middle, rack on top, words under it */
+.modes{justify-content:center}
+.mode.one{flex:0 1 auto;max-height:none;flex-direction:column;align-items:stretch;padding:14px;gap:14px}
+.mode.one .deck{width:auto;flex:1 1 auto;min-height:120px;max-height:260px}
+.mode.one .deck{overflow:hidden}.mode.one .deck svg{width:auto;height:86%;max-width:92%}.mode.one .txt em{white-space:nowrap}
+.mode.one .txt{gap:8px}.mode.one .txt strong{font-size:30px}.mode.one .txt span{font-size:16px}.mode.one .txt em{font-size:12px;padding:5px 8px 4px}
+.mode.one .go{position:absolute;right:20px;bottom:24px}
+.mode.one{position:relative}
 @media (max-height:620px){.sign{padding:10px 10px 10px}.disc{width:42px;height:42px;font-size:24px}.sign h1{font-size:25px;margin-bottom:10px}.txt span{font-size:13px}.deck{width:92px}.deck svg{width:86px}}
 </style>
 </head>
 <body>
 <main>
   <header class="sign"><div class="disc" aria-hidden="true">5</div><h1>bowl-rogue<small>a bowling roguelike</small></h1></header>
-  <nav class="modes" aria-label="Modes">
-    <a class="mode" href="labs/advancing-ten-pin/"><div class="deck" data-rack="adv"></div><div class="txt"><strong>Advancing</strong><span>Pins you leave advance and grow.</span><em>New · 12 games · shop</em></div><i class="go" aria-hidden="true"></i></a>
-    <a class="mode" href="labs/five-pin-bosses/"><div class="deck" data-rack="five"></div><div class="txt"><strong>Five-Pin</strong><span>Four levels of small, big and boss games. The hall changes as you go.</span><em>12 games · bosses</em></div><i class="go" aria-hidden="true"></i></a>
-    <a class="mode" href="labs/ten-pin/"><div class="deck" data-rack="ten"></div><div class="txt"><strong>Ten-Pin</strong><span>A full rack, two balls a frame. Spares count.</span><em>12 games · bosses</em></div><i class="go" aria-hidden="true"></i></a>
-    <a class="mode alt" href="game/"><div class="deck" data-rack="classic"></div><div class="txt"><strong>Classic</strong><span>The first Five-Pin Run: six games, strikes compound.</span><em>6 games</em></div><i class="go" aria-hidden="true"></i></a>
+  <nav class="modes" aria-label="Play">
+    <a class="mode one" href="labs/advancing-ten-pin/"><div class="deck" data-rack="adv"></div><div class="txt"><strong>Advancing</strong><span>Pins you leave advance and grow. Build them up with powers.</span><em id="runTag">12 games · shop</em></div><i class="go" aria-hidden="true"></i></a>
   </nav>
-  <footer><a href="labs/">All labs and tests</a></footer>
+  <footer><a href="labs/">Labs</a></footer>
 </main>
 <script>
 // each mode's rack, drawn as pixel pins seen from above-behind: back rows first, band colour by value (5 red, 3 amber, 2 green)
@@ -61,7 +66,7 @@ function rackSVG(pins){const W=48,H=30,s=[];
   pins.sort((a,b)=>a[1]-b[1]).forEach(([x,y,v])=>{PIN.forEach((row,j)=>[...row].forEach((ch,i)=>{if(ch==='.')return;
     s.push(`<rect x="${x-3+i}" y="${y-8+j}" width="1" height="1" fill="${ch==='b'?BAND[v]:j>=5?'#efe2c4':'#fff8e8'}"/>`);}));
     s.push(`<rect x="${x-3}" y="${y}" width="6" height="1" fill="rgba(42,22,14,.45)"/>`);});
-  return `<svg viewBox="4 5 40 26" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">${s.join('')}</svg>`;}
+  return `<svg viewBox="3 1 42 32" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">${s.join('')}</svg>`;}
 const RACKS={
   five:[[24,27,5],[16,21,3],[32,21,3],[8,15,2],[40,15,2]],
   classic:[[24,27,5],[16,21,3],[32,21,3],[8,15,2],[40,15,2]],
@@ -69,6 +74,8 @@ const RACKS={
   ten:[[24,29,5],[19,24,3],[29,24,3],[14,19,2],[24,19,2],[34,19,2],[9,14,2],[19,14,2],[29,14,2],[39,14,2]]
 };
 document.querySelectorAll('.deck').forEach(d=>d.innerHTML=rackSVG(RACKS[d.dataset.rack].map(p=>p.slice())));
+// a run in progress (saved by the game at each ball and in the shop): the tag says where it stands
+try{const d=JSON.parse(localStorage.getItem('advten-save')||'null');if(d&&d.run){const n=d.run.game+1;document.getElementById('runTag').textContent=`Continue · game ${n} of 12`;}}catch(e){}
 </script>
 </body>
 </html>

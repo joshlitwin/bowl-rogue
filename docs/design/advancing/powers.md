@@ -1,4 +1,4 @@
-# Next idea: powers in slots on your pins (Josh, 22 November 2026, not built)
+# Powers in slots on your pins (Josh, 22 November 2026; built the same day, see the end)
 
 ## What Josh asked
 - Combine powers on a single pin: **each pin has three slots**, filled with the same power several times (an upgrade) or with different powers.
@@ -31,3 +31,18 @@ Rules to settle when building: how many powers the shop offers per visit; whethe
 - Each power stacked three times on one pin should not beat the board alone (a pin worth 1,000 in level 1 breaks targets).
 - Lantern and Quick growth together should be strong but visible on the board before it pays.
 - Early targets stay reachable with no powers at all.
+
+## As built (22 November 2026)
+| Power | One slot | Stacked |
+|---|---|---|
+| Quick growth | ×3 a ball, not ×2 | ×4, ×5 |
+| Head start | comes back worth 2 | 4, 8 |
+| Spark | knocked down fresh (before it has stood a ball): the ball's × +1 | fresh for 2 balls, 3 (still +1: stacking +2, +3 more than doubled a board) |
+| Lantern | pins within 80 of it grow 1 faster while it stands | within 115, 150 |
+| Slow | advances every 2nd ball | every 3rd, never |
+| Shield | stands back up after its first hit, each time it comes back | 2 hits, 3 |
+| Bomb | falling, fells pins within 75 | 100, 125 |
+| Rent | +2 points each ball it stays up | +4, +6 |
+| Toll | $1 when taken on the front row (up to $3 a game in all) | $2, $3 |
+
+Rules settled: three powers in the shop per visit ($3-5), rerolled with the pins; a full pin takes no more, and slots can't be emptied or overwritten yet; no clashes (Slow with Quick growth, Shield with Bomb all allowed); a bought pin type keeps the powers of the pin it replaces; Slow, Spark, Shield, Bomb, Rent and Toll became powers, Runner, Anchor, Glass, Huddle, Crown and Crowd stay pin types. No pin grows past 32 (`?cap=`), except a type with its own cap (Glass 81, Slow type 64). Bot results: `docs/STATE.md`, "Powers in three slots".

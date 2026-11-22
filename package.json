@@ -14,7 +14,9 @@
     "boss-bot": "node tools/boss-bot.js",
     "ten-pin-bot": "node tools/ten-pin-bot.js",
     "advancing-bot": "node tools/advancing-bot.js",
-    "advancing-run-bot": "node tools/advancing-run-bot.js"
+    "advancing-run-bot": "node tools/advancing-run-bot.js",
+    "powers-bot": "node tools/advancing-powers-bot.js",
+    "save-test": "node tools/advancing-save-test.js"
   },
   "devDependencies": {
     "@napi-rs/canvas": "^1.1.1",

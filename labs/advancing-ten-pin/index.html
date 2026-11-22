@@ -297,6 +297,18 @@ body[data-stage="arrival"]{--deck:#141024;--deck-line:#1e1834;--deck-ink:#f0eeff
 #shopReroll b{position:absolute;top:-11px;left:50%;transform:translateX(-50%);font-family:var(--num);font-weight:400;font-size:12px;line-height:1;padding:3px 5px 4px;border-radius:4px;background:var(--tag);color:var(--tag-ink);box-shadow:0 2px 0 rgba(0,0,0,.45)}
 #shopReroll:disabled{opacity:.45}
 #shopReroll:active{transform:translateY(1px)}
+/* powers: a band on dark felt, its name under it */
+.wtray .offers{grid-template-columns:repeat(3,1fr)}
+.wtray .offer{height:50px;padding:9px 2px 3px;border:2px solid var(--ink);background:var(--panel);color:var(--chalk);box-shadow:0 3px 0 rgba(0,0,0,.45)}
+.wtray .offer canvas{flex:1;width:100%;min-height:0;touch-action:manipulation}
+.wtray .offer strong{font-size:11.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.wtray .offer.poor .c{color:var(--chalk);background:var(--paper-dim)}
+.wtray .offer.got{background:transparent;border:2px dashed var(--dim)}
+i.pw{display:inline-block;width:12px;height:6px;margin:0 3px 1px 0;vertical-align:middle;border-radius:2px;background:linear-gradient(90deg,var(--a) 45%,var(--b) 45%);box-shadow:0 0 0 1px #2a160e}
+i.pw.big{flex:none;width:22px;height:11px;border-radius:3px}
+.strip h3 .slots{display:inline-flex;gap:2px;margin-left:7px;vertical-align:middle}
+.slots i{width:10px;height:6px;border-radius:2px;background:linear-gradient(90deg,var(--a) 45%,var(--b) 45%);box-shadow:0 0 0 1px #2a160e}
+.slots i.e{background:transparent;box-shadow:inset 0 0 0 1px var(--dim)}
 /* lower shelf: balls on a dark ball-return rack, gear on a hang tag */
 .trays{flex:none;display:grid;grid-template-columns:2fr 1fr;gap:6px}
 .trays.solo{grid-template-columns:1fr}
@@ -342,13 +354,26 @@ body[data-stage="arrival"]{--deck:#141024;--deck-line:#1e1834;--deck-ink:#f0eeff
   .ptray .offer{height:68px;padding-top:10px}.ptray .offer img{width:18px;height:36px}
   .tray .offer strong{font-size:12.5px}
   .ptray .offer{height:72px;padding-top:12px}
-  .btray .offer,.gtray .offer{height:56px}
+  .btray .offer,.gtray .offer{height:56px}.wtray .offer{height:58px}
   #shop .strip{height:54px}#shop .row button{padding:11px 8px}
   .btray .offer{border-radius:28px 6px 6px 28px}.btray .offer .cradle{width:42px;height:42px}
   .ltray .lays svg{height:32px}.ltray .lays button{font-size:11px}
   #shop .strip{height:54px}
 }
 @media (prefers-reduced-motion:reduce){.sheet *{animation:none!important;transition:none!important}}
+/* the shop's info strip takes the header's place while something is picked, so the rack keeps its room */
+#shop .shead{align-items:stretch;min-height:48px}
+#shop .shead .chip{align-self:center}
+#shopMsg.idle{display:none}#shopResult[hidden]{display:none}
+#shop .shead #shopMsg{flex:1;min-width:0;height:auto;min-height:48px;margin:0}
+#shop .shead #shopMsg{white-space:normal;padding:4px 8px;gap:8px}#shop .shead #shopMsg h3{white-space:nowrap}#shop .shead #shopMsg b{font-size:inherit}#shop .shead #shopMsg span.slots,#shop .shead #shopMsg span.arrow{padding:0}
+/* name and words run on as one paragraph of up to three lines, so a long rule still fits beside the cash */
+#shop .shead #shopMsg div{display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;font-size:11px;line-height:1.18}
+#shop .shead #shopMsg h3,#shop .shead #shopMsg p{display:inline;font-size:inherit;line-height:inherit;white-space:normal}
+#shop .shead #shopMsg h3{font-size:13.5px;margin-right:5px}#shop .shead #shopMsg h3 small{margin-left:4px}
+#shop .shead #shopMsg .ag{font-size:.92em;opacity:.75;white-space:nowrap}
+#shop .shead #shopMsg .buy{display:flex;flex-direction:column;align-items:center;gap:1px;padding:4px 8px;font-size:12px;line-height:1.1}#shop .shead #shopMsg .buy b{font-size:13px}
+@media (min-height:660px){#shop .shead #shopMsg div{font-size:12.5px}#shop .shead #shopMsg h3{font-size:15px}}
 .goal .marks{color:var(--chalk)}
 #rackBtn.ten{gap:1px;padding:2px 4px 1px}#rackBtn.ten span,#rackBtn.ten img{width:11px;height:22px}
 #over .deck{display:flex}.cell.sweep{box-shadow:inset 0 -3px 0 #c8321f}.toast p .pt{margin-right:4px}.toast .neg{color:#ff6a52;font-weight:700;font-size:20px}
@@ -397,11 +422,11 @@ body[data-stage="arrival"]{--deck:#141024;--deck-line:#1e1834;--deck-ink:#f0eeff
   <div class="row"><button id="overLog" type="button">Results log</button><button class="main" id="again" type="button">New run</button></div>
 </div></div>
 <div class="sheet" id="shop" hidden><div class="box">
-  <div class="shead"><div class="strip tally" id="shopResult"></div><b class="chip" id="shopCash"></b></div>
+  <div class="shead"><div class="strip tally" id="shopResult"></div><div class="strip" id="shopMsg" aria-live="polite"></div><b class="chip" id="shopCash"></b></div>
   <div class="tray ptray"><span class="ttag">Pins</span><div class="offers" id="shopList"></div><button id="shopReroll" type="button"></button></div>
+  <div class="tray wtray"><span class="ttag">Powers</span><div class="offers" id="shopPows"></div></div>
   <div class="trays"><div class="tray btray" id="shopBallTray"><span class="ttag">Balls</span><div class="offers" id="shopBalls"></div></div><div class="tray gtray" id="shopGearTray"><span class="ttag">Gear</span><div class="offers" id="shopGearBuy"></div></div></div>
   <div class="tray ltray" id="shopLayTray"><span class="ttag">Next rack</span><div class="lays" id="shopLays"></div></div>
-  <div class="strip" id="shopMsg" aria-live="polite"></div>
   <div class="deck"><div class="rackmap" id="shopMap"></div><div class="shelf" id="shopGear"></div></div>
   <div class="row"><button class="main" id="shopNext" type="button"></button></div>
 </div></div>
@@ -409,7 +434,7 @@ body[data-stage="arrival"]{--deck:#141024;--deck-line:#1e1834;--deck-ink:#f0eeff
   <div class="shead"><h2>Rack</h2><b class="chip" id="rackCash"></b></div>
   <div class="deck"><div class="rackmap" id="rackMap"></div><div class="shelf" id="rackGear"></div></div>
   <div class="strip" id="rackMsg" aria-live="polite"></div>
-  <div class="row"><button id="rackLog" type="button">Results log</button><button class="main" id="rackClose" type="button">Done</button></div>
+  <div class="row"><button id="rackLog" type="button">Results log</button><button id="rackNew" type="button">New run</button><button class="main" id="rackClose" type="button">Done</button></div>
 </div></div>
 <div class="sheet" id="log" hidden><div class="box">
   <h2>Results log</h2>
@@ -527,18 +552,28 @@ function scoreFrames(fr){const flat=[].concat(...fr);let idx=0,tot=0;const out=[
 // a pin that would step past the red line (in front of row LK) breaks through: it costs its value and comes back at the back.
 // every pin is one of your ten: it keeps its type when it steps, falls and comes back
 const LK=()=>BOSS&&BOSS.lastk?BOSS.lastk:ADV.LASTK;
-var ADV={LASTK:4,STEP:60,BACKY:50,GAP:68,STRIKEX:2,BREACH:1,GROW:'double'};
+var ADV={LASTK:4,STEP:60,BACKY:50,GAP:68,STRIKEX:2,BREACH:1,GROW:'double',CAP:32};
 // per-type board rules: step (rows a ball), gx (growth ×), cap, freeBreak (breaking through costs 0), knock (pin hit needed to fell it)
 const PT={slow:{slow:1,cap:64},spark:{},shield:{},plain:{},runner:{step:2,gx:4},anchor:{step:0,cap:32},glass:{gx:3,cap:81,knock:20},bomb:{},huddle:{},crown:{},rent:{gx:1,freeBreak:1},crowd:{},toll:{}};
 const ptOf=p=>PT[p.item.t]||{};
-const grow=(p,k,gear)=>{const t=ptOf(p);let x=t.gx||2;if(gear&&gear.hothouse&&x===2&&k>=LK()-1)x=3;return ADV.GROW==='add'?p.v+1:Math.min(t.cap||1e9,p.v*x);};
+// powers: up to three on a pin, in slots; the same power twice or three times stacks. p.P counts them (set when the pin is made)
+// quick (grows 1 faster each), head (comes back worth 2, 4, 8), spark (+1 × when taken fresh: before it has stood 1, 2, 3 balls), lantern (pins near it grow 1 faster while it stands),
+// slow (advances every 2nd, 3rd ball, never), shield (shrugs off 1, 2, 3 hits each time it comes back), bomb (falling, fells pins within 75, 100, 125),
+// rent (+2, +4, +6 each ball it stays up), toll ($1, $2, $3 when taken on the front row). No pin grows past ADV.CAP (32; ?cap=) or its type's cap
+const LANTR=[0,80,115,150];
+function pwc(item){const o={};for(const k of (item&&item.pw)||[])o[k]=(o[k]||0)+1;return o;}
+const pc=(p,k)=>p.P&&p.P[k]||0;
+const startV=item=>{const n=pwc(item).head||0;return n?2**n:1;};
+const grow=(p,k,gear,lx)=>{const t=ptOf(p);let x=t.gx||2;if(gear&&gear.hothouse&&x===2&&k>=LK()-1)x=3;x+=pc(p,'quick')+(lx||0);return ADV.GROW==='add'?p.v+1:Math.min(t.cap||ADV.CAP,p.v*x);};
+// how many standing Lantern pins reach p (each one: p grows 1 faster)
+const lantern=(p,pins)=>pins.reduce((a,q)=>{const n=pc(q,'lantern');return a+(n&&q!==p&&Math.hypot(q.x-p.x,q.y-p.y)<=LANTR[Math.min(3,n)]?1:0);},0);
 const pinY=p=>rowY(p.k)+(p.stand?30:0);
-const gv=(p,k,gear,ctx)=>{const v=grow(p,k,gear);return ctx&&ctx.rush?grow(Object.assign({},p,{v}),k,gear):v;};
+const gv=(p,k,gear,ctx,lx)=>{const v=grow(p,k,gear,lx);return ctx&&ctx.rush?grow(Object.assign({},p,{v}),k,gear,lx):v;};
 const LINEY=()=>ADV.BACKY+LK()*ADV.STEP+30;
 const colX=c=>180+c*34.5,rowY=k=>ADV.BACKY+k*ADV.STEP;
-function mkPin(c,k,v,item,stand,ex){item=item||{t:'plain',lv:1};const t=PT[item.t]||{};return{shield:ex&&'shield' in ex?ex.shield:item.t==='shield',wait:!!(ex&&ex.wait),stand:!!stand,x:colX(c),y:rowY(k)+(stand?30:0),c,k,v,vx:0,vy:0,down:false,gone:false,age:0,ang:0,bolt:!!(BOSS&&BOSS.boltAll),knock:t.knock||0,slot:0,item,kind:item.t==='plain'?'p5':item.t};}
+function mkPin(c,k,v,item,stand,ex){item=item||{t:'plain',lv:1};const t=PT[item.t]||{},P=pwc(item);return{P,shield:ex&&'shield' in ex?ex.shield:(P.shield||0)+(item.t==='shield'?1:0),w:ex&&ex.w||0,b:ex&&ex.b||0,stand:!!stand,x:colX(c),y:rowY(k)+(stand?30:0),c,k,v,vx:0,vy:0,down:false,gone:false,age:0,ang:0,bolt:!!(BOSS&&BOSS.boltAll),knock:t.knock||0,slot:0,item,kind:item.t==='plain'?'p5':item.t};}
 const START=[[0,3],[-1,2],[1,2],[-2,1],[0,1],[2,1],[-3,0],[-1,0],[1,0],[3,0]];
-function boardStart(items){return START.slice(0,items?items.length:10).map(([c,k],i)=>mkPin(c,k,1,items?items[i]:null));}
+function boardStart(items){return START.slice(0,items?items.length:10).map(([c,k],i)=>mkPin(c,k,startV(items?items[i]:null),items?items[i]:null));}
 function shuffle(a,rnd){for(let i=a.length-1;i>0;i--){const j=Math.floor(rnd()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
 // what stands in the way of a returning pin: pins and the boss's posts
 function blockers(pins){return pins.map(p=>({x:p.x,y:p.y,h:p.item&&p.item.t==='huddle'})).concat(BOSS&&BOSS.posts?BOSS.posts.map(o=>({x:o.x,y:o.y,post:1})):[]);}
@@ -548,21 +583,23 @@ function refill(pins,items,rnd){rnd=rnd||Math.random;const out=[];
     for(const loose of [0,1]){for(let k=0;k<=LK()&&!put;k++){for(const c of shuffle([-3,-2,-1,0,1,2,3],rnd)){const x=colX(c),y=rowY(k);
         const ok=blockers(pins.concat(out)).every(b=>{const d=Math.hypot(b.x-x,b.y-y);if(b.post)return d>=40;if(loose)return d>=40;
           const near=pins.concat(out).some(h=>h.item&&h.item.t==='huddle'&&Math.hypot(h.x-x,h.y-y)<=90);return d>=(near?40:ADV.GAP);});
-        if(ok){put=mkPin(c,k,1,item);break;}}}if(put)break;}
+        if(ok){put=mkPin(c,k,startV(item),item);break;}}}if(put)break;}
     if(put)out.push(put);}
   return out;}
 // the step after a ball: returns the next board and what broke through
 function advance(left,fell,rnd,ballNo,ctx){ctx=ctx||{};const gear=ctx.gear||{},kept=[],broke=[];let swept=[];
   if(BOSS&&BOSS.sweep&&ballNo%4===0){swept=left;left=[];}
   // front pins first, so a pin that can't move into an occupied spot stops behind it
-  for(const p of left.slice().sort((a,b)=>b.k-a.k)){const t=ptOf(p),st0=t.slow?(p.wait?1:0):t.step===undefined?1:t.step,st=ctx.brake?0:st0*(ctx.rush?2:1);let k=p.k+st;const ex={shield:p.shield,wait:t.slow?!p.wait:false};
-    if(k>LK()){if(gear.stand&&!p.stand){kept.push(mkPin(p.c,LK(),gv(p,LK(),gear,ctx),p.item,true,ex));continue;}broke.push(p);continue;}
+  const lit=new Map(left.map(p=>[p,lantern(p,left)]));   // Lanterns reach from where pins stood this ball
+  for(const p of left.slice().sort((a,b)=>b.k-a.k)){const t=ptOf(p),base=t.step===undefined?1:t.step,sl=pc(p,'slow')+(t.slow?1:0),w=p.w||0;
+    const st0=sl>=3?0:sl?((w+1)%(sl+1)===0?base:0):base,st=ctx.brake?0:st0*(ctx.rush?2:1);let k=p.k+st;const ex={shield:p.shield,w:w+1,b:(p.b||0)+1},lx=lit.get(p);
+    if(k>LK()){if(gear.stand&&!p.stand){kept.push(mkPin(p.c,LK(),gv(p,LK(),gear,ctx,lx),p.item,true,ex));continue;}broke.push(p);continue;}
     while(k>p.k&&kept.some(q=>Math.hypot(colX(p.c)-q.x,rowY(k)-q.y)<30))k--;
-    kept.push(mkPin(p.c,k,gv(p,k,gear,ctx),p.item,false,ex));}
+    kept.push(mkPin(p.c,k,gv(p,k,gear,ctx,lx),p.item,false,ex));}
   if(BOSS&&BOSS.tent){const T=BOSS.tent;T.k++;if(T.k>LK())T.k=0;BOSS.posts=[{x:colX(T.c),y:rowY(T.k),r:13}];}
   const back=fell.concat(broke,swept).map(p=>p.item),strike=ctx.strike!==undefined?ctx.strike:left.length===0&&!swept.length&&fell.length>0;
   let fresh;
-  if(strike&&gear.home){const occ=kept.map(q=>q.x+','+q.y);fresh=START.map(([c,k])=>[c,k]).filter(([c,k])=>!kept.some(q=>Math.hypot(q.x-colX(c),q.y-rowY(k))<40)).slice(0,back.length).map(([c,k],i)=>mkPin(c,k,1,back[i]));if(fresh.length<back.length)fresh=fresh.concat(refill(kept.concat(fresh),back.slice(fresh.length),rnd));}
+  if(strike&&gear.home){const occ=kept.map(q=>q.x+','+q.y);fresh=START.map(([c,k])=>[c,k]).filter(([c,k])=>!kept.some(q=>Math.hypot(q.x-colX(c),q.y-rowY(k))<40)).slice(0,back.length).map(([c,k],i)=>mkPin(c,k,startV(back[i]),back[i]));if(fresh.length<back.length)fresh=fresh.concat(refill(kept.concat(fresh),back.slice(fresh.length),rnd));}
   else fresh=refill(kept,back,rnd);
   if(strike&&ctx.seed)fresh.forEach(p=>p.v=Math.max(p.v,2));
   if(strike&&gear.rebound){const vals=fell.map(p=>Math.max(1,p.v>>1)).sort((a,b)=>b-a);fresh.slice().sort((a,b)=>a.k-b.k).forEach((p,i)=>{if(i<vals.length)p.v=vals[i];});}
@@ -571,15 +608,17 @@ function advance(left,fell,rnd,ballNo,ctx){ctx=ctx||{};const gear=ctx.gear||{},k
   return{pins:kept.concat(fresh),kept,fresh,broke,swept,netUsed,cost:ADV.BREACH?costs.reduce((a,b)=>a+b,0):0};}
 // what one ball is worth: values of the pins that fell, plus Rent and Crowd for pins left standing, times Mult (strike ×2; ×3 with a Crown taken on the front two rows)
 function scoreAdv(fell,left,gear,ctx){gear=gear||{};ctx=ctx||{};const notes=[];let pts=fell.reduce((a,p)=>a+p.v,0);const strike=fell.length>0&&(left.length===0||ctx.sweep&&left.every(p=>p.k===0));let m=1,cash=0;
-  if(fell.length){for(const p of left){if(p.item.t==='rent'){pts+=2;notes.push('Rent +2');}if(p.item.t==='crowd'){pts+=left.length;notes.push('Crowd +'+left.length);}}}
+  if(fell.length){for(const p of left){const r=2*(pc(p,'rent')+(p.item.t==='rent'?1:0));if(r){pts+=r;notes.push('Rent +'+r);}if(p.item.t==='crowd'){pts+=left.length;notes.push('Crowd +'+left.length);}}}
   if(strike){m=gear.harvest?(ctx.ball>=ctx.max-1?5:1):ADV.STRIKEX+(gear.bell?1:0);if(gear.harvest&&m===5)notes.push('Harvest ×5');
     if(gear.chain&&ctx.chain){const a=Math.min(3,ctx.chain);m+=a;notes.push('Chain +'+a);}
     if(gear.front){const a=Math.min(4,fell.filter(p=>p.k===LK()).length);if(a){m+=a;notes.push('Full front +'+a);}}
     if(fell.some(p=>p.item.t==='crown'&&p.k>=LK()-1)){m+=1;notes.push('Crown +1');}}
-  for(const p of fell)if(p.item.t==='toll'&&p.k===LK()){cash++;notes.push('Toll +$1');}
-  {const n=fell.filter(p=>p.item.t==='spark'&&p.v===1).length;if(n){m+=n;notes.push('Spark +'+n);}}
+  for(const p of fell){const n=pc(p,'toll')+(p.item.t==='toll'?1:0);if(n&&p.k===LK()){cash+=n;notes.push('Toll +$'+n);}}
+  {const n=fell.filter(p=>p.item.t==='spark'&&!p.b||pc(p,'spark')>(p.b||0)).length;if(n){m+=n;notes.push('Spark +'+n);}}   // fresh: stood fewer balls since it came back than it has Spark slots (1: not one ball)
   return{pts,m,score:Math.round(pts*m),strike,cleared:strike,notes,cash};}
-function boardText(pins){return pins.slice().sort((a,b)=>a.k-b.k||a.c-b.c).map(p=>`${p.c}:${p.k}=${p.v}${p.item&&p.item.t!=='plain'?p.item.t[0].toUpperCase()+p.item.t.slice(1,3):''}`).join(' ');}
+const PWCODE={quick:'q',head:'h',spark:'k',lantern:'l',slow:'w',shield:'d',bomb:'b',rent:'r',toll:'t'};
+const pwText=item=>item&&item.pw&&item.pw.length?'['+item.pw.map(k=>PWCODE[k]).join('')+']':'';
+function boardText(pins){return pins.slice().sort((a,b)=>a.k-b.k||a.c-b.c).map(p=>`${p.c}:${p.k}=${p.v}${p.item&&p.item.t!=='plain'?p.item.t[0].toUpperCase()+p.item.t.slice(1,3):''}${pwText(p.item)}`).join(' ');}
 //SIM-END
 
 const OPT=(()=>{let q;try{q=new URLSearchParams(location.search);}catch(e){q=new URLSearchParams('');}return{layout:false,balls:q.get('balls')!=='0',spots:false};})();
@@ -593,20 +632,35 @@ const kindOf3=gi=>KINDS[gi%3],bossOf=gi=>gi%3===2?BOSSES[run.bosses[Math.floor(g
 // values: the headpin 5, the 2 and 3 pins 3, the rest 2 (the five-pin colours and values, so the art and pins carry over)
 const SLOTV=SPOTS.map(p=>p.v),SLOTN=['1 pin (headpin)','2 pin','3 pin','4 pin','5 pin','6 pin','7 pin','8 pin','9 pin','10 pin'],ADJ=[[1,2],[0,2,3,4],[0,1,4,5],[1,4,6,7],[1,2,3,5,7,8],[2,4,8,9],[3,7],[3,4,6,8],[4,5,7,9],[5,8]];
 const PINS={
-  slow:{name:'Slow pin',cost:4,text:()=>'Advances every other ball, doubling every ball, up to 64.'},
-  spark:{name:'Spark pin',cost:5,text:()=>'Knocked down fresh (worth 1): the whole ball scores 1 more ×.'},
-  shield:{name:'Shield pin',cost:5,text:()=>'Stands back up after its first hit, each time it comes back.'},
+  slow:{gone:1,name:'Slow pin',cost:4,text:()=>'Advances every other ball, doubling every ball, up to 64.'},
+  spark:{gone:1,name:'Spark pin',cost:5,text:()=>'Knocked down fresh (worth 1): the whole ball scores 1 more ×.'},
+  shield:{gone:1,name:'Shield pin',cost:5,text:()=>'Stands back up after its first hit, each time it comes back.'},
   plain:{name:'Plain pin',text:()=>'Doubles each ball it stands.'},
   runner:{name:'Runner pin',cost:6,text:()=>'Advances two rows a ball and grows ×4.'},
   anchor:{name:'Anchor pin',cost:5,text:()=>'Never advances. Doubles up to 32.'},
   glass:{name:'Glass pin',cost:6,text:()=>'Grows ×3 a ball, up to 81. Any pin that touches it knocks it down.'},
-  bomb:{name:'Bomb pin',cost:6,text:()=>'Falling, it knocks down every pin near it.'},
+  bomb:{gone:1,name:'Bomb pin',cost:6,text:()=>'Falling, it knocks down every pin near it.'},
   huddle:{name:'Huddle pin',cost:4,text:()=>'Pins come back packed close around it.'},
   crown:{name:'Crown pin',cost:7,text:()=>'A strike that takes it on the front two rows is ×3.'},
-  rent:{name:'Rent pin',cost:4,text:()=>'+2 points each ball it stays up. Never grows; breaking through is free.'},
+  rent:{gone:1,name:'Rent pin',cost:4,text:()=>'+2 points each ball it stays up. Never grows; breaking through is free.'},
   crowd:{name:'Crowd pin',cost:7,text:()=>'+1 point per pin left up, each ball it stays up.'},
-  toll:{name:'Toll pin',cost:4,text:()=>'$1 when you take it on the front row, up to $3 a game.'}
+  toll:{gone:1,name:'Toll pin',cost:4,text:()=>'$1 when you take it on the front row, up to $3 a game.'}
 };
+// powers go in a pin's three slots; text(n) is what n of them do together. c: the band's light and dark colour on the pin's neck
+const POWERS={
+  quick:{s:n=>`×${2+n} a ball`,name:'Quick growth',cost:4,c:['#5ed67a','#23803c'],text:n=>`Grows ×${2+n} a ball, not ×2.`,more:'Again: ×4, ×5'},
+  head:{s:n=>`back at ${2**n}`,name:'Head start',cost:4,c:['#6aa8f0','#2a5a9a'],text:n=>`Comes back worth ${2**n}.`,more:'Again: 4, 8'},
+  spark:{s:n=>n>1?`+1 × in its first ${n} balls`:'+1 × fresh',name:'Spark',cost:5,c:['#ff9a3a','#b8541a'],text:n=>n>1?`Knocked down in its first ${n} balls back: the whole ball scores 1 more ×.`:`Knocked down fresh: the whole ball scores 1 more ×.`,more:'Again: stays fresh 2 balls, 3'},
+  lantern:{s:n=>`neighbours grow faster`,name:'Lantern',cost:5,c:['#ffe85a','#c09a18'],text:n=>`Pins near it grow 1 faster while it stands.`,more:'Again: reaches further'},
+  slow:{s:n=>n>=3?'never advances':`advances every ${['','2nd','3rd'][n]} ball`,name:'Slow',cost:3,c:['#4cc4c8','#1f7a80'],text:n=>n>=3?'Never advances.':`Advances every ${['','2nd','3rd'][n]} ball.`,more:'Again: every 3rd, never'},
+  shield:{s:n=>`${n} hit${n>1?'s':''} shrugged off`,name:'Shield',cost:4,c:['#f0f4fa','#8e98aa'],text:n=>`Stands back up after its first ${n>1?n+' hits':'hit'}, each time it comes back.`,more:'Again: 2 hits, 3'},
+  bomb:{s:n=>['','blast','wider blast','widest blast'][n],name:'Bomb',cost:5,c:['#4a4a56','#16161c'],text:n=>`Falling, it knocks down every pin within ${[0,'a pin spacing','1½ spacings','2 spacings'][n]}.`,more:'Again: further'},
+  rent:{s:n=>`+${2*n} a ball standing`,name:'Rent',cost:3,c:['#b48aee','#5a2f8a'],text:n=>`+${2*n} points each ball it stays up.`,more:'Again: +4, +6'},
+  toll:{s:n=>`$${n} on the front row`,name:'Toll',cost:3,c:['#ff86aa','#b8406a'],text:n=>`$${n} when you take it on the front row, up to $3 a game.`,more:'Again: $2, $3'}
+};
+const pwOf=it=>(it&&it.pw)||[],pwCount=(it,k)=>pwOf(it).filter(x=>x===k).length;
+// what a pin's powers do together, one short clause each
+const pwLine=it=>[...new Set(pwOf(it))].map(k=>`<i class="pw" style="--a:${POWERS[k].c[0]};--b:${POWERS[k].c[1]}"></i>${POWERS[k].name}${pwCount(it,k)>1?' ×'+pwCount(it,k):''}`).join(' ');
 const PAL={
   gold:{w:'#fff2b0',l:'#ffd866',m:'#e8a020',d:'#b06c10',R:'#d83a2a',r:'#9c2218'},
   wing:{w:'#fff8e8',l:'#efe2c4',m:'#d2bf9a',d:'#a58f6e',R:'#2c6fb0',r:'#1c4a7a'},
@@ -638,7 +692,7 @@ const GEAR={
   breath:{name:'Slow breath',cost:4,text:'The needle moves a fifth slower.'},
   wrist:{name:'Strong wrist',cost:4,text:'The line bends a third further.'}
 };
-{let q;try{q=new URLSearchParams(location.search);}catch(e){q=new URLSearchParams('');}if(q.get('line'))ADV.LASTK=Math.max(2,Math.min(5,+q.get('line')));if(q.get('strike'))ADV.STRIKEX=+q.get('strike')||1;if(q.get('breach')==='0')ADV.BREACH=0;if(q.get('grow')==='add')ADV.GROW='add';}
+{let q;try{q=new URLSearchParams(location.search);}catch(e){q=new URLSearchParams('');}if(q.get('line'))ADV.LASTK=Math.max(2,Math.min(5,+q.get('line')));if(q.get('strike'))ADV.STRIKEX=+q.get('strike')||1;if(q.get('breach')==='0')ADV.BREACH=0;if(q.get('grow')==='add')ADV.GROW='add';if(q.get('cap'))ADV.CAP=Math.max(8,+q.get('cap')||32);}
 let LOG=[];try{LOG=JSON.parse(localStorage.getItem('advten-log')||'[]');}catch(e){}
 let runNo=LOG.length?LOG[LOG.length-1].run:0;
 const T={speed:.45,win:80,bend:90,risk:1,two:true,cam:'lane'};
@@ -662,7 +716,7 @@ function startFx(to){if(fx||to===stage)return;fx={from:stage,to,t:still?.5:0,fli
 
 // ---------- the run: the rack is the build ----------
 let run,g;
-const newItem=t=>({t,lv:1,gain:0});
+const newItem=t=>({t,lv:1,gain:0,pw:[]});
 const kindOf=(it,slot)=>it.t==='plain'?'p5':it.t;
 function applyKit(){T.win=80+(run.gear.steady?30:0);T.bend=90*(run.gear.wrist?4/3:1);T.speed=.45*(run.gear.breath?.8:1);if(!OPT.balls)run.ball=run.gear.big?'big':'house';RB=BALLS[run.ball].rb;MB=BALLS[run.ball].mb;}
 const BALLOFFERS={
@@ -677,13 +731,13 @@ const BALLOFFERS={
 };;
 const SPOTCOST={5:6,6:8},LAYCOST=3;
 function rackRun(){return rack().map((p,i)=>{p.slot=i;p.item=run.rack[i];p.kind=kindOf(p.item,i);return p;});}
-function rackText(){return run.rack.map(it=>it.t+(it.lv>1?it.lv:'')).join(' ');}
+function rackText(){return run.rack.map(it=>it.t+(it.lv>1?it.lv:'')+pwText(it)).join(' ');}
 function gearNames(){const n=Object.keys(GEAR).filter(k=>run.gear[k]).map(k=>GEAR[k].name);if(run.hook)n.unshift(BALLOFFERS[run.hook].name+(run.ball===run.hook?' (in hand)':''));return n.length?n.join(', '):'none';}
-function rackNames(){const n=run.rack.map((it,i)=>it.t==='plain'?null:PINS[it.t].name+(it.lv>1?' L'+it.lv:'')).filter(Boolean);return n.length?n.join(', '):'plain pins';}
+function rackNames(){const n=run.rack.map((it,i)=>it.t==='plain'&&!pwOf(it).length?null:PINS[it.t].name+(it.lv>1?' L'+it.lv:'')+(pwOf(it).length?' ('+pwOf(it).map(k=>POWERS[k].name).join(', ')+')':'')).filter(Boolean);return n.length?n.join(', '):'plain pins';}
 function ballsIn(frame){return 1;}
 function ballsLeftMax(){return FRAMES+(run&&run.gear&&run.gear.overtime?2:0);}
 // one step of the lane, plus pins that act when they fall
-function tick(s){stepSim(s,1/240);for(const p of s.pins){if(p.down&&!p.seen&&p.shield){p.shield=false;p.cracked=true;p.down=false;p.vx=p.vy=0;p.age=0;p.x=colX(p.c);p.y=pinY(p);delete p.by;continue;}if(p.down&&!p.seen){p.seen=true;if(p.item.t==='bomb')for(const q of s.pins){if(!q.down&&!q.bolt&&Math.hypot(q.x-p.x,q.y-p.y)<=75){p.boom=(p.boom||0)+1;q.by='pin';q.ord=s.ord=(s.ord||0)+1;q.down=true;const dx=q.x-p.x,dy=q.y-p.y,d=Math.hypot(dx,dy)||1;q.vx=dx/d*160;q.vy=dy/d*160;}}}}}
+function tick(s){stepSim(s,1/240);for(const p of s.pins){if(p.down&&!p.seen&&p.shield>0){p.shield--;p.cracked=true;p.down=false;p.vx=p.vy=0;p.age=0;p.x=colX(p.c);p.y=pinY(p);delete p.by;continue;}if(p.down&&!p.seen){p.seen=true;const bn=pc(p,'bomb')+(p.item.t==='bomb'?1:0);if(bn)for(const q of s.pins){if(!q.down&&!q.bolt&&Math.hypot(q.x-p.x,q.y-p.y)<=50+25*Math.min(3,bn)){p.boom=(p.boom||0)+1;q.by='pin';q.ord=s.ord=(s.ord||0)+1;q.down=true;const dx=q.x-p.x,dy=q.y-p.y,d=Math.hypot(dx,dy)||1;q.vx=dx/d*160;q.vy=dy/d*160;}}}}}
 // what one ball is worth: points from the pins that fell, times Mult
 function scoreBall(fell,left,fresh){const cleared=left.length===0&&fell.length>0,strike=cleared&&fresh,notes=[];let pts=0,m=1;
   const twins=fell.filter(p=>p.item.t==='twin').length;
@@ -711,12 +765,12 @@ function startGame(){run.target=tgtOf(run.game);run.tips=0;
   ['over','win','shop','rackSheet','log'].forEach(id=>$(id).hidden=true);if(BOSS&&BOSS.tent){BOSS.tent={c:[-1,0,1][Math.floor(Math.random()*3)],k:0};BOSS.posts=[{x:colX(BOSS.tent.c),y:rowY(0),r:13}];g.pins=boardStart(run.rack).filter(p=>Math.hypot(p.x-BOSS.posts[0].x,p.y-BOSS.posts[0].y)>=40);g.pins=g.pins.concat(refill(g.pins,run.rack.slice(g.pins.length)));}
   else if(BOSSES.tentacle.posts)delete BOSSES.tentacle.posts;
   if(!BOSS){g.toast='boss';$('toast').innerHTML=`<strong>${kindOf3(run.game)} game</strong><b>beat ${run.target} · boss: ${bossOf(run.game-run.game%3+2).name}</b>`;g.toastT=2.6;}topBar();strip();board();hint();setBtn();
-  if(BOSS){g.toast='boss';$('toast').innerHTML=`<strong>${BOSS.name}</strong><b>Boss · beat ${run.target}</b>`;g.toastT=2.6;}}
+  if(BOSS){g.toast='boss';$('toast').innerHTML=`<strong>${BOSS.name}</strong><b>Boss · beat ${run.target}</b>`;g.toastT=2.6;}saveRun('aim');}
 function topBar(){const h=$('title');h.setAttribute('aria-label',`Game ${run.game+1} of ${TARGETS.length}`);h.innerHTML=TARGETS.map((_,i)=>`<i class="${i<run.game?'won':i===run.game?'cur':''}${i%3===2?' boss':''}"></i>`).join('');
   $('cash').textContent='$'+run.cash;$('camBtn').dataset.cam=T.cam;}
 // the rack, left to right as it stands on the lane; the strip is the Rack button
 // the rack, left to right as it stands on the lane, each row a little lower toward the front, so the strip reads as the triangle seen from the approach
-function strip(){const el=$('rackBtn'),row=i=>i===0?3:i<3?2:i<6?1:0;el.classList.add('ten');el.innerHTML=[6,3,1,7,0,4,2,8,5,9].filter(i=>i<run.rack.length).map(i=>{const it=run.rack[i];return `<span style="top:${row(i)*5}px"${it.lv>1?` data-lv="${it.lv}"`:''}><img src="${icon(kindOf(it,i))}" alt="${PINS[it.t].name}"></span>`;}).join('');}
+function strip(){const el=$('rackBtn'),row=i=>i===0?3:i<3?2:i<6?1:0;el.classList.add('ten');el.innerHTML=[6,3,1,7,0,4,2,8,5,9].filter(i=>i<run.rack.length).map(i=>{const it=run.rack[i];return `<span style="top:${row(i)*5}px"${it.lv>1?` data-lv="${it.lv}"`:''}><img src="${iconOf(it)}" alt="${PINS[it.t].name}"></span>`;}).join('');}
 $('camBtn').addEventListener('click',()=>{T.cam=T.cam==='lane'?'top':'lane';drag=null;topBar();try{localStorage.setItem('pinrun-cam',T.cam);}catch(e){}});
 function setBtn(){swapBtn();const b=$('throw');b.disabled=g.mode!=='aim';b.classList.toggle('live',g.mode==='aim'&&g.ready);b.textContent=g.mode==='aim'&&!g.ready?'READY':'THROW';}
 function saveLog(){try{localStorage.setItem('advten-log',JSON.stringify(LOG));}catch(e){}}
@@ -777,7 +831,7 @@ function resolve(){g.live=0;const fell=g.pins.filter(p=>p.down),left=g.pins.filt
 function stepAnim(dt){const S=g.step;S.t+=dt;const a=Math.min(1,S.t/.35),e=a*a*(3-2*a),b=clamp((S.t-.3)/.3,0,1);
   for(const p of S.pins){if(p.y0===undefined)continue;if(p.fresh){p.alpha=b;p.y=p.y0+(pinY(p)-p.y0)*b;}else p.y=p.y0+(pinY(p)-p.y0)*e;}
   for(const p of S.broke){p.y=p.y0+(p.y1-p.y0)*e;p.alpha=1-b;}
-  if(S.t>=.65){for(const p of S.pins){p.y=pinY(p);p.alpha=1;delete p.y0;}g.pins=S.pins;g.step=null;g.mode='aim';g.ready=false;g.t0=performance.now();hint();setBtn();}}
+  if(S.t>=.65){for(const p of S.pins){p.y=pinY(p);p.alpha=1;delete p.y0;}g.pins=S.pins;g.step=null;g.mode='aim';g.ready=false;g.t0=performance.now();hint();setBtn();saveRun('aim');}}
 // the win card: what you scored, each line of pay and why, what comes next; then the shop
 function showWin(){const p=run.pay,k=kindOf3(run.game),bo=BOSS,n=run.game+1,nb=bossOf(n),marks=g.frames.flatMap(f=>f.marks),balls=g.frames.flatMap(f=>f.balls);
   $('winTitle').textContent=bo?'Boss beaten':k+' game won';$('winCash').textContent='$'+run.cash;
@@ -787,7 +841,7 @@ function showWin(){const p=run.pay,k=kindOf3(run.game),bo=BOSS,n=run.game+1,nb=b
     +`<li><span>${p.left} ball${p.left===1?'':'s'} left<small>+$1 each, up to $4</small></span><b>+$${p.extra}</b></li>`
     +(run.tips?`<li><span>Toll pins<small>Paid during the game</small></span><b>+$${run.tips}</b></li>`:'')
     +`<li class="next"><span>Next: ${nb?'Boss · '+nb.name:kindOf3(n)+' game'}<small>${n%3===0?'Level '+(Math.floor(n/3)+1)+' · ':''}beat ${tgtOf(n)}</small></span><b>${n+1}/12</b></li>`;
-  $('win').hidden=false;}
+  $('win').hidden=false;saveRun('win');}
 $('winNext').addEventListener('click',()=>{$('win').hidden=true;showShop();});
 function endGame(){const t=total(),won=t>=run.target,final=run.game===TARGETS.length-1;
   if(won&&!final){const extra=Math.min(4,g.left||0),earn=PAY[run.game%3]+extra;run.cash+=earn;run.rerolls=0;run.bought=false;topBar();rollOffers();
@@ -796,7 +850,7 @@ function endGame(){const t=total(),won=t>=run.target,final=run.game===TARGETS.le
   $('overTrack').innerHTML=TARGETS.map((v,i)=>`<span class="${i<run.game||(won&&i===run.game)?'won':i===run.game?'lost':''}">${tgtOf(i)}</span>`).join('');
   run.end={t,target:run.target};osel=null;ogsel=null;showOver();}
 let osel=null,ogsel=null;
-function showOver(){$('over').hidden=false;drawMap($('overMap'),i=>{osel=osel===i?null:i;ogsel=null;showOver();},osel);
+function showOver(){$('over').hidden=false;clearSave();drawMap($('overMap'),i=>{osel=osel===i?null:i;ogsel=null;showOver();},osel);
   drawGear($('overGear'),k=>{ogsel=ogsel===k?null:k;osel=null;showOver();},ogsel);
   const m=$('overMsg');m.className='strip'+(osel===null&&!ogsel?' tally big':'');m.innerHTML=osel!==null?pinInfo(osel):ogsel?gearInfo(ogsel):`<b>${run.end.t}<small> / ${run.end.target}</small></b>`;}
 $('again').addEventListener('click',newRun);
@@ -804,6 +858,7 @@ $('again').addEventListener('click',newRun);
 // ---------- shop and rack ----------
 let pending=null,sel=null,gsel=null,pick=null;const ICON={};
 function icon(kind){return ICON[kind]||(ICON[kind]=buildTheme(THEME.rec).pins[kind].toDataURL());}
+function iconOf(it){const o=buildTheme(THEME.rec),k=pinKey(o,kindOf(it),it);return ICON[k]||(ICON[k]=o.pins[k].toDataURL());}
 const GLYPH={
   chain:['...........','.###...###.','#yyy#.#yyy#','#y.y###y.y#','#yyy#.#yyy#','.###...###.','...........','.#r#.#r#.#r','.#r#.#r#.#r','...........','...........'],
   home:['.....#.....','....#w#....','...........','...#w.w#...','...........','..#w.w.w#..','...........','.#w.w.w.w#.','...........','###########','...........'],
@@ -832,9 +887,10 @@ const rich=s=>s.replace(/(\+\d+ points|\+\d+ Mult|Mult ×[\d.]+|\$\d+|\d+×)/g,'
 function randLayout(not){const ids=Object.keys(LAYOUTS).filter(k=>k!==run.layout&&!(not||[]).includes(k));return ids[Math.floor(Math.random()*ids.length)];}
 const pickOut=a=>a.splice(Math.floor(Math.random()*a.length),1)[0];
 // pins: three at random; the only thing Reroll changes
-function rollPins(){const pins=Object.keys(PINS).filter(k=>k!=='plain');run.pinOffers=[0,1,2].map(()=>{const t=pickOut(pins);return{kind:'pin',t,name:PINS[t].name,text:PINS[t].text(1),cost:PINS[t].cost,bought:false};});
-  run.seen.push('pins: '+run.pinOffers.map(o=>o.name+' $'+o.cost).join('; '));composeOffers();}
-function composeOffers(){run.offers=run.pinOffers.concat(run.ballOffers||[],run.gearOffer?[run.gearOffer]:[]);}
+function rollPins(){const pins=Object.keys(PINS).filter(k=>k!=='plain'&&!PINS[k].gone);run.pinOffers=[0,1,2].map(()=>{const t=pickOut(pins);return{kind:'pin',t,name:PINS[t].name,text:PINS[t].text(1),cost:PINS[t].cost,bought:false};});
+  const pws=Object.keys(POWERS);run.powOffers=[0,1,2].map(()=>{const t=pickOut(pws);return{kind:'pow',t,name:POWERS[t].name,text:POWERS[t].text(1),cost:POWERS[t].cost,bought:false};});
+  run.seen.push('pins: '+run.pinOffers.map(o=>o.name+' $'+o.cost).join('; ')+' | powers: '+run.powOffers.map(o=>o.name+' $'+o.cost).join('; '));composeOffers();}
+function composeOffers(){run.offers=(run.pinOffers||[]).concat(run.powOffers||[],run.ballOffers||[],run.gearOffer?[run.gearOffer]:[]);}
 // a new shop: pins rolled; balls stay on the shelf until bought, two at a time; one piece of gear, new each shop, not refilled
 function rollOffers(){
   if(OPT.balls){const pool=Object.keys(BALLOFFERS).filter(k=>k!==run.hook&&!run.ballStock.includes(k));while(run.ballStock.length<2&&pool.length)run.ballStock.push(pickOut(pool));
@@ -856,7 +912,9 @@ const PLV=(()=>{const v=[-.46,-.5,.73],n=Math.hypot(...v);return v.map(x=>x/n);}
 const SIN_EL=.42,BAND=[.28,.365],BAND_EL=.22,PIN_OUT='#3b261c',PCACHE={};   // SIN_EL: how far above the pins we look, which curves the band and the base
 // colours: PAL for each pin type; a plain pin is the Rec Room pin with the red neck band
 const bigPal=k=>k==='plain'||k==='p5'?Object.assign({},THEME.rec.pin,{R:THEME.rec.band[5][0],r:THEME.rec.band[5][1]}):PAL[k];
-function bigPin(H,key){H=Math.max(12,Math.round(H));const id=key+H;if(PCACHE[id])return PCACHE[id];
+const BANDS=[[BAND],[[.255,.31],[.335,.39]],[[.24,.285],[.305,.35],[.37,.415]]];
+function bigPin(H,key,pw){H=Math.max(12,Math.round(H));pw=pw||[];const id=key+H+pw.join();if(PCACHE[id])return PCACHE[id];
+  const bands=pw.length?BANDS[pw.length-1].map((b,i)=>[b[0],b[1],POWERS[pw[i]].c]):[[BAND[0],BAND[1],null]];
   const pal=bigPal(key),belly=H*.168,W=2*Math.ceil(belly)+4,cx=W/2,pad=2,extra=Math.ceil(belly*.44*SIN_EL)+1,CH=H+pad+extra+1;
   const k=mk(W,CH),q=k.getContext('2d'),hwAt=y=>belly*prof(y/H);
   const inside=(x,y)=>{if(y<0)return false;const yy=y-pad,dx=x+.5-cx;
@@ -867,7 +925,8 @@ function bigPin(H,key){H=Math.max(12,Math.round(H));const id=key+H;if(PCACHE[id]
     if(inside(x,y)){const yy=Math.min(H-.5,y-pad+.5),hw=Math.max(.6,hwAt(yy)),u=Math.max(-1,Math.min(1,(x+.5-cx)/hw)),cz=Math.sqrt(1-u*u);
       const s=(hwAt(yy+1)-hwAt(yy-1))/2,nl=Math.hypot(u,s,cz),I=(u*PLV[0]-s*PLV[1]+cz*PLV[2])/nl;
       const tc=(yy-hw*BAND_EL*cz)/H;   // where this pixel sits on the turned surface, so the neck band curves round the pin
-      if(tc>=BAND[0]&&tc<BAND[1])col=I>.42?pal.R:pal.r;
+      const bd=bands.find(b=>tc>=b[0]&&tc<b[1]);
+      if(bd)col=bd[2]?(I>.42?bd[2][0]:bd[2][1]):I>.42?pal.R:pal.r;
       else if(metal)col=I>.8?pal.w:I>.62?pal.m:I>.4?pal.l:I>.18?pal.m:pal.d;   // Anchor: chrome
       else if(glass)col=(u>-.62&&u<-.3)?'#ffffff':I>.55?pal.w:I>.3?pal.l:I>.12?pal.m:pal.l;   // Glass: a glint, lit through
       else col=I>.6?pal.w:I>.38?pal.l:I>.15?pal.m:pal.d;}
@@ -902,6 +961,13 @@ function drawCard(cv,key){cv.style.width='';cv.style.height='';const r=cv.getBou
   drawFloor(q,W,H,-H*1.6,7,FLOORS.rec);
   const sp=bigPin(Math.max(12,Math.min(H-11,Math.floor((W-6)/.37))),key),bx=W/2,by=H-3;
   floorShadow(q,bx,by,sp,FLOORS.rec);q.drawImage(sp.cv,Math.round(bx-sp.w/2),Math.round(by-sp.base));}
+// a power for sale: its band on its own, seen a little from above: the inside of the back half, then the front, lit from the left
+function drawBandCard(cv,k){cv.style.width='';cv.style.height='';const r=cv.getBoundingClientRect(),[W,H]=fitArt(cv,r.width,r.height),q=cv.getContext('2d'),[L,D]=POWERS[k].c;
+  q.clearRect(0,0,W,H);const rx=Math.max(5,Math.min(W*.36,H*.9)),ry=Math.max(2,rx*.38),h=Math.max(3,Math.round(rx*.42)),cx=W/2,cy=(H-h)/2+1;
+  for(let x=Math.floor(cx-rx);x<=cx+rx;x++){const u=(x+.5-cx)/rx;if(Math.abs(u)>1)continue;const e=ry*Math.sqrt(1-u*u);
+    for(let y=Math.round(cy-e);y<Math.round(cy-e)+h;y++){q.fillStyle=D;q.fillRect(x,y,1,1);}                       // back half, its inside in shade
+    for(let y=Math.round(cy+e);y<Math.round(cy+e)+h;y++){q.fillStyle=u<-.25||(u<.15&&((x+y)&1))?L:D;q.fillRect(x,y,1,1);}   // front half, lit from the left
+    q.fillStyle=PIN_OUT;q.fillRect(x,Math.round(cy+e)+h,1,1);q.fillRect(x,Math.round(cy-e)-1,1,1);}}
 // your ten in perspective: headpin nearest, back row smaller and higher; sized to fill the deck
 function layoutRack(W,H,L){const D=7,el=.85,se=Math.sin(el),ce=Math.cos(el),DEPTH=.693,SPC=1.02,f=z=>D/(D+z*DEPTH);
   const top=3,bot=7,kH=(H-top-bot-2)/(3*DEPTH*se*f(3)+ce*f(3)*1.02),kW=(W-12)/(3*SPC*f(3)+.34*f(3)),k=Math.max(6,Math.min(kH,kW));   // art pixels per pin height; the largest that fits
@@ -911,10 +977,10 @@ function layoutRack(W,H,L){const D=7,el=.85,se=Math.sin(el),ce=Math.cos(el),DEPT
 // el._map holds drawMap's arguments, so the canvas can be repainted (dashes marching, resize) without rebuilding the buttons
 let mapPhase=0;
 function paintMap(el){const [,selI,o,lay]=el._map,cv=el.querySelector('canvas'),[W,H]=fitArt(cv,el.clientWidth,el.clientHeight,false);el._sz=el.clientWidth+'x'+el.clientHeight;const q=cv.getContext('2d'),wd=floorPal(),
-  order=layoutRack(W,H,LAYOUTS[lay||run.layout]||LAYOUTS.standard),spr=g=>bigPin(g.ph,kindOf(run.rack[g.i],g.i));
+  order=layoutRack(W,H,LAYOUTS[lay||run.layout]||LAYOUTS.standard),spr=g=>bigPin(g.ph,kindOf(run.rack[g.i],g.i),pwOf(run.rack[g.i]));
   drawFloor(q,W,H,-H*1.15,11,wd);
   for(const g of order){const sp=spr(g),x=Math.round(g.x);floorShadow(q,x,g.y,sp,wd);   // shadows and rings under every pin, then the pins back to front
-    if(o)floorRing(q,x,g.y,sp,wd.ring,true,mapPhase);else if(selI===g.i)floorRing(q,x,g.y,sp,wd.sel,false,0);}
+    if(o&&!(o.kind==='pow'&&pwOf(run.rack[g.i]).length>=3))floorRing(q,x,g.y,sp,wd.ring,true,mapPhase);else if(selI===g.i)floorRing(q,x,g.y,sp,wd.sel,false,0);}
   for(const g of order){const sp=spr(g);q.drawImage(sp.cv,Math.round(g.x-sp.w/2),g.y-sp.base);}
   return order;}
 // o: a pin being placed (dashed rings on every spot); selI: the selected spot (solid ring); no onTap: read-only
@@ -922,20 +988,24 @@ function paintMap(el){const [,selI,o,lay]=el._map,cv=el.querySelector('canvas'),
 function drawMap(el,onTap,selI,o,lay){el.className='rackmap'+(o?' place':'');el._map=[onTap,selI,o,lay];el.innerHTML='<canvas aria-hidden="true"></canvas>';el._hit=[];
   if(!el._tap){el._tap=1;el.addEventListener('click',e=>{const f=el._map[0];if(!f||e.target.classList.contains('spot'))return;const r=el.getBoundingClientRect(),x=e.clientX-r.left,y=e.clientY-r.top;let best=null,bd=1.6;
     for(const h of el._hit){const d=Math.hypot((x-h.x)/h.rx,(y-h.y)/h.ry);if(d<bd){bd=d;best=h.i;}}if(best!==null)f(best);});}
-  for(const g of paintMap(el)){const it=run.rack[g.i],sp=bigPin(g.ph,kindOf(it,g.i)),b=document.createElement(onTap?'button':'div'),w=Math.max(sp.w+6,g.w*.92);
+  for(const g of paintMap(el)){const it=run.rack[g.i],sp=bigPin(g.ph,kindOf(it,g.i),pwOf(it)),b=document.createElement(onTap?'button':'div'),w=Math.max(sp.w+6,g.w*.92);
     el._hit.push({i:g.i,x:g.x*ART,y:(g.y-sp.base*.45)*ART,rx:g.w*ART/2,ry:sp.base*ART*.6});
     b.className='spot';Object.assign(b.style,{left:(g.x-w/2)*ART+'px',width:w*ART+'px',top:(g.y-sp.base-2)*ART+'px',height:(sp.base+6)*ART+'px'});
-    b.setAttribute('aria-label',`${SLOTN[g.i]}, worth ${SLOTV[g.i]}: ${PINS[it.t].name}${it.lv>1?', level '+it.lv:''}`);
+    b.setAttribute('aria-label',`${SLOTN[g.i]}: ${PINS[it.t].name}${pwOf(it).length?', '+pwOf(it).map(k=>POWERS[k].name).join(', '):''}${pwOf(it).length<3?', '+(3-pwOf(it).length)+' free slot'+(pwOf(it).length===2?'':'s'):''}`);
     if(onTap){b.type='button';b.setAttribute('aria-pressed',selI===g.i?'true':'false');b.addEventListener('click',()=>onTap(g.i));}else b.setAttribute('role','img');
     el.appendChild(b);}}
 setInterval(()=>{const el=$('shopMap');if(still||!pending||$('shop').hidden||!el._map)return;mapPhase^=1;paintMap(el);},450);
 function repaintSheets(){for(const id of ['shopMap','rackMap','overMap']){const el=$(id);if(el._map&&!el.closest('.sheet').hidden)drawMap(el,...el._map);}
-  if(!$('shop').hidden)$('shopList').querySelectorAll('.offer:not(.got) canvas').forEach(c=>drawCard(c,c.dataset.t));}
+  if(!$('shop').hidden){$('shopList').querySelectorAll('.offer:not(.got) canvas').forEach(c=>drawCard(c,c.dataset.t));$('shopPows').querySelectorAll('.offer:not(.got) canvas').forEach(c=>drawBandCard(c,c.dataset.w));}}
 window.addEventListener('resize',repaintSheets);
 if(window.ResizeObserver){const mapRO=new ResizeObserver(es=>{for(const e of es){const el=e.target;if(el._map&&el._sz!==el.clientWidth+'x'+el.clientHeight&&!el.closest('.sheet').hidden)drawMap(el,...el._map);}});['shopMap','rackMap','overMap'].forEach(id=>mapRO.observe($(id)));}if(document.fonts&&document.fonts.ready)document.fonts.ready.then(repaintSheets);
 function drawGear(el,onTap,selK){el.innerHTML='';if(run.hook){const w=document.createElement('span');w.innerHTML=`<img src="${gicon(run.hook)}" alt="${BALLOFFERS[run.hook].name}">`;el.appendChild(w);}Object.keys(GEAR).filter(k=>run.gear[k]).forEach(k=>{const b=document.createElement('button');b.type='button';b.className=selK===k?'sel':'';
   b.setAttribute('aria-label',GEAR[k].name);b.innerHTML=`<img src="${gicon(k)}" alt="">`;b.addEventListener('click',()=>onTap(k));el.appendChild(b);});}
-function pinInfo(i){const it=run.rack[i];return `<img src="${icon(kindOf(it,i))}" alt=""><div><h3>${short(PINS[it.t].name)}<small>Starts on the ${SLOTN[i]}</small></h3><p>${rich(PINS[it.t].text(it.lv))}</p></div>`;}
+function pinInfo(i){const it=run.rack[i],pw=pwOf(it);return `<img src="${iconOf(it)}" alt=""><div><h3>${short(PINS[it.t].name)}<small>${SLOTN[i]}</small>${slots(it)}</h3><p>${pw.length?pwText2(it):rich(PINS[it.t].text(it.lv))}</p></div>`;}
+// three slots as three little bands: filled in the power's colours, empty as outlines
+const slots=it=>`<span class="slots">${[0,1,2].map(j=>{const k=pwOf(it)[j];return k?`<i style="--a:${POWERS[k].c[0]};--b:${POWERS[k].c[1]}"></i>`:'<i class="e"></i>';}).join('')}</span>`;
+// a built pin's powers, each with what it adds up to on this pin
+const pwText2=it=>[...new Set(pwOf(it))].map(k=>`<b>${POWERS[k].name}</b> ${POWERS[k].s(pwCount(it,k))}`).join(' · ');
 function gearInfo(k){return `<img class="gear" src="${gicon(k)}" alt=""><div><h3>${GEAR[k].name}<small>Gear</small></h3><p>${rich(GEAR[k].text)}</p></div>`;}
 function buy(o){if(run.cash<o.cost)return;run.cash-=o.cost;run.bought=true;
   if(o.kind==='gear'){run.gear[o.t]=true;o.bought=true;applyKit();}
@@ -950,7 +1020,7 @@ function rackDiagram(id){const n=run.rack.length,W=96,H=30,X=x=>Math.round((x-60
     +(id==='standard'?'':base.map(p=>`<rect x="${X(p.x)-d/2+.5}" y="${Y(p.y)-d/2+.5}" width="${d-1}" height="${d-1}" fill="none" stroke="var(--deck-dim)" stroke-width="1"/>`).join(''))
     +at.map((p,i)=>`<rect x="${X(p.x)-d/2-1}" y="${Y(p.y)-d/2-1}" width="${d+2}" height="${d+2}" fill="var(--paper-ink)"/><rect x="${X(p.x)-d/2}" y="${Y(p.y)-d/2}" width="${d}" height="${d}" fill="${i===0?'var(--tag)':'var(--paper)'}"/>`).join('')+'</svg>';}
 function showShop(){const box=$('shop').firstElementChild,el=$('shopList'),chip=$('shopCash'),p=run.pay;$('shop').hidden=false;   // shown first, so the canvases can measure themselves
-  box.classList.toggle('placing',!!pending);box.classList.remove('nudge');const bEl=$('shopBalls'),gEl=$('shopGearBuy');[el,bEl,gEl].forEach(e=>e.innerHTML='');
+  box.classList.toggle('placing',!!pending);box.classList.remove('nudge');const bEl=$('shopBalls'),gEl=$('shopGearBuy'),wEl=$('shopPows');[el,bEl,gEl,wEl].forEach(e=>e.innerHTML='');
   if(chip.textContent!=='$'+run.cash){chip.textContent='$'+run.cash;chip.classList.remove('bump');void chip.offsetWidth;chip.classList.add('bump');}
   if(p&&p.fresh){p.fresh=false;chip.insertAdjacentHTML('beforeend',`<span class="fly">+$${p.earn}</span>`);}
   run.offers.forEach(o=>{const b=document.createElement('button'),on=pending===o||pick===o,poor=!o.bought&&run.cash<o.cost&&!on;b.type='button';
@@ -958,12 +1028,13 @@ function showShop(){const box=$('shop').firstElementChild,el=$('shopList'),chip=
     b.setAttribute('aria-label',o.bought?o.name+', sold':`${o.name}, $${o.cost}. ${o.text}`);
     const tag=`<span class="c">${on?'×':'$'+o.cost}</span>`;
     b.innerHTML=o.kind==='pin'?`${tag}<canvas data-t="${o.t}" aria-hidden="true"></canvas><strong>${short(o.name)}</strong>`
+      :o.kind==='pow'?`${tag}<canvas data-w="${o.t}" aria-hidden="true"></canvas><strong>${o.name}</strong>`
       :o.kind==='ball'?`${tag}<i class="cradle"><img class="gear" src="${gicon(o.t)}" alt=""></i><strong>${o.name.replace(' ball','')}</strong>`
       :`${tag}<img class="gear" src="${gicon(o.t)}" alt=""><strong>${o.name}</strong>`;
     b.addEventListener('click',()=>{if(o.bought)return;sel=null;gsel=null;
-      if(o.kind==='pin'){pick=null;pending=pending===o?null:o;}else{pending=null;pick=pick===o?null:o;}
-      showShop();});(o.kind==='pin'?el:o.kind==='ball'?bEl:gEl).appendChild(b);});
-  el.querySelectorAll('.offer:not(.got) canvas').forEach(c=>drawCard(c,c.dataset.t));
+      if(o.kind==='pin'||o.kind==='pow'){pick=null;pending=pending===o?null:o;}else{pending=null;pick=pick===o?null:o;}
+      showShop();});(o.kind==='pin'?el:o.kind==='pow'?wEl:o.kind==='ball'?bEl:gEl).appendChild(b);});
+  el.querySelectorAll('.offer:not(.got) canvas').forEach(c=>drawCard(c,c.dataset.t));wEl.querySelectorAll('.offer:not(.got) canvas').forEach(c=>drawBandCard(c,c.dataset.w));
   $('shopBallTray').hidden=!run.ballOffers.length;$('shopGearTray').hidden=!run.gearOffer;$('shopBallTray').parentNode.hidden=!run.ballOffers.length&&!run.gearOffer;
   $('shopBallTray').parentNode.classList.toggle('solo',!run.ballOffers.length||!run.gearOffer);
   const lays=$('shopLays');$('shopLayTray').hidden=!OPT.layout;lays.innerHTML='';
@@ -971,17 +1042,20 @@ function showShop(){const box=$('shop').firstElementChild,el=$('shopList'),chip=
     b.disabled=!on&&run.cash+run.layoutPaid<l.cost;b.innerHTML=`${rackDiagram(l.id)}<span>${LAYOUTS[l.id].name}</span>${l.cost?`<b>$${l.cost}</b>`:''}`;b.setAttribute('aria-label',`Next rack: ${LAYOUTS[l.id].name}${l.cost?', $'+l.cost:''}`);
     b.addEventListener('click',()=>{if(on)return;run.cash+=run.layoutPaid;run.layoutPaid=l.cost;run.cash-=l.cost;run.nextLayout=l.id;topBar();showShop();});lays.appendChild(b);});
   const m=$('shopMsg'),info=pending||pick;m.className='strip'+(pending?' go':info?' info':sel===null&&!gsel?' idle':'');
-  m.innerHTML=pending?`<img src="${icon(pending.t)}" alt=""><div><h3>${short(pending.name)}</h3><p>${rich(pending.text)}</p></div><span class="arrow tri"></span>`
+  m.innerHTML=pending&&pending.kind==='pow'?`<i class="pw big" style="--a:${POWERS[pending.t].c[0]};--b:${POWERS[pending.t].c[1]}"></i><div><h3>${pending.name}</h3><p>${rich(pending.text)} <small class="ag">${POWERS[pending.t].more}</small></p></div><span class="arrow tri"></span>`
+    :pending?`<img src="${icon(pending.t)}" alt=""><div><h3>${short(pending.name)}</h3><p>${rich(pending.text)}</p></div><span class="arrow tri"></span>`
     :pick?`<img class="gear" src="${pick.kind==='spot'?icon(pick.t):gicon(pick.t)}" alt=""><div><h3>${short(pick.name)}</h3><p>${rich(pick.text)}</p></div><button type="button" class="buy" id="shopBuy"${run.cash<pick.cost?' disabled':''}>Buy <b>$${pick.cost}</b></button>`
     :sel!==null?pinInfo(sel):gsel?gearInfo(gsel)
     :'';
-  $('shopResult').innerHTML=p?`<b>${p.t}<small> / ${p.target}</small></b><span><i>Won</i>+$${p.earn}</span>`:'';   // the win card has the breakdown
+  $('shopResult').hidden=!m.classList.contains('idle');$('shopResult').innerHTML=p?`<b>${p.t}<small> / ${p.target}</small></b><span><i>Won</i>+$${p.earn}</span>`:'';   // the win card has the breakdown
   if(pick)$('shopBuy').addEventListener('click',()=>buy(pick));
   drawMap($('shopMap'),shopTap,sel,pending,OPT.layout?run.nextLayout:run.layout);drawGear($('shopGear'),k=>{gsel=gsel===k?null:k;sel=null;pending=null;pick=null;showShop();},gsel);
-  const rc=2+run.rerolls,rb=$('shopReroll');rb.innerHTML=`<b>$${rc}</b><span class="ro">⟳</span>Reroll`;rb.setAttribute('aria-label',`Reroll pins, $${rc}`);rb.disabled=run.cash<rc;
-  skipAsk=false;{const n=run.game+1,bo=bossOf(n);$('shopNext').innerHTML=`${bo?'Boss · '+bo.name:kindOf3(n)+' game'} · beat <b>${tgtOf(n)}</b><i class="tri r"></i>`;}}
+  const rc=2+run.rerolls,rb=$('shopReroll');rb.innerHTML=`<b>$${rc}</b><span class="ro">⟳</span>Reroll`;rb.setAttribute('aria-label',`Reroll pins and powers, $${rc}`);rb.disabled=run.cash<rc;
+  saveRun('shop');skipAsk=false;{const n=run.game+1,bo=bossOf(n);$('shopNext').innerHTML=`${bo?'Boss · '+bo.name:kindOf3(n)+' game'} · beat <b>${tgtOf(n)}</b><i class="tri r"></i>`;}}
 function shopTap(i){gsel=null;pick=null;
-  if(pending){const o=pending,it=run.rack[i];run.cash-=o.cost;run.rack[i]=newItem(o.t);o.bought=true;run.bought=true;run.seen.push('bought '+o.name+' $'+o.cost+' at '+SLOTN[i]);pending=null;sel=null;topBar();showShop();return;}
+  if(pending&&pending.kind==='pow'){const o=pending,it=run.rack[i];if(pwOf(it).length>=3){sel=i;pending=null;showShop();return;}   // full: show its build instead
+    run.cash-=o.cost;it.pw=pwOf(it).concat(o.t);o.bought=true;run.bought=true;run.seen.push('bought '+o.name+' $'+o.cost+' on '+SLOTN[i]);pending=null;sel=i;topBar();strip();showShop();return;}
+  if(pending){const o=pending,it=run.rack[i];run.cash-=o.cost;run.rack[i]=Object.assign(newItem(o.t),{pw:pwOf(it)});o.bought=true;run.bought=true;run.seen.push('bought '+o.name+' $'+o.cost+' at '+SLOTN[i]);pending=null;sel=null;topBar();showShop();return;}
   if(sel===null)sel=i;else if(sel===i)sel=null;else{const a=run.rack[sel];run.rack[sel]=run.rack[i];run.rack[i]=a;sel=null;}
   showShop();}
 $('shopReroll').addEventListener('click',()=>{const rc=2+run.rerolls;if(run.cash<rc)return;run.cash-=rc;run.rerolls++;pending=null;pick=null;topBar();rollPins();showShop();});
@@ -993,7 +1067,7 @@ function showRack(){const m=$('rackMsg');$('rackCash').textContent='$'+run.cash;
   drawGear($('rackGear'),k=>{rgsel=rgsel===k?null:k;rsel=null;showRack();},rgsel);
   m.className='strip'+(rsel===null&&!rgsel?' tally':'');
   m.innerHTML=rsel!==null?pinInfo(rsel):rgsel?gearInfo(rgsel):'<span>Pins double each ball</span><span><i>Strike</i>×2</span>';}
-$('rackBtn').addEventListener('click',()=>{rsel=null;rgsel=null;showRack();});
+$('rackBtn').addEventListener('click',()=>{rsel=null;rgsel=null;newAsk=false;$('rackNew').textContent='New run';showRack();});
 $('rackClose').addEventListener('click',()=>$('rackSheet').hidden=true);
 
 // ---------- cameras: the sim stays in flat lane units, the camera only decides where they land on screen ----------
@@ -1021,7 +1095,7 @@ cv.addEventListener('pointermove',e=>{if(!drag||g.mode!=='aim')return;const dx=(
   fixBend();});
 ['pointerup','pointercancel'].forEach(n=>cv.addEventListener(n,()=>drag=null));
 
-function logText(){const sg=v=>(v>0?'+':'')+v;let t='Advancing Ten-Pin log. Four levels of small, big, boss; ten balls a game at most, ending as soon as the target is reached ($1 per ball left, up to $4). One board per game that never resets. After each ball, pins left standing advance one row toward you and double in value (1, 2, 4, 8, 16); pins that fell come back worth 1 at the back, as far back as they fit. A pin that would advance past the red line breaks through: it costs its value and comes back at the back. A strike (every pin on the board) is worth '+ADV.STRIKEX+'x. Growth: '+ADV.GROW+'. Rows before the line: '+(ADV.LASTK+1)+' (Short line boss: 4). Bosses, one per level, strike killers and ripen killers alternating: Short line (the line one row closer), Sweep bar (balls 4 and 8: every standing pin swept off for nothing; never in level 1), Bolted rack (only the ball knocks pins down), Rising tentacle (a post that rises at the back of a middle column and advances each ball; it stops the ball). Your ten pins keep their type: Slow, Spark, Shield, Runner, Anchor, Glass, Bomb, Huddle, Crown, Rent, Crowd, Toll; the board lists a type by its first three letters after the value. Rack lists your ten by starting spot 1 to 10. Ball used: the house ball, or the one you bought (Big, Small, Plastic: size and weight; Rush, Brake, Toll, Sweep, Seed: the house ball with an effect on how the board advances). Positions are px from lane centre (lane edges -120/+120). Board lists each pin as column:row=value, columns -3..3 are half a pin spacing apart (34.5 px), row 0 is the back. Hot is how many pins stood on the front row (they break through unless knocked down). Moved is how far the line changed from the previous ball (start + aim + half the bend). Timing is ms early (-) or late (+); drift is how far the ball was pushed off the drawn line.\n';
+function logText(){const sg=v=>(v>0?'+':'')+v;let t='Advancing Ten-Pin log. Four levels of small, big, boss; ten balls a game at most, ending as soon as the target is reached ($1 per ball left, up to $4). One board per game that never resets. After each ball, pins left standing advance one row toward you and double in value (1, 2, 4, 8, 16); pins that fell come back worth 1 at the back, as far back as they fit. A pin that would advance past the red line breaks through: it costs its value and comes back at the back. A strike (every pin on the board) is worth '+ADV.STRIKEX+'x. Growth: '+ADV.GROW+'. Powers: each pin has three slots; a pin shows them as letters in brackets, e.g. 0:3=8[qqh] (q Quick growth, h Head start, k Spark, l Lantern, w Slow, d Shield, b Bomb, r Rent, t Toll). No pin grows past '+ADV.CAP+'. Rows before the line: '+(ADV.LASTK+1)+' (Short line boss: 4). Bosses, one per level, strike killers and ripen killers alternating: Short line (the line one row closer), Sweep bar (balls 4 and 8: every standing pin swept off for nothing; never in level 1), Bolted rack (only the ball knocks pins down), Rising tentacle (a post that rises at the back of a middle column and advances each ball; it stops the ball). Your ten pins keep their type: Slow, Spark, Shield, Runner, Anchor, Glass, Bomb, Huddle, Crown, Rent, Crowd, Toll; the board lists a type by its first three letters after the value. Rack lists your ten by starting spot 1 to 10. Ball used: the house ball, or the one you bought (Big, Small, Plastic: size and weight; Rush, Brake, Toll, Sweep, Seed: the house ball with an effect on how the board advances). Positions are px from lane centre (lane edges -120/+120). Board lists each pin as column:row=value, columns -3..3 are half a pin spacing apart (34.5 px), row 0 is the back. Hot is how many pins stood on the front row (they break through unless knocked down). Moved is how far the line changed from the previous ball (start + aim + half the bend). Timing is ms early (-) or late (+); drift is how far the ball was pushed off the drawn line.\n';
   t+='run,game,target,ball,ball_used,start,aim,bend,moved,timing_ms,drift_px,setup_seconds,board_value,hot,pins_down,value_down,clean_pins,mult,score,triggers,broke_through,cost,swept,net,result,board_before,board_after,boss,cash,your_ten,gear,shop_before_game\n';
   LOG.forEach(r=>{t+=[r.run,r.game,r.target,r.frame,r.ball||'house',sg(r.start),sg(r.aim),sg(r.bend),r.moved,sg(r.ms),sg(r.drift),r.setup,r.value,r.hot,r.down,r.downValue,r.clean,r.mult,r.score,r.notes||'',r.broke,r.cost,r.swept||0,r.net,r.result,r.rack,r.after,r.boss||'',r.cash||'',r.ten||'',r.gear||'',r.offers||''].join(',')+'\n';});return t;}
 function openLog(){$('logText').value=LOG.length?logText():'No throws recorded yet.';$('log').hidden=false;}
@@ -1277,14 +1351,19 @@ function drawBolt(o,cm,p){const q=cm.proj(p.x,p.y),X=Math.round(q.X),Y=Math.roun
 function drawClosed(o,cm){if(!BOSS||!BOSS.side)return;const sr=startRange(),x0=BOSS.side<0?sr[1]+RB:G.L,x1=BOSS.side<0?G.R:sr[0]-RB;
   for(let y=G.SY-30;y<=G.FOUL;y+=3){const a=cm.proj(x0,y),b=cm.proj(x1,y),Y=Math.round(a.Y);for(let X=Math.round(a.X);X<=Math.round(b.X);X++)if(((X+Y)&3)===0)px(c,X,Y,1,1,o.edge);}
   const a=cm.proj(BOSS.side<0?sr[1]+RB:sr[0]-RB,G.SY-30),b=cm.proj(BOSS.side<0?sr[1]+RB:sr[0]-RB,G.FOUL);plotLine(c,Math.round(a.X),Math.round(a.Y),Math.round(b.X),Math.round(b.Y),o.handle);}
-function drawPin(o,cm,p){const q=cm.proj(p.x,p.y),X=Math.round(q.X),Y=Math.round(q.Y);if(p.alpha!==undefined&&p.alpha<1)c.globalAlpha=Math.max(0,p.alpha);drawPinBody(o,cm,p,X,Y);if(p.item&&p.item.t==='shield'&&!p.shield&&!p.down&&cm.id==='lane'){px(c,X-1,Y-15,2,3,'#1a1010');}
+function drawPin(o,cm,p){const q=cm.proj(p.x,p.y),X=Math.round(q.X),Y=Math.round(q.Y);if(p.alpha!==undefined&&p.alpha<1)c.globalAlpha=Math.max(0,p.alpha);drawPinBody(o,cm,p,X,Y);if(p.item&&(p.item.t==='shield'||p.P&&p.P.shield)&&p.cracked&&!p.shield&&!p.down&&cm.id==='lane'){px(c,X-1,Y-15,2,3,'#1a1010');}
   if(!p.down&&!p.broke&&p.v>1&&g.mode!=='roll'&&g.mode!=='settle'){const s=String(p.v),w=s.length*4-1,ty=cm.id==='lane'?Y-24:Y-19,col=(p.k===LK()||p.stand)?'#ff6a52':p.v>=4?'#ffd866':'#fff2d8';px(c,X-Math.floor(w/2)-1,ty-1,w+2,7,'rgba(20,10,6,.72)');txt(c,s,X-Math.floor(w/2),ty,col);}
   if(!p.down&&!p.broke&&p.k===LK()&&g.mode==='aim'){const bl=Math.floor(lastT/260)%2;px(c,X-4,Y+(cm.id==='lane'?2:6),9,1,bl?'#ff4a32':'#a8231a');}
   c.globalAlpha=1;}
-function drawPinBody(o,cm,p,X,Y){if(p.bolt&&!p.down)drawBolt(o,cm,p);
-  if(p.down){c.drawImage(o.pins[p.kind+(Math.cos(p.ang)<0?'l':'r')],X-9,Y-(cm.id==='lane'?7:4));return;}
-  if(cm.id==='lane'){px(c,X-3,Y,7,2,o.shadow);c.save();c.globalAlpha=.2;c.translate(0,2*Y+2);c.scale(1,-1);c.drawImage(o.pins[p.kind],X-4,Y-17);c.restore();c.drawImage(o.pins[p.kind],X-4,Y-17);}
-  else{px(c,X-3,Y+4,8,3,o.shadow);c.drawImage(o.pins[p.kind],X-4,Y-12);}}
+function drawPinBody(o,cm,p,X,Y){if(p.bolt&&!p.down)drawBolt(o,cm,p);const K=pinKey(o,p.kind,p.item);
+  if(p.down){c.drawImage(o.pins[K+(Math.cos(p.ang)<0?'l':'r')],X-9,Y-(cm.id==='lane'?7:4));return;}
+  if(cm.id==='lane'){px(c,X-3,Y,7,2,o.shadow);c.save();c.globalAlpha=.2;c.translate(0,2*Y+2);c.scale(1,-1);c.drawImage(o.pins[K],X-4,Y-17);c.restore();c.drawImage(o.pins[K],X-4,Y-17);}
+  else{px(c,X-3,Y+4,8,3,o.shadow);c.drawImage(o.pins[K],X-4,Y-12);}}
+// a pin wearing powers: the neck band split into one band per filled slot, each in its power's colours
+function pinKey(o,kind,it){const pw=pwOf(it);if(!pw.length)return kind;const key=kind+'|'+pw.join(',');if(o.pins[key])return key;
+  const pal=kind==='p5'?Object.assign({R:o.band[5][0],r:o.band[5][1]},o.pin):Object.assign({o:o.pin.o},PAL[kind]),rows=PIN.slice(),body='owwwwlmdo',at=pw.length===1?[[10,11]]:pw.length===2?[[9,10],[12,13]]:[[9],[11],[13]];
+  rows[10]=rows[11]=body;at.forEach((rr,i)=>{const L='ABC'[i],D='abc'[i];pal[L]=POWERS[pw[i]].c[0];pal[D]=POWERS[pw[i]].c[1];rr.forEach(r=>rows[r]=body.replace(/[wl]/g,L).replace(/[md]/g,D));});
+  const sp=sprite(rows,pal);o.pins[key]=sp;o.pins[key+'r']=turned(sp,false);o.pins[key+'l']=turned(sp,true);return key;}
 function drawBall(o,cm,b){const q=cm.proj(b.x,b.y),X=Math.round(q.X),Y=Math.round(q.Y),r=clamp(Math.round(RB*q.k),2,11),BI=BALLS[run.ball]||BALLS.house,B=o.ballsBy[BI.spr||run.ball]||o.ballsBy.house,band=BI.band?(run.ball==='brake'&&g.brakeUsed?'#8a8478':BI.band):null;
   if(cm.id==='lane'){px(c,X-r+1,Y,2*r-1,2,o.shadow);c.drawImage(B[r],X-r,Y-2*r);if(band&&r>2)px(c,X-r+1,Y-r-1,2*r-1,2,band);return{X,Y:Y-r,r};}
   disc(c,X+1,Y+2,r,o.shadow);c.drawImage(B[r],X-r,Y-r);return{X,Y,r};}
@@ -1364,7 +1443,29 @@ function loop(ts){const dt=Math.min(.05,(ts-lastT)/1000||0);lastT=ts;
   if(fx){fx.t+=dt;if(!fx.flip&&fx.t>=.9){fx.flip=true;setChrome(fx.to);}
     if(fx.t>=(still?1.9:2.7)){stage=fx.to;fx=null;}}
   draw();requestAnimationFrame(loop);}
-newRun();fit();requestAnimationFrame(loop);
+// ---------- save state: the run is kept at the start of each ball, on the win card and in the shop; opening the page picks it up there ----------
+const SAVE='advten-save';
+function clearSave(){try{localStorage.removeItem(SAVE);}catch(e){}}
+function saveRun(screen){if(!run||!g)return;try{
+  const pins=g.pins.filter(p=>!p.broke&&run.rack.includes(p.item)).map(p=>({c:p.c,k:p.k,v:p.v,stand:!!p.stand,i:run.rack.indexOf(p.item),shield:p.shield||0,w:p.w||0,b:p.b||0,cracked:!!p.cracked}));
+  const r=Object.assign({},run);delete r.offers;
+  localStorage.setItem(SAVE,JSON.stringify({v:1,at:Date.now(),screen,run:r,stage:stageOf(run.game),boss:BOSS&&BOSS.tent?{tent:BOSS.tent,posts:BOSS.posts}:null,
+    g:{frames:g.frames,frame:g.frame,chain:g.chain||0,netUsed:!!g.netUsed,brakeUsed:!!g.brakeUsed,breaks:g.breaks||0,rackBalls:g.rackBalls||0,sx:g.sx,ex:g.ex,bend:g.bend,left:g.left||0,lastLine:g.lastLine,pins}}));}catch(e){}}
+function loadRun(){let d=null;try{d=JSON.parse(localStorage.getItem(SAVE)||'null');}catch(e){}
+  if(!d||d.v!==1||!d.run||!Array.isArray(d.run.rack))return false;
+  try{run=d.run;run.rack.forEach(it=>{if(!it.pw)it.pw=[];});runNo=Math.max(runNo,run.n||0);composeOffers();applyKit();stage=d.stage||stageOf(run.game);fx=null;setChrome(stage);
+    const keep={tips:run.tips,seen:run.seen,offerNote:run.offerNote};startGame();Object.assign(run,keep);
+    if(d.boss&&BOSS){BOSS.tent=d.boss.tent;BOSS.posts=d.boss.posts;}
+    const q=d.g;Object.assign(g,{frames:q.frames,frame:q.frame,chain:q.chain,netUsed:q.netUsed,brakeUsed:q.brakeUsed,breaks:q.breaks,rackBalls:q.rackBalls,sx:q.sx,ex:q.ex,bend:q.bend,bx:(q.sx+q.ex)/2+q.bend/2,left:q.left,lastLine:q.lastLine});
+    g.pins=q.pins.filter(o=>run.rack[o.i]).map(o=>{const p=mkPin(o.c,o.k,o.v,run.rack[o.i],o.stand,{shield:o.shield,w:o.w,b:o.b});p.cracked=o.cracked;return p;});
+    pending=null;pick=null;sel=null;gsel=null;board();strip();topBar();hint();setBtn();
+    if(d.screen==='win'||d.screen==='shop'){g.mode='over';g.toastT=0;if(d.screen==='win')showWin();else showShop();}
+    else saveRun('aim');
+    return true;}catch(e){console.error(e);clearSave();return false;}}
+// New run from the Rack sheet: a second tap confirms, since it drops the saved run
+let newAsk=false;
+$('rackNew').addEventListener('click',e=>{if(!newAsk){newAsk=true;e.currentTarget.textContent='Drop this run?';return;}newAsk=false;e.currentTarget.textContent='New run';$('rackSheet').hidden=true;newRun();});
+if(!loadRun())newRun();fit();requestAnimationFrame(loop);
 </script>
 </body>
 </html>

@@ -175,5 +175,23 @@ Run 1 lost game 3 to Sweep bar (101/125); run 2 won game 1 (95/90) and lost game
 
 Next idea from Josh: powers in three slots on each pin, `docs/design/advancing/powers.md`.
 
+## Powers in three slots (built 22 November, not yet played by Josh)
+Built into `labs/advancing-ten-pin/` (the pre-powers run is kept as `labs/advancing-ten-pin-v1/`). Rules as built: `docs/design/advancing/powers.md`.
+- Every one of your ten pins has three slots. Nine powers: **Quick growth, Head start, Spark, Lantern, Slow, Shield, Bomb, Rent, Toll**; the same one again stacks. Slow, Spark, Shield, Bomb, Rent and Toll stopped being whole pins and became powers; Runner, Anchor, Glass, Huddle, Crown and Crowd stay pin types. A bought pin keeps the powers of the pin it replaces; a full pin takes no more (no emptying or overwriting yet). Any mix is allowed.
+- Shop: a Powers tray (three, $3-5) between Pins and Balls; Reroll rolls pins and powers. Tap a power, then a pin with a free slot (dashed rings mark them). The info strip now sits in the header next to the cash while something is picked, so the rack keeps its room at 360x600.
+- On the lane and in the rack, a powered pin's neck band splits into one band per filled slot, in each power's colours; tapping a pin shows its slots and what its powers add up to.
+- No pin grows past **32** (`?cap=` to change; a pin type's own cap wins, so Glass still reaches 81).
+- Log: pins carry their powers as letters, e.g. `0:3=8[qqh]` (q quick, h head, k spark, l lantern, w slow, d shield, b bomb, r rent, t toll).
+
+What the bots found (`npm run powers-bot`, 40 random lines a ball as a stand-in for a person, 60 ms spread):
+- **Stacked three times on the headpin's pin** (level-1 games, all ten balls, plain board 160 patient / 129 strike): biggest gains Lantern +122, Spark +97, Head start +96; nothing beats the board alone; top pin value 32. Before the fix Spark ×3 added +198 / +263 (more than a whole board): stacking now widens Spark's fresh window (taken within 1, 2, 3 balls of coming back) instead of adding more ×.
+- **Shield is a loss** in every test (-5 to -18): it stops clean strikes and the patient bot gains little from a pin that stays up. Toll pays cash, not points.
+- **Lantern with Quick growth** (Lantern on the headpin, Quick on the 2 and 3 pins): 330 against plain 163 for the patient bot; nothing for the strike bot. The values climb on the board before they pay.
+- **Whole runs**, 6 each: no shopping cleared level 1 in 3-4 of 6 (small and big games mostly won, losses at Bolted rack). With the cap at 64, power builds won 6 of 6 by 1.5-4× the targets (a game-6 score of 631 against 150); at 32: growth build 5 of 6 (lost to Sweep bar), mixed 5 of 6 (lost to Sweep bar), strike-and-Spark 2 of 6 (lost at Bolted rack in game 12). Hence the cap of 32.
+
+## Front page and save state (22 November)
+- The front page has one card, Advancing; everything else (Five-Pin, Ten-Pin, Classic and every lab) is under Labs. When a run is saved the card's tag reads "Continue · game N of 12".
+- The run saves in `localStorage` (`advten-save`) at the start of each ball, on the win card and in the shop; opening the page picks it up where it was (the shop with its offers, the board with every pin's value, slots and Shield hits left). Run over clears it. **New run** on the Rack sheet starts over (second tap confirms). Closing during a roll resumes at the start of that ball, so the ball can be retried. `npm run save-test` saves and reopens at each point.
+
 ## Next
-Josh plays Advancing Ten-Pin (and the Advancing Rack Lab) and pastes logs. Check: did the best throw change between balls; did he ever leave pins to grow on purpose; did each boss hurt the way he played. Then a shop for this mode (pieces that favour striking or ripening). The fix list in `docs/IDEATION.md` (big shop pin art, level-up versus replace, dead pieces) still stands.
+Josh plays Advancing Ten-Pin with powers and pastes logs. Check: does he build one pin up or spread powers; does Shield earn its place (bots say no); is the cap of 32 the right ceiling; is the bottom of level 1 still where runs end. Before powers: did the best throw change between balls; did he leave pins to grow on purpose; did each boss hurt the way he played. The fix list in `docs/IDEATION.md` (level-up versus replace, dead pieces) still stands.
