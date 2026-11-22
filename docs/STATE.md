@@ -107,8 +107,19 @@ Josh: "I basically just find what works for a strike and hit that every time. We
   - Rec and After Close are pixel-identical to before in games 1 to 6.
 - Small and big games still reward finding one strike line and repeating it; bosses force a new line once a level.
 
+### Runs after the target change (21 November)
+Josh: "I basically have to hit all strikes to win eh? I feel like I can't affect the game as much as I'd like." Strikes averaged 43 a ball, everything else 11; one late release in game 4 of run 3 ended the run. He asked to try ten-pin.
+
+## Ten-Pin Lab (built 21 November, not yet played by Josh)
+`labs/ten-pin/`: the Boss Lab at ten pins. Built by a separate pass; details in the commit `f1247b4`.
+- Real proportions in lane units (240 = 41.5 in): pins 69 apart, rows 60 deep, pin radius 14, house ball 20 (Big 24, Small 17). Headpin at y 230, back row at y 50; EY 230 so the line ends at the headpin. At true scale pins knocked each other too easily (29% of lines struck), so KNOCK 45 to 80 and fallen-pin radius RT 27 to 18: 11% of lines strike, as in five-pin, most others leave 6 to 9 down.
+- Two balls a frame, five frames a game; a clear ends the frame; strike and spare both +1 Mult. Fourth ball gear is Third ball. No extra spots. Layouts move the headpin only (Standard is one of the choices).
+- Pin values: headpin 5, 2 and 3 pins 3, the rest 2 (keeps the five-pin colours, so pin art and shop pins carry over); a plain strike is 25 × 2 = 50. Spots named 1 to 10 pin; Wing pays on the 7 and 10; Bomb's neighbours follow the triangle.
+- Bosses retuned to leave a similar share of strike lines (313 to 460 of 974): Bolted 2 and 3 pins, Bolted 7 and 10 pins, Centre post (y 340), Twin posts (x 122/238, y 400), Left-side and Right-side start.
+- Targets 120, 170, 220 / 320, 450, 600 / 750, 1000, 1250 / 1300, 1650, 2000; pay $5 / $6 / $8. `npm run ten-pin-bot`: level 1 always cleared; 4 of 8 real runs won all 12.
+
 ## Next
-Josh plays Five-Pin Boss Lab and pastes the log. Questions: does re-finding the line each game feel like play or a chore; does a different ball or a bigger rack change what he does; if it's not fun, which of the three to switch off.
+Josh plays the Ten-Pin Lab and the Boss Lab (with growing layouts) and pastes logs. Questions: does re-finding the line each game feel like play or a chore; does a different ball or a bigger rack change what he does; if it's not fun, which of the three to switch off.
 
 ## Earlier next (Rules Lab)
 Josh plays Five-Pin Rules Lab and pastes the log. Questions: does choosing between striking and picking pins off feel like a decision; do games feel too short when you strike; are the targets right.

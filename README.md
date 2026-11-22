@@ -7,6 +7,7 @@ Everything playable is a single self-contained HTML file. Open any `index.html` 
 | Path | What it is |
 |---|---|
 | `game/index.html` | **Five-Pin Run**, the current game: six games, a rack of five trigger pins, points × Mult, a shop between games |
+| `labs/ten-pin/` | **Ten-Pin Lab**: the Boss Lab with ten pins at real proportions (pins 69 units apart, radius 14, ball 20), two balls a frame, five frames a game. A clear ends the frame; strikes and spares both +1 Mult. Pin values 5 / 3 / 2. Headpin-only layouts, no extra spots |
 | `labs/five-pin-bosses/` | **Five-Pin Boss Lab**: the Variety Lab with the Shelves shop, run as four levels of three games (small, big, boss). Each boss game adds one rule: Bolted 3-pins, Bolted corners, Centre post, Twin posts, Left-side start or Right-side start. Trophy capped at +12 per level. Each level has its own hall look |
 | `labs/five-pin-variety/` | **Five-Pin Variety Lab**: Five-Pin Run with three changes, each switchable off by URL (`?layout=0`, `?balls=0`, `?spots=0`): from game 2 the rack moves to a different layout each game; the shop sells pins (three, rerollable), balls (two on the shelf, $10, replace yours) and one piece of gear separately; you can pay $3 to swap the next game's rack layout; an empty spot on the rack map buys a sixth pin (back centre) and then a seventh (left flank). Targets as in Five-Pin Run |
 | `labs/five-pin-rules/` | **Five-Pin Rules Lab**: Five-Pin Run with one rule change: clearing the rack ends the frame and strikes and clears give no Mult. Targets 35, 60, 100, 160, 250, 400 |
@@ -26,6 +27,7 @@ Everything playable is a single self-contained HTML file. Open any `index.html` 
 npm install
 npm test        # plays a scripted six-game run through game/index.html
 npm run bot     # scores sample racks with a bot that has human-like timing error
+npm run ten-pin-bot    # Ten-Pin Lab: same as boss-bot
 npm run boss-bot       # Five-Pin Boss Lab: whole runs by a bot that aims the best line each ball (args: runs, timing ms, 'all' to play all 12 games, boss ids)
 npm run variety-bot    # Five-Pin Variety Lab: strike lines per layout and ball, and how many of the standard layout's still strike (add 7 for seven pins)
 npm run rules-bot      # Five-Pin Rules Lab: best frame per build, strike-only against best plan (add a build name and a ms spread to play games)
