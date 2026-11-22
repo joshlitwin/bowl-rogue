@@ -1,4 +1,6 @@
-# bowl-rogue
+# Temperance Lanes
+
+A bowling roguelike (working title was bowl-rogue; the repo keeps that name so the Pages address stays the same). Name and identity: `docs/design/branding/` (round 3, Toronto alleys); icons and share card in `assets/`.
 
 A five-pin bowling roguelike for phones, built with Claude. Pixel art, a 1974 rec-room hall that gets stranger as a run goes on.
 

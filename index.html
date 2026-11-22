@@ -3,7 +3,26 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>bowl-rogue</title>
+<title>Temperance Lanes</title>
+<meta name="description" content="Temperance Lanes: a bowling roguelike. Ten pins. Know when to stop.">
+<meta name="theme-color" content="#4c2a1a">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Temperance Lanes">
+<meta property="og:title" content="Temperance Lanes">
+<meta property="og:description" content="A bowling roguelike. Ten pins. Know when to stop.">
+<meta property="og:url" content="https://joshlitwin.github.io/bowl-rogue/">
+<meta property="og:image" content="https://joshlitwin.github.io/bowl-rogue/assets/share.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Temperance Lanes">
+<meta name="twitter:description" content="A bowling roguelike. Ten pins. Know when to stop.">
+<meta name="twitter:image" content="https://joshlitwin.github.io/bowl-rogue/assets/share.png">
+<link rel="icon" href="assets/icon.svg" type="image/svg+xml">
+<link rel="icon" href="assets/icon-32.png" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="assets/icon-180.png">
+<link rel="manifest" href="assets/manifest.webmanifest">
+<meta name="apple-mobile-web-app-title" content="Temperance">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@500;700&family=Silkscreen&display=swap" rel="stylesheet">
@@ -21,7 +40,7 @@ main{flex:1;min-height:0;width:100%;max-width:420px;margin:0 auto;display:flex;f
 .sign::before,.sign::after{content:"";position:absolute;left:0;right:0;height:5px}
 .sign::before{bottom:14px;background:var(--accent)}.sign::after{bottom:9px;background:var(--chalk)}
 .disc{position:relative;z-index:1;flex:none;width:52px;height:52px;border-radius:50%;background:var(--chalk);border:3px solid #3a2016;display:grid;place-items:center;font-family:var(--num);font-size:30px;line-height:1;color:var(--red);padding:0 0 2px 5px}
-.sign h1{position:relative;z-index:1;margin:0 0 12px;font-size:30px;letter-spacing:.03em;line-height:1}
+.sign h1{position:relative;z-index:1;margin:0 0 12px;font-size:min(30px,6.6vw);white-space:nowrap;letter-spacing:.03em;line-height:1}
 .sign h1 small{display:block;font-family:var(--num);font-size:11px;letter-spacing:.08em;color:var(--dim);margin-top:6px}
 /* modes */
 .modes{flex:1;min-height:0;display:flex;flex-direction:column;gap:10px}
@@ -47,14 +66,14 @@ footer a:focus-visible,footer a:hover{color:var(--chalk)}
 .mode.one .txt{gap:8px}.mode.one .txt strong{font-size:30px}.mode.one .txt span{font-size:16px}.mode.one .txt em{font-size:12px;padding:5px 8px 4px}
 .mode.one .go{position:absolute;right:20px;bottom:24px}
 .mode.one{position:relative}
-@media (max-height:620px){.sign{padding:10px 10px 10px}.disc{width:42px;height:42px;font-size:24px}.sign h1{font-size:25px;margin-bottom:10px}.txt span{font-size:13px}.deck{width:92px}.deck svg{width:86px}}
+@media (max-height:620px){.sign{padding:10px 10px 10px}.disc{width:42px;height:42px;font-size:24px}.sign h1{font-size:min(25px,6.6vw);margin-bottom:10px}.txt span{font-size:13px}.deck{width:92px}.deck svg{width:86px}}
 </style>
 </head>
 <body>
 <main>
-  <header class="sign"><div class="disc" aria-hidden="true">5</div><h1>bowl-rogue<small>a bowling roguelike</small></h1></header>
+  <header class="sign"><div class="disc" aria-hidden="true">5</div><h1>Temperance Lanes<small>a bowling roguelike</small></h1></header>
   <nav class="modes" aria-label="Play">
-    <a class="mode one" href="labs/advancing-ten-pin/"><div class="deck" data-rack="adv"></div><div class="txt"><strong>Advancing</strong><span>Pins you leave advance and grow. Build them up with powers.</span><em id="runTag">12 games · shop</em></div><i class="go" aria-hidden="true"></i></a>
+    <a class="mode one" href="labs/advancing-ten-pin/"><div class="deck" data-rack="adv"></div><div class="txt"><strong>Play</strong><span>Pins you leave advance and grow. Build them up with powers.</span><em id="runTag">12 games · shop</em></div><i class="go" aria-hidden="true"></i></a>
   </nav>
   <footer><a href="labs/">Labs</a></footer>
 </main>

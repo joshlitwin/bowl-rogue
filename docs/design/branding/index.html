@@ -1,0 +1,649 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Naming board: a real name for Advancing Ten-Pin</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@500;700&family=Silkscreen&family=Jersey+10&family=VT323&family=Jacquard+24&family=DotGothic16&family=Tiny5&family=Doto:wght@700;900&family=Major+Mono+Display&family=IM+Fell+English+SC&family=Alfa+Slab+One&family=Yellowtail&family=Limelight&display=swap" rel="stylesheet">
+<style>
+/* A review board, not a game screen: vertical scroll is fine here. Colours and fonts follow the front page (Rec Room '74). */
+:root{--ink:#1d100a;--wall:#4c2a1a;--panel:#3a2016;--chalk:#f3e2b8;--dim:#c9a878;--accent:#d86a28;--red:#d83a2a;
+  --body:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;--display:"Pixelify Sans",system-ui,sans-serif;--num:"Silkscreen",ui-monospace,monospace;color-scheme:dark}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--ink);color:var(--chalk);font:15px/1.45 var(--body);padding:max(18px,env(safe-area-inset-top)) 12px 40px}
+main{max-width:1180px;margin:0 auto}
+a{color:#ffb070}
+h1{font:700 30px/1.05 var(--display);margin:6px 0 8px}
+.lede{color:var(--dim);max-width:720px;margin:0 0 6px}
+.jump{display:flex;flex-wrap:wrap;gap:6px;margin:14px 0 22px;padding:0;list-style:none}
+.jump a{display:block;font:12px/1 var(--num);letter-spacing:.04em;color:var(--chalk);text-decoration:none;padding:8px 10px 7px;border-radius:5px;background:var(--panel);border:2px solid #120a06}
+.jump a:hover{box-shadow:inset 0 0 0 2px var(--accent)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:16px}
+.dir{background:var(--panel);border:3px solid #120a06;border-radius:10px;padding:14px;display:flex;flex-direction:column;gap:12px;scroll-margin-top:12px}
+.dir header{display:flex;flex-direction:column;gap:4px}
+.dir .kind{font:11px/1 var(--num);letter-spacing:.08em;color:var(--dim)}
+.wm{border-radius:7px;min-height:118px;display:grid;place-items:center;padding:14px 10px;overflow:hidden}
+.wm svg{display:block;max-width:100%;height:auto}
+.why{margin:0}
+.tag{margin:0;font:500 18px/1.2 var(--display)}
+.tag::before{content:"“"}.tag::after{content:"”"}
+.icons{display:flex;align-items:flex-end;gap:16px;flex-wrap:wrap}
+.icons figure{margin:0;display:flex;flex-direction:column;align-items:center;gap:5px}
+.icons figcaption{font:10px/1 var(--num);color:var(--dim)}
+.icons svg{display:block;image-rendering:pixelated}
+.app svg{border-radius:22.5%}
+.tab{display:flex;align-items:center;gap:6px;background:#f1ece4;color:#222;border-radius:7px 7px 0 0;padding:6px 10px;font:12px/1 var(--body);max-width:200px}
+.tab span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pal{display:flex;gap:0;border-radius:6px;overflow:hidden;border:2px solid #120a06}
+.pal div{flex:1;min-width:0;height:62px;display:flex;flex-direction:column;justify-content:flex-end;padding:4px 5px;font:9px/1.15 var(--num)}
+.pal div b{font-weight:400;display:block}
+.card{display:block;border-radius:6px;overflow:hidden;border:2px solid #120a06}
+.card svg{display:block;width:100%;height:auto}
+.conf{background:rgba(0,0,0,.25);border-radius:6px;padding:9px 11px;font-size:13.5px}
+.conf h3,.dir h3{font:700 11px/1 var(--num);letter-spacing:.08em;color:var(--dim);margin:0 0 6px;text-transform:uppercase}
+.conf p{margin:0 0 4px}.conf p:last-child{margin:0}
+.risk{display:inline-block;font:11px/1 var(--num);padding:3px 5px 2px;border-radius:3px;margin-right:6px;vertical-align:1px}
+.risk.low{background:#3f8f6a;color:#0d1a12}.risk.mid{background:#e8a020;color:#2a160e}
+.files{font-size:12.5px;color:var(--dim);margin:0}
+.files a{color:var(--dim)}
+section.more{margin-top:28px;background:var(--panel);border:3px solid #120a06;border-radius:10px;padding:14px}
+section.more h2{font:700 22px/1.1 var(--display);margin:0 0 10px}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 12px;padding:0;list-style:none}
+.chips li{font:13px/1 var(--display);padding:6px 8px;border-radius:4px;background:rgba(0,0,0,.3)}
+.chips li.short{box-shadow:inset 0 0 0 2px var(--accent)}
+.chips li s{color:var(--dim)}
+table{border-collapse:collapse;width:100%;font-size:13.5px}
+td,th{text-align:left;vertical-align:top;padding:6px 8px;border-top:1px solid rgba(243,226,184,.12)}
+th{font:11px/1.2 var(--num);color:var(--dim);font-weight:400}
+.rec{margin-top:16px;padding:12px 14px;border-radius:8px;background:#2a160e;box-shadow:inset 0 0 0 2px var(--accent)}
+.rec h2{margin-bottom:6px}
+h2.round{font:700 26px/1.1 var(--display);margin:6px 0 6px;display:inline}
+#round3{margin-top:18px}
+#round3 .lede,.fold .lede{margin-top:8px}
+details.fold{margin-top:34px;border-top:3px solid #3a2016;padding-top:14px}
+details.fold summary{cursor:pointer;list-style:none;display:flex;flex-direction:column;gap:4px}
+details.fold summary::-webkit-details-marker{display:none}
+details.fold summary h2::before{content:"▸ ";color:var(--accent)}
+details.fold[open] summary h2::before{content:"▾ "}
+details.fold summary span{color:var(--dim);font-size:13px}
+details.fold+details.fold{margin-top:18px}
+h3.sub{font:700 11px/1 var(--num);letter-spacing:.08em;color:var(--dim);margin:14px 0 4px}
+/* single share card mode, for rendering the 1200x630 PNGs */
+body.solo{padding:0;background:#000}
+body.solo main{max-width:none}
+</style>
+</head>
+<body>
+<main id="board">
+  <h1>A real name for Advancing Ten-Pin</h1>
+  <p class="lede">“bowl-rogue” is the working title and “Advancing” the mode name. Each direction has a wordmark, an icon, colours, a tagline and a share card. Names were searched on Steam, the App Store, Google Play and itch.io; notes say what turned up.</p>
+
+  <section id="round3">
+    <h2 class="round">Round 3: Toronto alleys</h2>
+    <p class="lede">Josh passed on round 2 too (“Go less cutesy and smart … the name of a street or bowling alley related to the history of Toronto bowling”). These are plain names off real Toronto signs and corners, from five-pin's birthplace (Tommy Ryan's club on Yonge Street, 1909) to the halls that closed. Sources: <a href="toronto-history.md">toronto-history.md</a>.</p>
+    <ul class="jump" id="jump3"></ul>
+    <div class="grid" id="grid3"></div>
+    <section class="more"><div class="rec" id="rec3"></div></section>
+    <section class="more">
+      <h2>Every name considered in round 3</h2>
+      <p class="lede">Outlined: shortlisted. Struck through: dropped (reasons below). Plain: considered, not searched.</p>
+      <ul class="chips" id="chips3"></ul>
+      <h3 class="sub">Dropped</h3>
+      <table id="dropped3"><thead><tr><th>Name</th><th>Why</th></tr></thead><tbody></tbody></table>
+    </section>
+  </section>
+
+  <details id="round2" class="fold">
+    <summary><h2 class="round">Round 2: less literal (passed on)</h2><span>Comeuppance, Latewood, Sodium Hour, Loiter, Open Tab</span></summary>
+    <p class="lede">Josh passed on round 1 (“None of these. Go less literal.”). These names leave out pin, rack, bowl, frame and the rules themselves; they aim at the feel: a late-night hall, what you leave behind coming back, patience against greed. The tagline carries the bowling.</p>
+    <ul class="jump" id="jump2"></ul>
+    <div class="grid" id="grid2"></div>
+    <section class="more"><div class="rec" id="rec2"></div></section>
+    <section class="more">
+      <h2>Every name considered in round 2</h2>
+      <p class="lede">Outlined: shortlisted. Struck through: searched and dropped. Plain: brainstormed, not searched.</p>
+      <ul class="chips" id="chips2"></ul>
+      <h3 class="sub">Dropped after a search</h3>
+      <table id="dropped2"><thead><tr><th>Name</th><th>What turned up</th></tr></thead><tbody></tbody></table>
+    </section>
+  </details>
+
+  <details id="round1" class="fold">
+    <summary><h2 class="round">Round 1: literal names (passed on)</h2><span>Ripe Rack, Pin Creep, After Close, Pinburst, Long Frame</span></summary>
+    <ul class="jump" id="jump"></ul>
+    <div class="grid" id="grid"></div>
+    <section class="more" id="recommend"><div class="rec" id="rec"></div></section>
+    <section class="more" id="longlist">
+      <h2>Every name considered in round 1</h2>
+      <p class="lede">Outlined: shortlisted. Struck through: dropped (reasons below).</p>
+      <ul class="chips" id="chips"></ul>
+      <h3 class="sub">Dropped after a search</h3>
+      <table id="dropped"><thead><tr><th>Name</th><th>What turned up</th></tr></thead><tbody></tbody></table>
+    </section>
+  </details>
+</main>
+<script>
+// ---------- pixel helpers ----------
+// rows: strings, one char per pixel; pal maps a char to a colour ('.' and missing chars are transparent). Runs are merged.
+function pix(rows,pal,ox=0,oy=0,s=1){let o='';rows.forEach((row,y)=>{let x=0;while(x<row.length){const ch=row[x];if(!pal[ch]){x++;continue;}let e=x;while(e<row.length&&row[e]===ch)e++;
+  o+=`<rect x="${ox+x*s}" y="${oy+y*s}" width="${(e-x)*s}" height="${s}" fill="${pal[ch]}"/>`;x=e;}});return o;}
+const flipH=rows=>rows.map(r=>[...r].reverse().join(''));
+
+// a big upright pin, 11x18: o outline, h highlight, w body, s shade, b band, B band shade
+const BIGPIN=['....ooo....','...ohwwo...','..ohwwwso..','..owwwwso..','..owwwwso..','...owwso...','...obbBo...','...obbBo...','..owwwwso..','.ohwwwwwso.','ohwwwwwwsso','owwwwwwwsso','owwwwwwwsso','owwwwwwwsso','.owwwwwwso.','.owwwwwwso.','..owwwwso..','...ooooo...'];
+const BIG_W=11,BIG_H=18;
+function bigPin(cx,base,s,c){return pix(BIGPIN,{o:c.o,h:c.h,w:c.w,s:c.s,b:c.b,B:c.B},Math.round(cx-BIG_W*s/2),Math.round(base-BIG_H*s),s);}
+const PLAIN={o:'#2a160e',h:'#ffffff',w:'#fff8e8',s:'#d2bf9a',b:'#d83a2a',B:'#9c2218'};
+const GOLD={o:'#2a160e',h:'#fff2b0',w:'#ffd866',s:'#e8a020',b:'#d83a2a',B:'#9c2218'};
+const withBand=(p,b,B)=>Object.assign({},p,{b,B});
+
+// pixel lettering for the arcade direction, 5x7 (I is 3 wide)
+const GLY={P:['####.','#...#','#...#','####.','#....','#....','#....'],I:['###','.#.','.#.','.#.','.#.','.#.','###'],N:['#...#','##..#','#.#.#','#..##','#...#','#...#','#...#'],
+  B:['####.','#...#','#...#','####.','#...#','#...#','####.'],U:['#...#','#...#','#...#','#...#','#...#','#...#','.###.'],R:['####.','#...#','#...#','####.','#.#..','#..#.','#...#'],
+  S:['.####','#....','#....','.###.','....#','....#','####.'],T:['#####','..#..','..#..','..#..','..#..','..#..','..#..']};
+function pixWord(word,ox,oy,s,fill,shadow){let x=ox,o='',sh='';for(const ch of word){const g=GLY[ch];sh+=pix(g,{'#':shadow},x,oy+s,s);o+=pix(g,{'#':fill},x,oy,s);x+=(g[0].length+2)*s;}return sh+o;}
+const pixWordW=(word,s)=>[...word].reduce((a,ch)=>a+(GLY[ch][0].length+2)*s,0)-2*s;
+
+// ---------- the five directions ----------
+const B=[];
+
+// 1. Ripening
+B.push({id:'ripe-rack',name:'Ripe Rack',kind:'About ripening',
+  why:'Names the choice at the heart of every ball: the pins you leave ripen (1, 2, 4 … 32), and a ripe rack is worth waiting for until it isn\'t. “Rack” is the bowling word for the set of pins.',
+  tagline:'Leave them standing. Let them ripen.',
+  font:'Pixelify Sans 700 (already the game\'s display font)',
+  pal:[['#1d100a','Deck'],['#4c2a1a','Wall'],['#f3e2b8','Chalk'],['#ffd866','Ripe gold'],['#e8a020','Amber'],['#d83a2a','Red line']],
+  conflict:{risk:'low',notes:[
+    'Searched “Ripe Rack” on Steam, the App Store and itch.io: found nothing with that name.',
+    'Nearby single words: <a href="https://rawg.io/games/ripe">Ripe</a>, a 2021 horror visual novel sold on itch.io; <a href="https://www.technicalgrimoire.com/ripe">RIPE</a>, a tabletop randomiser; a <a href="https://apkpure.com/ripe/io.ripeapp.mobile">Ripe</a> Android app. None is a bowling or arcade game, and the two-word name keeps clear of them.']},
+  wordmark(){return `<svg viewBox="0 0 520 130" width="520" xmlns="http://www.w3.org/2000/svg"><text x="260" y="70" text-anchor="middle" font-family="Pixelify Sans" font-weight="700" font-size="82" letter-spacing="2"><tspan fill="#ffd866">Ripe</tspan><tspan fill="#f3e2b8"> Rack</tspan></text>${rampRow(260,126,6)}</svg>`;},
+  wmBg:'#4c2a1a',
+  icon:{bg:'#4c2a1a',pal:{o:'#1d100a',h:'#fff2b0',g:'#ffd866',s:'#e8a020',r:'#d83a2a',l:'#d83a2a'},rows:[
+    '................','.......oo.......','......ohgo......','.....ohggso.....','.....ogggso.....','......oggo......','......orro......','......orro......','.....ohggso.....','....ohggggso....','....oggggsso....','....oggggsso....','....oggggsso....','.....oggsso.....','......oooo......','................']},
+  card(){const W=1200,H=630;let s=`<rect width="${W}" height="${H}" fill="#4c2a1a"/>`;
+    // the deck: boards running away
+    s+=`<rect x="640" y="0" width="560" height="${H}" fill="#c98f52"/>`;for(let x=640;x<W;x+=44)s+=`<rect x="${x+40}" y="0" width="4" height="${H}" fill="#b47a40"/>`;
+    s+=`<rect x="632" y="0" width="8" height="${H}" fill="#1d100a"/>`;
+    // the rack ripening toward you: back row plain, front row gold
+    const rows=[{y:178,sp:58,sc:3,n:4,c:PLAIN},{y:286,sp:80,sc:4,n:3,c:withBand(PLAIN,'#3f8f6a','#286248')},{y:418,sp:104,sc:5,n:2,c:withBand(PLAIN,'#e8a020','#b06c10')},{y:566,sp:0,sc:7,n:1,c:GOLD}];
+    rows.forEach(r=>{for(let i=0;i<r.n;i++){const cx=920+(i-(r.n-1)/2)*r.sp;s+=`<rect x="${cx-r.sc*7}" y="${r.y-r.sc}" width="${r.sc*14}" height="${r.sc*2}" fill="#a8662e"/>`;s+=bigPin(cx,r.y,r.sc,r.c);}});
+    for(let x=648;x<W;x+=36)s+=`<rect x="${x}" y="592" width="22" height="8" fill="#d83a2a"/>`;
+    s+=`<text x="70" y="250" font-family="Pixelify Sans" font-weight="700" font-size="128"><tspan fill="#ffd866">Ripe</tspan><tspan x="70" dy="122" fill="#f3e2b8">Rack</tspan></text>`;
+    s+=`<text x="74" y="460" font-family="Pixelify Sans" font-weight="500" font-size="36" fill="#f3e2b8">Leave them standing.</text><text x="74" y="504" font-family="Pixelify Sans" font-weight="500" font-size="36" fill="#ffd866">Let them ripen.</text>`;
+    s+=`<text x="74" y="580" font-family="Silkscreen" font-size="20" fill="#c9a878" letter-spacing="1">A TEN-PIN ROGUELIKE FOR PHONES</text>`;
+    return svgWrap(W,H,s);}
+});
+
+// 2. Advancing
+B.push({id:'pin-creep',name:'Pin Creep',kind:'About pins advancing',
+  why:'Says what you watch happen: every pin you leave creeps a row closer, worth double each time, until it crosses the red line. The wordmark\'s letters grow as they come toward you.',
+  tagline:'Every pin you leave comes closer.',
+  font:'Jersey 10 (tall pixel sports lettering)',
+  pal:[['#120a1c','Night'],['#3a2458','Plum'],['#fff8e8','Pin'],['#d4ff3a','Lime'],['#d83a2a','Red line']],
+  conflict:{risk:'mid',notes:[
+    'Searched “Pin Creep” on Steam, the App Store, Google Play and itch.io: found nothing with that name.',
+    'Closest: <a href="https://store.steampowered.com/app/3514920/PinCrawl/">Pin-Crawl</a>, a pinball roguelite dungeon crawler on Steam (So Romantic, planned for 2027). Different word, but it sounds alike and sits in the same roguelite-with-pins corner, so the two could be confused.',
+    '“Creep” also reads as an insult in English; some may hear it that way first.']},
+  wordmark(){return `<svg viewBox="0 0 520 130" width="520" xmlns="http://www.w3.org/2000/svg"><text x="260" y="100" text-anchor="middle" font-family="'Jersey 10'" letter-spacing="3">${growing('PIN CREEP',46,9)}</text><rect x="20" y="110" width="480" height="7" fill="#d83a2a"/></svg>`;},
+  wmBg:'#120a1c',
+  icon:{bg:'#120a1c',pal:{w:'#fff8e8',s:'#bdb0d0',l:'#d4ff3a',r:'#d83a2a'},rows:[
+    '................','................','...........w....','...........l....','..........wws...','..........wws...','................','....ww..........','...wwws.........','....ll..........','...wwws.........','..wwwwss........','..wwwwss........','...wwss.........','rrrrrrrrrrrrrrrr','................']},
+  card(){const W=1200,H=630;let s=`<rect width="${W}" height="${H}" fill="#120a1c"/>`;
+    // the lane: a wedge of plum boards narrowing away
+    s+=`<polygon points="780,0 1000,0 1200,630 580,630" fill="#1e1230"/>`;for(let i=1;i<6;i++){const t=i/6;s+=`<line x1="${780+220*t}" y1="0" x2="${580+620*t}" y2="630" stroke="#2a1a40" stroke-width="4"/>`;}
+    // one column of pins coming at you, each nearer one bigger and worth more
+    const P=withBand(PLAIN,'#d4ff3a','#9ab820');P.o='#120a1c';P.s='#bdb0d0';
+    [[60,2],[130,3],[230,4],[370,5.5],[560,8]].forEach(([y,sc])=>{s+=bigPin(890,y,sc,P);});
+    s+=`<rect x="0" y="574" width="${W}" height="10" fill="#d83a2a"/>`;
+    s+=`<text x="1040" y="420" font-family="Silkscreen" font-size="34" fill="#d4ff3a">16</text><text x="1052" y="250" font-family="Silkscreen" font-size="24" fill="#9a92c0">4</text><text x="1060" y="130" font-family="Silkscreen" font-size="18" fill="#6c6694">2</text>`;
+    s+=`<text x="70" y="300" font-family="'Jersey 10'" letter-spacing="5">${growing('PIN CREEP',84,16)}</text>`;
+    s+=`<text x="74" y="390" font-family="Pixelify Sans" font-weight="500" font-size="36" fill="#fff8e8">Every pin you leave</text><text x="74" y="434" font-family="Pixelify Sans" font-weight="500" font-size="36" fill="#fff8e8">comes closer.</text>`;
+    s+=`<text x="74" y="540" font-family="Silkscreen" font-size="20" fill="#9a92c0" letter-spacing="1">A TEN-PIN ROGUELIKE FOR PHONES</text>`;
+    return svgWrap(W,H,s);}
+});
+
+// 3. The hall
+B.push({id:'after-close',name:'After Close',kind:'About the alley',
+  why:'The hall once the regulars have gone: the lights-down moment Josh liked, when the Rec Room goes dark and the game turns strange. Half the sign is unlit.',
+  tagline:'Bowling after the lights go down.',
+  font:'Silkscreen (the game\'s number font, as sign lettering)',
+  pal:[['#05071a','Closed'],['#141a44','Navy'],['#3fe0ff','Sign cyan'],['#ff4fa8','Pink'],['#f2f6ff','Pin']],
+  conflict:{risk:'mid',notes:[
+    'Searched “After Close” on Steam, the App Store and itch.io: found no game with that exact name.',
+    'Close: <a href="https://limelessstudio.itch.io/afterclosure">After Closure</a> on itch.io, a short horror walking game about a night-shift shop worker once the doors lock. Similar words and a similar premise.',
+    'It is an everyday phrase (search results are mostly sports scores), which makes it hard to find in a store and hard to own as a mark. It names the look, not the rules.']},
+  wordmark(){return `<svg viewBox="0 0 520 130" width="520" xmlns="http://www.w3.org/2000/svg"><text x="260" y="76" text-anchor="middle" font-family="Silkscreen" font-size="62" letter-spacing="2"><tspan fill="#2c3a78">AFTER</tspan><tspan fill="#3fe0ff"> CLOSE</tspan></text><rect x="40" y="98" width="440" height="5" fill="#ff4fa8"/></svg>`;},
+  wmBg:'#05071a',
+  icon:{bg:'#05071a',pal:{k:'#ff4fa8',c:'#3fe0ff',d:'#163d68',w:'#f2f6ff',s:'#9aa8de',p:'#ff4fa8',n:'#141a44'},rows:[
+    '.....kkkkkk.....','.......cc.......','......dddd......','......dddd......','.....ddwwdd.....','.....dwwwsd.....','....dddwwddd....','....dddppddd....','...ddddppdddd...','...dddwwwsddd...','..dddwwwwssddd..','..dddwwwwssddd..','.ddddwwwwssdddd.','.dddddwwssddddd.','nnnnnnnnnnnnnnnn','nnnnnnnnnnnnnnnn']},
+  card(){const W=1200,H=630;let s=`<rect width="${W}" height="${H}" fill="#05071a"/>`;
+    // floor
+    s+=`<rect x="0" y="560" width="${W}" height="70" fill="#141a44"/>`;
+    // one hanging lamp and its cone, dithered on a 6 px grid, thinning toward the edges
+    const LX=880,cell=6;s+=`<rect x="${LX-50}" y="0" width="100" height="14" fill="#ff4fa8"/><rect x="${LX-4}" y="14" width="8" height="10" fill="#3fe0ff"/>`;
+    for(let y=24;y<560;y+=cell){const half=40+(y-24)*.55;for(let x=LX-half;x<LX+half;x+=cell){const gx=Math.round(x/cell),gy=Math.round(y/cell),edge=Math.abs(x-LX)/half;
+      const keep=edge<.45?((gx+gy)%2===0):edge<.8?((gx%2===0)&&(gy%2===0)):((gx%4===0)&&(gy%4===0));if(keep)s+=`<rect x="${Math.round(x/cell)*cell}" y="${y}" width="${cell}" height="${cell}" fill="${edge<.45?'#1e6f9a':'#123a66'}"/>`;}}
+    // the rack in the light
+    const P={o:'#05071a',h:'#ffffff',w:'#f2f6ff',s:'#9aa8de',b:'#ff4fa8',B:'#b02a78'};
+    [{y:330,sp:58,sc:3,n:4},{y:400,sp:74,sc:3.5,n:3},{y:480,sp:92,sc:4.5,n:2},{y:575,sp:0,sc:6,n:1}].forEach(r=>{for(let i=0;i<r.n;i++)s+=bigPin(LX+(i-(r.n-1)/2)*r.sp,r.y,r.sc,P);});
+    s+=`<text x="70" y="250" font-family="Silkscreen" font-size="104" letter-spacing="2" fill="#2c3a78">AFTER</text><text x="70" y="370" font-family="Silkscreen" font-size="104" letter-spacing="2" fill="#3fe0ff">CLOSE</text><rect x="74" y="392" width="360" height="8" fill="#ff4fa8"/>`;
+    s+=`<text x="74" y="460" font-family="Pixelify Sans" font-weight="500" font-size="32" fill="#f2f6ff">Bowling after the lights go down.</text>`;
+    s+=`<text x="74" y="530" font-family="Silkscreen" font-size="20" fill="#9aa8de" letter-spacing="1">A TEN-PIN ROGUELIKE FOR PHONES</text>`;
+    return svgWrap(W,H,s);}
+});
+
+// 4. Arcade word
+B.push({id:'pinburst',name:'Pinburst',kind:'Punchy arcade word',
+  why:'One loud word for the moment the board pays: a ripe pin falls and its value bursts above it (+16, +32), strikes multiply the lot. Hand-drawn pixel letters, like the score pops.',
+  tagline:'Knock now or let it double.',
+  font:'Custom 5×7 pixel letters (SVG); numbers in Silkscreen',
+  pal:[['#0e0907','Black'],['#d86a28','Orange'],['#ffd866','Coin gold'],['#fff8e8','Pin'],['#d83a2a','Strike red']],
+  conflict:{risk:'low',notes:[
+    'Searched “Pinburst” on Steam, the App Store, Google Play and itch.io: found nothing with that name.',
+    'Near: <a href="https://apkpure.com/bubble-pin-burst/com.bubblePinBurst">Bubble Pin Burst</a>, an Android bubble game. Different words in a different genre.',
+    'It says “arcade” but not “bowling” on its own; the pin icon has to do that work.']},
+  wordmark(){const s=7,w=pixWordW('PINBURST',s)+2*s;return `<svg viewBox="0 0 520 130" width="520" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges">${pixWord('PIN',Math.round(260-w/2),30,s,'#fff8e8','#7a3a14')}${pixWord('BURST',Math.round(260-w/2)+pixWordW('PIN',s)+2*s,30,s,'#ffd866','#b06c10')}</svg>`;},
+  wmBg:'#0e0907',
+  icon:{bg:'#0e0907',pal:{y:'#ffd866',a:'#d86a28',w:'#fff8e8',s:'#d2bf9a',o:'#0e0907',b:'#d86a28'},rows:[
+    '.......y........','..y....y....y...','...y.......y....','................','.y....ww.....y..','.....wwws.......','.....wwws.......','......bb........','......bb........','.....wwws.......','....wwwwss......','....wwwwss......','....wwwwss......','.....wwss.......','.....wwss.......','................'].map(r=>r.slice(0,16).padEnd(16,'.'))},
+  card(){const W=1200,H=630;let s=`<rect width="${W}" height="${H}" fill="#0e0907"/>`;
+    const cx=900,base=560,sc=13;
+    // the burst: pixel rays from behind the pin's head
+    const hx=cx,hy=base-BIG_H*sc+40;
+    for(let k=0;k<8;k++){if(k===6)continue;const a=k/8*Math.PI*2;for(let r=190;r<240;r+=14){const x=Math.round((hx+Math.cos(a)*r)/14)*14,y=Math.round((hy+Math.sin(a)*r*.9)/14)*14;if(y<0||y>H)continue;s+=`<rect x="${x}" y="${y}" width="14" height="14" fill="${r<250?'#ffd866':'#d86a28'}"/>`;}}
+    s+=bigPin(cx,base,sc,{o:'#0e0907',h:'#ffffff',w:'#fff8e8',s:'#d2bf9a',b:'#d86a28',B:'#a84410'});
+    s+=`<rect x="${cx-150}" y="${base}" width="300" height="14" fill="#2a1a10"/>`;
+    s+=`<text x="${hx}" y="215" text-anchor="middle" font-family="Silkscreen" font-size="80" fill="#ffd866">+32</text>`;
+    const ps=17;s+=pixWord('PIN',70,130,ps,'#fff8e8','#7a3a14');s+=pixWord('BURST',70,130+8*ps+16,ps,'#ffd866','#b06c10');
+    s+=`<text x="74" y="500" font-family="Pixelify Sans" font-weight="500" font-size="36" fill="#fff8e8">Knock now or let it double.</text>`;
+    s+=`<text x="74" y="566" font-family="Silkscreen" font-size="20" fill="#c9a878" letter-spacing="1">A TEN-PIN ROGUELIKE FOR PHONES</text>`;
+    return svgWrap(W,H,s);}
+});
+
+// 5. The run
+B.push({id:'long-frame',name:'Long Frame',kind:'About the run',
+  why:'In bowling a frame ends and the pins are reset. Here the frame never ends: one board, never reset, carried through twelve games. Lettered into score-sheet boxes, with the last frame running long.',
+  tagline:'One frame. It never resets.',
+  font:'VT323 (score-printer lettering)',
+  pal:[['#f3e2b8','Score sheet'],['#2a160e','Ink'],['#d83a2a','Strike red'],['#3fd67a','Phosphor'],['#000201','Console']],
+  conflict:{risk:'low',notes:[
+    'Searched “Long Frame” and “The Long Frame” on Steam, the App Store, Google Play and itch.io: found nothing with that name.',
+    'Near: <a href="https://store.steampowered.com/app/4220620/The_Last_Frame/">The Last Frame</a>, a first-person horror game on Steam (NULLMIND STUDIOS, coming soon), and <a href="https://napoleon841.itch.io/the-lost-frame">The Lost Frame</a> on itch.io. One word apart; both are horror, not bowling.',
+    'Needs a beat to land for people who don\'t know bowling frames.']},
+  wordmark(){return `<svg viewBox="0 0 520 130" width="520" xmlns="http://www.w3.org/2000/svg">${frames(20,18,4,62,94,3,'LONG')}${longFrameBox(20+4*62+12,18,232,94,3,'FRAME')}</svg>`;},
+  wmBg:'#f3e2b8',
+  icon:{bg:'#f3e2b8',pal:{k:'#2a160e',r:'#d83a2a',g:'#3fd67a'},rows:[
+    'kkkkkkkkkkkkkkkk','k........kkkkkkk','k........kr..r.k','k........k.rr..k','k........k.rr..k','k........kr..r.k','k........kkkkkkk','k..............k','k..............k','k..............k','k..kk..kk..kk..k','k..kk..kk..kk..k','k..............k','k..............k','k..............k','kkkkkkkkkkkkkkkk']},
+  card(){const W=1200,H=630;let s=`<rect width="${W}" height="${H}" fill="#f3e2b8"/>`;
+    // a score strip: three ordinary frames, then one that runs off the card
+    const y=70,h=200,fw=150;
+    for(let i=0;i<3;i++){const x=40+i*fw;s+=`<rect x="${x}" y="${y}" width="${fw}" height="${h}" fill="none" stroke="#2a160e" stroke-width="6"/><rect x="${x+fw-62}" y="${y}" width="62" height="62" fill="none" stroke="#2a160e" stroke-width="6"/>`;
+      s+=`<text x="${x+fw-31}" y="${y+50}" text-anchor="middle" font-family="VT323" font-size="56" fill="#d83a2a">X</text><text x="${x+fw/2}" y="${y+160}" text-anchor="middle" font-family="VT323" font-size="64" fill="#2a160e">${[30,60,90][i]}</text>`;}
+    const lx=40+3*fw;s+=`<rect x="${lx}" y="${y}" width="${W-lx+20}" height="${h}" fill="none" stroke="#2a160e" stroke-width="6"/>`;
+    // the board inside the long frame, values chalked over a few
+    const P={o:'#2a160e',h:'#ffffff',w:'#fff8e8',s:'#d2bf9a',b:'#d83a2a',B:'#9c2218'};
+    [[560,1],[640,2],[720,4],[800,8],[880,16],[980,32]].forEach(([x,v],i)=>{const sc=3+i*.5;s+=bigPin(x+40,y+h-22,sc,v>=16?GOLD:P);s+=`<text x="${x+40}" y="${y+h-26-BIG_H*sc-8}" text-anchor="middle" font-family="VT323" font-size="${30+i*4}" fill="${v>=16?'#b06c10':'#7a4a2c'}">${v}</text>`;});
+    s+=`<text x="1110" y="${y+h/2+12}" font-family="VT323" font-size="96" fill="#2a160e">…</text>`;
+    s+=`<text x="70" y="420" font-family="VT323" font-size="150" fill="#2a160e">LONG FRAME</text>`;
+    s+=`<text x="74" y="490" font-family="Pixelify Sans" font-weight="500" font-size="36" fill="#2a160e">One frame. It never resets.</text>`;
+    s+=`<rect x="0" y="560" width="${W}" height="70" fill="#000201"/><text x="74" y="604" font-family="Silkscreen" font-size="20" fill="#3fd67a" letter-spacing="1">A TEN-PIN ROGUELIKE FOR PHONES</text>`;
+    return svgWrap(W,H,s);}
+});
+
+// ================= ROUND 2: less literal =================
+const R2=[];
+// a small pin, 8x13, for programmatic icons: o outline, h highlight, w body, s shade, b band
+const SP=['...oo...','..ohwo..','.ohwwso.','.owwwso.','..owwo..','..obbo..','..obbo..','.ohwwso.','ohwwwsso','owwwwsso','owwwwsso','.owwsso.','..oooo..'];
+const spAt=(x,y)=>{const r=SP[y];if(!r||x<0||x>=8)return '';const c=r[x];return c==='.'?'':c;};
+function grid16(fn){const rows=[];for(let y=0;y<16;y++){let r='';for(let x=0;x<16;x++)r+=fn(x,y)||'.';rows.push(r);}return rows;}
+// tree rings: which band a point sits in (E early, light; L late, dark)
+function ringAt(dx,dy,w){const r=Math.hypot(dx,dy),a=Math.atan2(dy,dx),rr=r*(1+.07*Math.sin(3*a+1)+.03*Math.sin(7*a)),k=rr/w;return (k-Math.floor(k))>.6||r<w*.35?'L':'E';}
+
+R2.push({id:'comeuppance',name:'Comeuppance',kind:'A phrase with a sting',
+  why:'What greed earns you: the pins you leave don\'t go away, they come back for you, bigger. It also holds “come up”: something rising toward you. Pixel blackletter, like an old sign above a bar.',
+  tagline:'The pins you leave come back.',
+  font:'Jacquard 24 (pixel blackletter)',
+  pal:[['#120607','Soot'],['#3a0d12','Oxblood'],['#a3242a','Dried red'],['#c8962e','Brass'],['#efe2c4','Bone']],
+  conflict:{risk:'low',notes:[
+    'Searched “Comeuppance” as a game on Steam, the App Store, Google Play and itch.io: found no game or app with this title; results were articles about revenge and punishment in games.',
+    'Downsides: 11 letters, and people misspell it (one p or two). It works best said aloud.']},
+  wordmark(){return `<svg viewBox="0 0 520 130" width="520" xmlns="http://www.w3.org/2000/svg"><text x="260" y="88" text-anchor="middle" font-family="'Jacquard 24'" font-size="84" fill="#efe2c4">Comeuppance</text><rect x="150" y="104" width="220" height="5" fill="#c8962e"/></svg>`;},
+  wmBg:'#3a0d12',
+  icon:{bg:'#3a0d12',pal:{o:'#120607',h:'#ffffff',w:'#efe2c4',s:'#bfa98a',b:'#a3242a',a:'#c8962e'},
+    rows:grid16((x,y)=>{const c=spAt(x-6,y-3);if(c)return c;if(x===2&&y>=1&&y<=14)return 'a';if(y===1&&x>=2&&x<=10)return 'a';if(y===2&&x>=9&&x<=11)return 'a';if(y===14&&x>=2&&x<=7)return 'a';return '';})},
+  card(){const W=1200,H=630;let s=`<rect width="${W}" height="${H}" fill="#3a0d12"/>`;const T=14,A='#c8962e';
+    // the loop: from behind the pin's base, round and back down onto its head
+    s+=`<rect x="720" y="230" width="${T}" height="330" fill="${A}"/><rect x="720" y="230" width="224" height="${T}" fill="${A}"/><rect x="720" y="546" width="140" height="${T}" fill="${A}"/>`;
+    s+=`<rect x="902" y="244" width="70" height="${T}" fill="${A}"/><rect x="916" y="258" width="42" height="${T}" fill="${A}"/><rect x="930" y="272" width="14" height="${T}" fill="${A}"/>`;
+    s+=bigPin(937,574,12,{o:'#120607',h:'#ffffff',w:'#efe2c4',s:'#bfa98a',b:'#a3242a',B:'#6e141a'});
+    s+=`<text x="66" y="260" font-family="'Jacquard 24'" font-size="118" fill="#efe2c4">Comeuppance</text>`;
+    s+=`<text x="70" y="350" font-family="'Jacquard 24'" font-size="54" fill="#c8962e">The pins you leave come back.</text>`;
+    s+=`<text x="72" y="560" font-family="Silkscreen" font-size="20" fill="#c9a07a" letter-spacing="1">A TEN-PIN ROGUELIKE FOR PHONES</text>`;
+    return svgWrap(W,H,s);}
+});
+
+R2.push({id:'latewood',name:'Latewood',kind:'A borrowed word',
+  why:'A real word: latewood is the dense, dark ring a tree lays down late in the season, the strongest part of the wood. Bowling pins are maple, and bowlers call pins “wood”; here the wood you leave late is the wood that pays. Late night, too. The icon is a cross-section of rings.',
+  tagline:'Ten pins. Leave them late.',
+  font:'DotGothic16 (pixel gothic)',
+  pal:[['#2b1a10','Walnut'],['#3d2414','Bark'],['#7a4422','Latewood'],['#d9a866','Earlywood'],['#f0d6a0','Maple'],['#ffcf5a','Lamp']],
+  conflict:{risk:'low',notes:[
+    'Searched “Latewood” on Steam, the App Store, Google Play and itch.io: found nothing with that name.',
+    'Near in sound only: <a href="https://en.wikipedia.org/wiki/Rotwood">Rotwood</a> (an existing roguelike), <a href="https://store.steampowered.com/app/4632540/Fellwood/">Fellwood</a> on Steam, and the survival game <a href="https://rawg.io/games/last-wood">Last Wood</a>. Rotwood is a roguelike, so the -wood ending sits near it; the first half differs.',
+    'As an ordinary dictionary word (forestry), it can be used but is weaker as a trademark than a coined word.']},
+  wordmark(){return `<svg viewBox="0 0 520 130" width="520" xmlns="http://www.w3.org/2000/svg"><text x="260" y="86" text-anchor="middle" font-family="DotGothic16" font-size="76" letter-spacing="4"><tspan fill="#d9a866">Late</tspan><tspan fill="#f0d6a0">wood</tspan></text><rect x="96" y="104" width="328" height="4" fill="#7a4422"/><rect x="96" y="112" width="328" height="2" fill="#7a4422"/></svg>`;},
+  wmBg:'#2b1a10',
+  icon:{bg:'#2b1a10',pal:{E:'#d9a866',L:'#7a4422',k:'#3d2414'},
+    rows:grid16((x,y)=>{const dx=x-7.5,dy=y-7.5,r=Math.hypot(dx,dy);if(r>7.9)return '';if(r>6.7)return 'k';return ringAt(dx+.6,dy+.4,2.3);})},
+  card(){const W=1200,H=630;let s=`<rect width="${W}" height="${H}" fill="#2b1a10"/>`;const C=10,cx=900,cy=315,R=280;
+    for(let y=cy-R;y<cy+R;y+=C)for(let x=cx-R;x<cx+R;x+=C){const dx=x+C/2-cx,dy=y+C/2-cy,r=Math.hypot(dx,dy);if(r>R)continue;
+      const col=r>R-26?'#3d2414':ringAt(dx+30,dy+18,46)==='L'?'#7a4422':'#d9a866';s+=`<rect x="${x}" y="${y}" width="${C}" height="${C}" fill="${col}"/>`;}
+    s+=`<text x="66" y="270" font-family="DotGothic16" font-size="124" letter-spacing="4"><tspan fill="#d9a866">Late</tspan><tspan fill="#f0d6a0">wood</tspan></text>`;
+    s+=`<text x="72" y="360" font-family="DotGothic16" font-size="40" fill="#f0d6a0">Ten pins. Leave them late.</text>`;
+    s+=`<text x="72" y="560" font-family="Silkscreen" font-size="20" fill="#c9a878" letter-spacing="1">A TEN-PIN ROGUELIKE FOR PHONES</text>`;
+    return svgWrap(W,H,s);}
+});
+
+R2.push({id:'sodium-hour',name:'Sodium Hour',kind:'A mood and a time',
+  why:'The hour when only the orange sodium lamps are on: the car park outside the hall, the last game, everything one colour. A late-night name that never mentions bowling. The whole identity is in that one hue.',
+  tagline:'Ten pins under the last lamp.',
+  font:'Tiny5 (small pixel capitals)',
+  pal:[['#0d0703','Night'],['#3a1c06','Tarmac'],['#a5520f','Low glow'],['#ff9a2a','Sodium'],['#ffd9a0','Hot core']],
+  conflict:{risk:'low',notes:[
+    'Searched “Sodium Hour” and “Sodium Lights” on Steam and itch.io: found no game with either name.',
+    'The single word is taken: <a href="https://en.wikipedia.org/wiki/Sodium_(video_game)">Sodium</a> is an existing video game, and a Steam Workshop item is called <a href="https://steamcommunity.com/sharedfiles/filedetails/?id=3729688636">Sodium Lights</a>. The two-word name keeps clear of both. Not searched on the App Store or Google Play specifically.']},
+  wordmark(){return `<svg viewBox="0 0 520 130" width="520" xmlns="http://www.w3.org/2000/svg"><circle cx="44" cy="66" r="24" fill="#ff9a2a"/><circle cx="44" cy="66" r="13" fill="#ffd9a0"/><text x="90" y="92" font-family="Tiny5" font-size="64" letter-spacing="3" fill="#ff9a2a">SODIUM HOUR</text></svg>`;},
+  wmBg:'#0d0703',
+  icon:{bg:'#1a0d05',pal:{Y:'#ffd9a0',O:'#ff9a2a',l:'#a5520f',p:'#0d0703',g:'#3a1c06'},
+    rows:grid16((x,y)=>{const c=spAt(x-7,y-2);if(c)return {o:'p',h:'Y',w:'O',s:'l',b:'l'}[c];if(y>=15)return 'g';const r=Math.hypot(x-3.5,y-3.5);if(r<1.9)return 'Y';if(r<3)return 'O';if(r<4.2&&(x+y)%2)return 'l';return '';})},
+  card(){const W=1200,H=630;let s=`<rect width="${W}" height="${H}" fill="#1a0d05"/>`;const C=10,cx=900,cy=210;
+    for(let y=0;y<520;y+=C)for(let x=560;x<W;x+=C){const r=Math.hypot(x+C/2-cx,y+C/2-cy);let col='';if(r<110)col='#ffd9a0';else if(r<180)col='#ff9a2a';else if(r<250)col=((x+y)/C)%2?'#a5520f':'';else if(r<300)col=((x/C)%2===0&&(y/C)%2===0)?'#a5520f':'';if(col)s+=`<rect x="${x}" y="${y}" width="${C}" height="${C}" fill="${col}"/>`;}
+    s+=`<rect x="0" y="520" width="${W}" height="110" fill="#3a1c06"/>`;
+    const P={o:'#a5520f',h:'#0d0703',w:'#0d0703',s:'#0d0703',b:'#3a1c06',B:'#3a1c06'};
+    [{y:360,sp:70,sc:3,n:4},{y:430,sp:88,sc:3.6,n:3},{y:510,sp:110,sc:4.4,n:2},{y:600,sp:0,sc:5.4,n:1}].forEach(r=>{for(let i=0;i<r.n;i++)s+=bigPin(cx+(i-(r.n-1)/2)*r.sp,r.y,r.sc,P);});
+    s+=`<text x="66" y="250" font-family="Tiny5" font-size="104" letter-spacing="4" fill="#ff9a2a">SODIUM</text><text x="66" y="360" font-family="Tiny5" font-size="104" letter-spacing="4" fill="#ff9a2a">HOUR</text>`;
+    s+=`<text x="70" y="440" font-family="Tiny5" font-size="38" letter-spacing="1" fill="#ffd9a0">Ten pins under the last lamp.</text>`;
+    s+=`<text x="70" y="584" font-family="Silkscreen" font-size="20" fill="#a5520f" letter-spacing="1">A TEN-PIN ROGUELIKE FOR PHONES</text>`;
+    return svgWrap(W,H,s);}
+});
+
+R2.push({id:'loiter',name:'Loiter',kind:'One short verb',
+  why:'To hang about where you shouldn\'t, after hours: what you do in a closed hall, and what the pins you leave do, standing there, getting worse. Short, plain, and it carries patience and threat at once. Dot-matrix like an old score display.',
+  tagline:'Leave a pin. It won\'t leave.',
+  font:'Doto (dot-matrix); tagline in DotGothic16',
+  pal:[['#0b1016','Off'],['#1f2a36','Unlit dot'],['#6f8396','Dim'],['#e6edf2','Lit'],['#e0413a','Red line']],
+  conflict:{risk:'low',notes:[
+    'Searched “Loiter” on Steam, the App Store, Google Play and itch.io: found no game with that name. Results were games with “Looter” in the title (e.g. <a href="https://store.steampowered.com/app/1163020/The_Looter/">The Looter</a>, <a href="https://mokaaja.itch.io/idle-looter">Idle Looter</a>), one letter away and likely to be confused in search.',
+    'An ordinary English verb with a negative legal sense (“no loitering”): easy to say, harder to own and to find.']},
+  wordmark(){return `<svg viewBox="0 0 520 130" width="520" xmlns="http://www.w3.org/2000/svg"><text x="260" y="92" text-anchor="middle" font-family="Doto" font-weight="900" font-size="96" letter-spacing="10" fill="#e6edf2">LOITER</text><g fill="#e0413a">${Array.from({length:22},(_,i)=>`<rect x="${42+i*20}" y="112" width="8" height="8"/>`).join('')}</g></svg>`;},
+  wmBg:'#0b1016',
+  icon:{bg:'#0b1016',pal:{d:'#e6edf2',m:'#9fb0bf',r:'#e0413a',u:'#1f2a36'},
+    rows:grid16((x,y)=>{if(y===15)return x%2===0?'r':'';const c=spAt(x-4,y-1);if(c)return c==='o'?'':c==='b'?'r':c==='s'?'m':'d';return (x%2===0&&y%2===0)?'u':'';})},
+  card(){const W=1200,H=630;let s=`<rect width="${W}" height="${H}" fill="#0b1016"/>`;const C=14;
+    // an unlit dot matrix, with one pin lit in it
+    const lit={};const sc=C*1.4,ox=880-BIG_W*sc/2,oy=560-BIG_H*sc;BIGPIN.forEach((row,j)=>[...row].forEach((ch,i)=>{if(ch==='.'||ch==='o')return;for(let yy=oy+j*sc;yy<oy+(j+1)*sc;yy+=C)for(let xx=ox+i*sc;xx<ox+(i+1)*sc;xx+=C)lit[Math.round(xx/C)+','+Math.round(yy/C)]=ch;}));
+    for(let gy=0;gy*C<H;gy++)for(let gx=0;gx*C<W;gx++){const k=lit[gx+','+gy];let col=gx*C>660?'#16202b':'';if(k)col=k==='b'||k==='B'?'#e0413a':k==='s'?'#9fb0bf':'#e6edf2';if(gy===42&&gx*C>660)col='#e0413a';if(col)s+=`<rect x="${gx*C+3}" y="${gy*C+3}" width="8" height="8" fill="${col}"/>`;}
+    s+=`<text x="62" y="280" font-family="Doto" font-weight="900" font-size="150" letter-spacing="8" fill="#e6edf2">LOITER</text>`;
+    s+=`<text x="70" y="370" font-family="DotGothic16" font-size="40" fill="#e6edf2">Leave a pin. It won't leave.</text>`;
+    s+=`<text x="70" y="560" font-family="Silkscreen" font-size="20" fill="#6f8396" letter-spacing="1">A TEN-PIN ROGUELIKE FOR PHONES</text>`;
+    return svgWrap(W,H,s);}
+});
+
+R2.push({id:'open-tab',name:'Open Tab',kind:'An object with a double meaning',
+  why:'A bar tab left open: every round you don\'t settle gets added on, and at closing it all comes due. That is the board (pins you leave run up value and risk), told as a late-night object. The icon is a tally on a chit.',
+  tagline:'Leave pins standing. Settle up later.',
+  font:'Major Mono Display (receipt mono)',
+  pal:[['#1f5a3f','Felt'],['#f4efe4','Chit'],['#22201c','Carbon'],['#b8892c','Brass'],['#c23b2b','Stamp red']],
+  conflict:{risk:'mid',notes:[
+    'Searched “Open Tab” on Steam, the App Store and itch.io: found no game with that name.',
+    'The phrase is everywhere in software (browser tabs, “open tab” UI help pages), so it would be hard to find in a store or a search engine and hard to own. Not searched on Google Play specifically.']},
+  wordmark(){return `<svg viewBox="0 0 520 130" width="520" xmlns="http://www.w3.org/2000/svg"><rect x="70" y="16" width="380" height="94" fill="#f4efe4"/>${Array.from({length:19},(_,i)=>`<polygon points="${70+i*20},110 ${80+i*20},120 ${90+i*20},110" fill="#f4efe4"/>`).join('')}<text x="260" y="82" text-anchor="middle" font-family="'Major Mono Display'" font-size="54" fill="#22201c">open tab</text><rect x="96" y="92" width="328" height="3" fill="#c23b2b"/></svg>`;},
+  wmBg:'#1f5a3f',
+  icon:{bg:'#1f5a3f',pal:{p:'#f4efe4',k:'#22201c',r:'#c23b2b'},
+    rows:grid16((x,y)=>{if(x<2||x>13)return '';if(y===14)return x%2===0?'p':'';if(y<1||y>14)return '';
+      const t=(y-3)/7;if(y>=3&&y<=10&&Math.abs(x-(12-t*9))<0.8)return 'r';if([4,6,8,10].includes(x)&&y>=4&&y<=10)return 'k';if(y===12&&x>=4&&x<=11)return (x%2?'k':'p');return 'p';})},
+  card(){const W=1200,H=630;let s=`<rect width="${W}" height="${H}" fill="#1f5a3f"/>`;
+    const X=760,Y=36,Wc=360,Hc=540;s+=`<rect x="${X+10}" y="${Y+12}" width="${Wc}" height="${Hc}" fill="#143c2a"/><rect x="${X}" y="${Y}" width="${Wc}" height="${Hc}" fill="#f4efe4"/>`;
+    for(let i=0;i<Wc/24;i++)s+=`<polygon points="${X+i*24},${Y+Hc} ${X+i*24+12},${Y+Hc+14} ${X+i*24+24},${Y+Hc}" fill="#f4efe4"/>`;
+    const M=`font-family="'Major Mono Display'"`;s+=`<text x="${X+Wc/2}" y="${Y+64}" text-anchor="middle" ${M} font-size="40" fill="#22201c">tab</text><rect x="${X+30}" y="${Y+86}" width="${Wc-60}" height="3" fill="#22201c"/>`;
+    [1,2,4,8,16,32].forEach((v,i)=>{const yy=Y+140+i*52;s+=`<text x="${X+34}" y="${yy}" ${M} font-size="28" fill="#22201c">pin</text><text x="${X+Wc-34}" y="${yy}" text-anchor="end" ${M} font-size="28" fill="${v>=16?'#c23b2b':'#22201c'}">${v}</text>`;for(let d=X+110;d<X+Wc-90;d+=14)s+=`<rect x="${d}" y="${yy-6}" width="4" height="4" fill="#9a958a"/>`;});
+    s+=`<rect x="${X+30}" y="${Y+450}" width="${Wc-60}" height="3" fill="#22201c"/><text x="${X+34}" y="${Y+500}" ${M} font-size="30" fill="#22201c">owed</text><text x="${X+Wc-34}" y="${Y+500}" text-anchor="end" ${M} font-size="30" fill="#22201c">63</text>`;
+        s+=`<text x="66" y="260" ${M} font-size="112" fill="#f4efe4">open tab</text>`;
+    s+=`<text x="70" y="340" font-family="Pixelify Sans" font-weight="500" font-size="38" fill="#f4efe4">Leave pins standing.</text><text x="70" y="388" font-family="Pixelify Sans" font-weight="500" font-size="38" fill="#e0b860">Settle up later.</text>`;
+    s+=`<text x="70" y="560" font-family="Silkscreen" font-size="20" fill="#a9c7b6" letter-spacing="1">A TEN-PIN ROGUELIKE FOR PHONES</text>`;
+    return svgWrap(W,H,s);}
+});
+
+// ================= ROUND 3: Toronto alleys =================
+const R3=[];
+const H3='toronto-history.md';
+// pixel capital letters for icons, 5 wide x 7 tall
+const BIGL={T:['#####','#####','.###.','.###.','.###.','.###.','.###.'],H:['##.##','##.##','#####','#####','##.##','##.##','##.##'],Q:['.###.','##.##','##.##','##.##','##.##','.###.','...##']};
+const letterAt=(L,x,y,ox,oy,s)=>{const g=BIGL[L],gx=Math.floor((x-ox)/s),gy=Math.floor((y-oy)/s);return gy>=0&&gy<g.length&&gx>=0&&gx<5&&g[gy][gx]==='#';};
+
+R3.push({id:'temperance-lanes',name:'Temperance Lanes',kind:'Yonge at Temperance, 1905',
+  why:'By one account, Tommy Ryan opened the city\'s first regulation ten-pin alley above a store at Yonge and Temperance Street; five-pin came out of his Toronto Bowling Club in 1909 (whether at the same address isn\'t confirmed). A plain street name, painted the way the front page\'s Rec Room sign already is.',
+  tagline:'Ten pins. Know when to stop.',
+  font:'Pixelify Sans 700 (the game\'s own sign lettering)',
+  pal:[['#1d100a','Ink'],['#4c2a1a','Wall'],['#d86a28','Stripe'],['#f3e2b8','Chalk'],['#d83a2a','Red']],
+  conflict:{risk:'low',notes:[
+    'History: <a href="https://glimpsesofcanadianhistory.ca/?p=823">Glimpses of Canadian History</a> (Yonge and Temperance; it cites the Ottawa Youth Bowling Club); <a href="https://www.metro.us/living-history-of-5-pin-bowling/">Metro</a> places Ryan\'s alley near Yonge and Richmond, a block away. No street number found.',
+    'Live business: searched “Temperance Lanes”; no bowling alley with this name turned up (only Forest View Lanes in Temperance, Michigan).',
+    'Games: searched “Temperance Lanes” with Steam, itch.io, App Store and Google Play: nothing with this name. Several itch.io games are called just <a href="https://inky90.itch.io/temperance">Temperance</a>.']},
+  wordmark(){return `<svg viewBox="0 0 520 130" width="520" xmlns="http://www.w3.org/2000/svg"><rect x="6" y="8" width="508" height="114" rx="6" fill="#4c2a1a" stroke="#1d100a" stroke-width="4"/><rect x="6" y="94" width="508" height="7" fill="#d86a28"/><rect x="6" y="104" width="508" height="5" fill="#f3e2b8"/><text x="260" y="72" text-anchor="middle" font-family="Pixelify Sans" font-weight="700" font-size="54" fill="#f3e2b8">Temperance Lanes</text></svg>`;},
+  wmBg:'#1d100a',
+  icon:{bg:'#4c2a1a',pal:{c:'#f3e2b8',a:'#d86a28',k:'#1d100a'},rows:grid16((x,y)=>{if(y===11||y===12)return 'a';if(y===13)return 'c';if(y>=14)return 'k';return letterAt('T',x,y,3,1,2)&&y<=10?'c':'';})},
+  card(){const W=1200,H=630;let s=`<rect width="${W}" height="${H}" fill="#1d100a"/>`;
+    s+=`<rect x="0" y="380" width="${W}" height="250" fill="#c98f52"/>`;for(let x=0;x<W;x+=44)s+=`<rect x="${x+40}" y="380" width="4" height="250" fill="#b47a40"/>`;
+    s+=`<rect x="40" y="40" width="1120" height="230" rx="10" fill="#4c2a1a" stroke="#120a06" stroke-width="8"/><rect x="46" y="200" width="1108" height="16" fill="#d86a28"/><rect x="46" y="224" width="1108" height="10" fill="#f3e2b8"/>`;
+    s+=`<text x="600" y="160" text-anchor="middle" font-family="Pixelify Sans" font-weight="700" font-size="112" fill="#f3e2b8">Temperance Lanes</text>`;
+    s+=`<text x="70" y="330" font-family="Pixelify Sans" font-weight="500" font-size="38" fill="#f3e2b8">Ten pins. Know when to stop.</text>`;
+    s+=`<text x="1130" y="330" text-anchor="end" font-family="Silkscreen" font-size="22" fill="#c9a878" letter-spacing="1">YONGE AT TEMPERANCE · TORONTO</text>`;
+    [{y:452,sp:58,sc:2.6,n:4},{y:500,sp:72,sc:3.1,n:3},{y:556,sp:88,sc:3.7,n:2},{y:618,sp:0,sc:4.4,n:1}].forEach(r=>{for(let i=0;i<r.n;i++)s+=bigPin(600+(i-(r.n-1)/2)*r.sp,r.y,r.sc,PLAIN);});
+    return svgWrap(W,H,s);}
+});
+
+R3.push({id:'toronto-bowling-club',name:'Toronto Bowling Club',kind:'Where five-pin was born, 1909',
+  why:'Tommy Ryan\'s club: Canada\'s first regulation ten-pin lanes in 1905, and the room where he cut the pins down and invented five-pin around 1909. Lettered like the gold leaf on a club\'s black-glass transom.',
+  tagline:'Ten-pin alleys. Yonge Street, 1905.',
+  font:'IM Fell English SC (period serif, gold leaf)',
+  pal:[['#0d0b08','Black glass'],['#4a2214','Mahogany'],['#8a6a24','Old gold'],['#d9b45a','Gold leaf'],['#efe2c4','Ivory']],
+  conflict:{risk:'mid',notes:[
+    'History: <a href="https://en.wikipedia.org/wiki/Five-pin_bowling">Wikipedia: Five-pin bowling</a> and the <a href="https://www.guelphsportshalloffame.com/builders/thomas-f-tommy-ryan">Guelph Sports Hall of Fame</a> (first regulation lanes 1905, five-pin 1909, first league 1910 per <a href="https://glimpsesofcanadianhistory.ca/?p=823">Glimpses</a>).',
+    'Live business: no alley by this exact name found, but Toronto has lawn bowling clubs with close names (e.g. <a href="https://www.doorsopenontario.on.ca/toronto/west-toronto-lawn-bowling-club">West Toronto Lawn Bowling Club</a>, <a href="https://www.lawnbowls.com/clubs/new-toronto-lawn-bowling-club">New Toronto Lawn Bowling Club</a>) and a <a href="https://playsport.com/TorontoWorkersBowlingClub_Toronto/about">Toronto Workers Bowling Club</a> listing. Easy to confuse.',
+    'Games: searched “Toronto Bowling Club” with Steam, itch.io and app stores: nothing with this name; results were general bowling games. The App Store is full of “Bowling Club” apps (e.g. <a href="https://apps.apple.com/us/app/-/id1475730224">Bowling Club™ - Challenge King</a>), so it would be hard to find.']},
+  wordmark(){return `<svg viewBox="0 0 520 130" width="520" xmlns="http://www.w3.org/2000/svg"><rect x="6" y="6" width="508" height="118" fill="#0d0b08" stroke="#8a6a24" stroke-width="3"/><rect x="14" y="14" width="492" height="102" fill="none" stroke="#d9b45a" stroke-width="1.5"/><text x="260" y="62" text-anchor="middle" font-family="IM Fell English SC" font-size="40" letter-spacing="3" fill="#d9b45a">Toronto</text><text x="260" y="102" text-anchor="middle" font-family="IM Fell English SC" font-size="30" letter-spacing="5" fill="#d9b45a">Bowling Club</text></svg>`;},
+  wmBg:'#4a2214',
+  icon:{bg:'#0d0b08',pal:{g:'#d9b45a',d:'#8a6a24'},rows:(()=>{const P=['.g.','.g.','ggg','ggg','.d.'];const at=[[6,10],[3,6],[9,6],[0,2],[12,2]];return grid16((x,y)=>{for(const[px,py]of at){const r=P[y-py];if(r&&x-px>=0&&x-px<3&&r[x-px]!=='.')return r[x-px];}return '';});})()},
+  card(){const W=1200,H=630;let s=`<rect width="${W}" height="${H}" fill="#4a2214"/>`;
+    for(let x=0;x<W;x+=60)s+=`<rect x="${x}" y="0" width="2" height="${H}" fill="#3e1c10"/>`;
+    s+=`<rect x="60" y="50" width="1080" height="300" fill="#0d0b08" stroke="#8a6a24" stroke-width="6"/><rect x="78" y="68" width="1044" height="264" fill="none" stroke="#d9b45a" stroke-width="2"/>`;
+    s+=`<text x="600" y="180" text-anchor="middle" font-family="IM Fell English SC" font-size="104" letter-spacing="8" fill="#d9b45a">Toronto</text><text x="600" y="282" text-anchor="middle" font-family="IM Fell English SC" font-size="76" letter-spacing="10" fill="#d9b45a">Bowling Club</text>`;
+    s+=`<text x="600" y="430" text-anchor="middle" font-family="IM Fell English SC" font-size="44" letter-spacing="2" fill="#efe2c4">Ten-pin alleys. Yonge Street, 1905.</text>`;
+    const G={o:'#0d0b08',h:'#fff2c0',w:'#d9b45a',s:'#8a6a24',b:'#0d0b08',B:'#0d0b08'};[[540,560,4],[600,590,4.6],[660,560,4]].forEach(([x,y,sc])=>s+=bigPin(x,y,sc,G));
+    s+=`<text x="600" y="616" text-anchor="middle" font-family="Silkscreen" font-size="18" fill="#c9a878" letter-spacing="1">A TEN-PIN ROGUELIKE FOR PHONES</text>`;
+    return svgWrap(W,H,s);}
+});
+
+R3.push({id:'home-bowling-club',name:'Home Bowling Club',kind:'Queen at Parliament, 1925–1978',
+  why:'A second-floor alley in a warehouse at Queen Street East and Parliament, open from about 1925 to 1978; its old entrance turned up when the building was restored in 2017. Painted on brick like a ghost sign.',
+  tagline:'Second floor. Ten pins. Open late.',
+  font:'Alfa Slab One (painted-sign slab)',
+  pal:[['#241210','Soot'],['#5e2416','Dark brick'],['#8a3a24','Brick'],['#c4a483','Mortar'],['#ece0c2','Sign paint']],
+  conflict:{risk:'mid',notes:[
+    'History: <a href="https://www.blogto.com/city/2017/07/toronto-construction-revealed-old-bowling-alley/">blogTO, 2017</a>.',
+    'Live business: searched “Home Bowling Club” with Toronto, Queen and Parliament: nothing live with this name found.',
+    'Games: searched “Home Bowling Club” game or app: no exact match, but App Store results are full of “Bowling Club” apps (<a href="https://apps.apple.com/us/app/-/id1475730224">Bowling Club™ - Challenge King</a>, <a href="https://apps.apple.com/US/app/id1615539271">Bowling Club: Realistic 3D PvP</a>), so the name would get lost in a store search. Not searched on Steam or itch.io separately.']},
+  wordmark(){return `<svg viewBox="0 0 520 130" width="520" xmlns="http://www.w3.org/2000/svg">${bricks(0,0,520,130,13,40)}<text x="260" y="64" text-anchor="middle" font-family="Alfa Slab One" font-size="44" letter-spacing="2" fill="#ece0c2" opacity=".92">HOME</text><text x="260" y="108" text-anchor="middle" font-family="Alfa Slab One" font-size="30" letter-spacing="3" fill="#ece0c2" opacity=".92">BOWLING CLUB</text></svg>`;},
+  wmBg:'#8a3a24',
+  icon:{bg:'#8a3a24',pal:{m:'#5e2416',c:'#ece0c2'},rows:grid16((x,y)=>{if(letterAt('H',x,y,3,1,2)&&y<=14)return 'c';if(y%4===3)return 'm';if(x%8===((Math.floor(y/4)%2)?3:7))return 'm';return '';})},
+  card(){const W=1200,H=630;let s=bricks(0,0,W,H,30,90);
+    s+=`<text x="600" y="200" text-anchor="middle" font-family="Alfa Slab One" font-size="150" letter-spacing="6" fill="#ece0c2" opacity=".9">HOME</text><text x="600" y="320" text-anchor="middle" font-family="Alfa Slab One" font-size="92" letter-spacing="8" fill="#ece0c2" opacity=".9">BOWLING CLUB</text>`;
+    s+=`<rect x="250" y="350" width="700" height="8" fill="#ece0c2" opacity=".85"/>`;
+    s+=`<text x="600" y="430" text-anchor="middle" font-family="Alfa Slab One" font-size="44" letter-spacing="2" fill="#ece0c2" opacity=".9">SECOND FLOOR · TEN PINS · OPEN LATE</text>`;
+    s+=`<g fill="#ece0c2" opacity=".9"><rect x="586" y="470" width="28" height="70"/><polygon points="560,480 600,440 640,480"/></g>`;
+    s+=`<rect x="0" y="575" width="${W}" height="55" fill="#241210"/><text x="600" y="610" text-anchor="middle" font-family="Silkscreen" font-size="18" fill="#c4a483" letter-spacing="1">QUEEN ST. EAST AT PARLIAMENT · A TEN-PIN ROGUELIKE FOR PHONES</text>`;
+    return svgWrap(W,H,s);}
+});
+
+R3.push({id:'oconnor-bowl',name:'O\'Connor Bowl',kind:'O\'Connor Drive, about 1950–2015',
+  why:'An East York alley that ran for 65 years before it was knocked down for condos in 2015. A street name with a postwar neon sign: the closest real thing to the game\'s After Close hall.',
+  tagline:'Open late. Ten pins waiting.',
+  font:'Yellowtail (neon script) with Silkscreen',
+  pal:[['#05071a','Night'],['#141a44','Navy'],['#ff4fa8','Neon pink'],['#3fe0ff','Neon cyan'],['#f2f6ff','Tube white']],
+  conflict:{risk:'low',notes:[
+    'History: <a href="https://www.blogto.com/sports_play/2017/03/bowling-alleys-toronto/">blogTO, 2017</a> (65 years, demolished for condos) and the headline of <a href="https://www.BlogTo.com/sports_play/2015/06/oconnor_bowl_to_close_just_shy_of_its_65th_birthday/">blogTO, 2015</a> (that article couldn\'t be opened). Exact address and opening year not confirmed.',
+    'Live business: searched “O\'Connor Bowl” Toronto: only O\'Connor Drive and schools came up, no live alley.',
+    'Games: searched “O\'Connor Bowl” game or app: nothing; results were college-football bowl apps. It is a family name, so it reads as a person\'s business as well as a street. Not searched on Steam or itch.io separately.']},
+  wordmark(){return `<svg viewBox="0 0 520 130" width="520" xmlns="http://www.w3.org/2000/svg"><text x="230" y="80" text-anchor="middle" font-family="Yellowtail" font-size="74" fill="none" stroke="#ff4fa8" stroke-width="7" opacity=".25">O'Connor</text><text x="230" y="80" text-anchor="middle" font-family="Yellowtail" font-size="74" fill="#ff4fa8">O'Connor</text><text x="500" y="116" text-anchor="end" font-family="Silkscreen" font-size="30" letter-spacing="3" fill="#3fe0ff">BOWL</text></svg>`;},
+  wmBg:'#05071a',
+  icon:{bg:'#05071a',pal:{p:'#ff4fa8',c:'#3fe0ff',w:'#f2f6ff'},rows:grid16((x,y)=>{const r=Math.hypot(x-7.5,y-7.5);if(r>=6&&r<7.2)return 'p';const c=spAt(x-4,y-1);if(c&&c!=='o'&&y<=13)return c==='b'?'p':c==='s'?'c':'w';return '';})},
+  card(){const W=1200,H=630;let s=`<rect width="${W}" height="${H}" fill="#05071a"/>`;
+    s+=`<rect x="0" y="470" width="${W}" height="160" fill="#141a44"/>`;
+    s+=`<text x="560" y="250" text-anchor="middle" font-family="Yellowtail" font-size="220" fill="none" stroke="#ff4fa8" stroke-width="14" opacity=".12">O'Connor</text><text x="560" y="250" text-anchor="middle" font-family="Yellowtail" font-size="220" fill="#ff4fa8">O'Connor</text>`;
+    s+=`<text x="1000" y="340" text-anchor="end" font-family="Silkscreen" font-size="80" letter-spacing="4" fill="#3fe0ff">BOWL</text>`;
+    s+=`<text x="80" y="420" font-family="Pixelify Sans" font-weight="500" font-size="40" fill="#f2f6ff">Open late. Ten pins waiting.</text>`;
+    const P={o:'#05071a',h:'#ffffff',w:'#f2f6ff',s:'#9aa8de',b:'#ff4fa8',B:'#b02a78'};[{y:520,sp:44,sc:2.2,n:4},{y:550,sp:54,sc:2.6,n:3},{y:584,sp:66,sc:3.1,n:2},{y:624,sp:0,sc:3.7,n:1}].forEach(r=>{for(let i=0;i<r.n;i++)s+=bigPin(960+(i-(r.n-1)/2)*r.sp,r.y,r.sc,P);});
+    s+=`<text x="80" y="560" font-family="Silkscreen" font-size="20" fill="#9aa8de" letter-spacing="1">O'CONNOR DRIVE · A TEN-PIN ROGUELIKE FOR PHONES</text>`;
+    return svgWrap(W,H,s);}
+});
+
+R3.push({id:'queen-city-lanes',name:'Queen City Lanes',kind:'Toronto\'s old nickname',
+  why:'“Queen City” is Toronto\'s old nickname, and a Queen City Bowling Club stood on Church Street around 1906 (the record doesn\'t say whether it was lawn or alleys). Lettered for a bulb-lit marquee over the door.',
+  tagline:'Ten pins. One long night.',
+  font:'Limelight (deco marquee)',
+  pal:[['#120d08','Marquee black'],['#b3261e','Deco red'],['#a8782c','Brass'],['#ffcf5a','Bulb'],['#fff4d6','Warm white']],
+  conflict:{risk:'low',notes:[
+    'History: <a href="https://digitalarchive.tpl.ca/objects/386207/queen-city-bowling-club-toronto-ontario">TPL photo, Queen City Bowling Club, Church Street, about 1906</a>. Whether it had alleys is not confirmed.',
+    'Live business: searched “Queen City Lanes” and “Queen City Bowl”: no alley with either name found (results were Queens, New York alleys). “Queen City” is also a nickname for other cities (Cincinnati, Regina), so a business elsewhere could use it.',
+    'Games: searched “Queen City Lanes” with Steam, itch.io, App Store and Google Play: nothing with this name; Google Play has a developer account called <a href="https://play.google.com/store/apps/dev?id=5261973047593996521&hl=en_IN">QUEEN CITY</a>.']},
+  wordmark(){return `<svg viewBox="0 0 520 130" width="520" xmlns="http://www.w3.org/2000/svg"><rect x="6" y="6" width="508" height="118" rx="4" fill="#120d08" stroke="#a8782c" stroke-width="3"/>${bulbs(6,6,508,118,18,3.4)}<text x="260" y="70" text-anchor="middle" font-family="Limelight" font-size="40" letter-spacing="3" fill="#fff4d6">QUEEN CITY</text><text x="260" y="104" text-anchor="middle" font-family="Limelight" font-size="24" letter-spacing="10" fill="#ffcf5a">LANES</text></svg>`;},
+  wmBg:'#b3261e',
+  icon:{bg:'#120d08',pal:{y:'#ffcf5a',w:'#fff4d6'},rows:grid16((x,y)=>{const edge=x===0||y===0||x===15||y===15;if(edge)return (x+y)%2===0?'y':'';return letterAt('Q',x,y,3,1,2)&&y<=14?'w':'';})},
+  card(){const W=1200,H=630;let s=`<rect width="${W}" height="${H}" fill="#b3261e"/>`;
+    for(let x=0;x<W;x+=40)s+=`<rect x="${x}" y="0" width="3" height="${H}" fill="#9c1f18"/>`;
+    s+=`<rect x="80" y="50" width="1040" height="330" rx="8" fill="#120d08" stroke="#a8782c" stroke-width="8"/>${bulbs(80,50,1040,330,34,7)}`;
+    s+=`<text x="600" y="215" text-anchor="middle" font-family="Limelight" font-size="118" letter-spacing="6" fill="#fff4d6">QUEEN CITY</text><text x="600" y="320" text-anchor="middle" font-family="Limelight" font-size="70" letter-spacing="30" fill="#ffcf5a">LANES</text>`;
+    s+=`<text x="600" y="460" text-anchor="middle" font-family="Limelight" font-size="48" letter-spacing="2" fill="#fff4d6">Ten pins. One long night.</text>`;
+    s+=`<text x="600" y="580" text-anchor="middle" font-family="Silkscreen" font-size="20" fill="#ffd9c0" letter-spacing="1">A TEN-PIN ROGUELIKE FOR PHONES</text>`;
+    return svgWrap(W,H,s);}
+});
+
+// brick wall with mortar; marquee bulbs round a box
+function bricks(x0,y0,W,H,bh,bw){let o=`<rect x="${x0}" y="${y0}" width="${W}" height="${H}" fill="#8a3a24"/>`;for(let r=0,y=y0;y<y0+H;r++,y+=bh){o+=`<rect x="${x0}" y="${y+bh-3}" width="${W}" height="3" fill="#5e2416"/>`;for(let x=x0-(r%2?bw/2:0);x<x0+W;x+=bw)o+=`<rect x="${Math.max(x0,x+bw-3)}" y="${y}" width="3" height="${bh-3}" fill="#5e2416"/>`;}return o;}
+function bulbs(x,y,w,h,step,r){let o='';for(let i=step/2;i<w;i+=step){o+=`<circle cx="${x+i}" cy="${y+r+3}" r="${r}" fill="#ffcf5a"/><circle cx="${x+i}" cy="${y+h-r-3}" r="${r}" fill="#ffcf5a"/>`;}for(let j=step*1.2;j<h-step;j+=step){o+=`<circle cx="${x+r+3}" cy="${y+j}" r="${r}" fill="#ffcf5a"/><circle cx="${x+w-r-3}" cy="${y+j}" r="${r}" fill="#ffcf5a"/>`;}return o;}
+
+// helpers used by the directions above
+// letters that grow as they come toward you (left to right)
+function growing(word,fs0,step){return [...word].map((ch,i)=>`<tspan font-size="${fs0+i*step}" fill="${i<3?'#fff8e8':'#d4ff3a'}">${ch===' '?'&#160;':ch}</tspan>`).join('');}
+function svgWrap(W,H,inner){return `<svg viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges">${inner}</svg>`;}
+// a row of small pins whose bands ramp 1 → 32 (cream, green, amber, gold, orange, red)
+function rampRow(cx,base,n){const bands=['#f3e2b8','#3f8f6a','#e8a020','#ffd866','#d86a28','#d83a2a'];let o='';const sc=2,sp=36;
+  for(let i=0;i<n;i++){const c=withBand(PLAIN,bands[i],bands[i]);c.o='#1d100a';o+=bigPin(cx+(i-(n-1)/2)*sp,base,sc,c);}return o;}
+// score-sheet boxes with one letter each
+function frames(x,y,n,w,h,sw,word){let o='';for(let i=0;i<n;i++){const fx=x+i*w;o+=`<rect x="${fx}" y="${y}" width="${w}" height="${h}" fill="none" stroke="#2a160e" stroke-width="${sw}"/><rect x="${fx+w-24}" y="${y}" width="24" height="24" fill="none" stroke="#2a160e" stroke-width="${sw}"/>`;
+  o+=`<text x="${fx+w/2-6}" y="${y+h-16}" text-anchor="middle" font-family="VT323" font-size="66" fill="#2a160e">${word[i]}</text>`;}return o;}
+function longFrameBox(x,y,w,h,sw,word){return `<rect x="${x}" y="${y}" width="${w}" height="${h}" fill="none" stroke="#2a160e" stroke-width="${sw}"/><rect x="${x+w-24}" y="${y}" width="24" height="24" fill="none" stroke="#2a160e" stroke-width="${sw}"/><text x="${x+10}" y="${y+h-16}" font-family="VT323" font-size="66" letter-spacing="6" fill="#d83a2a">${word}</text>`;}
+function iconSVG(b,size){const ic=b.icon;return `<svg viewBox="0 0 16 16" width="${size}" height="${size}" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges"><rect width="16" height="16" fill="${ic.bg}"/>${pix(ic.rows,ic.pal)}</svg>`;}
+const ink=hex=>{const n=parseInt(hex.slice(1),16),r=n>>16,g=n>>8&255,b=n&255;return (r*299+g*587+b*114)/1000>140?'#1d100a':'#f3e2b8';};
+window.BRANDS=B;window.iconSVG=iconSVG;
+
+// ---------- the board ----------
+const ALL=B.concat(R2,R3);
+const q=new URLSearchParams(location.search);
+function dirHTML(b){return `<article class="dir" id="${b.id}">
+    <header><span class="kind">${b.kind.toUpperCase()}</span></header>
+    <div class="wm" style="background:${b.wmBg}" role="img" aria-label="${b.name} wordmark">${b.wordmark()}</div>
+    <p class="tag">${b.tagline}</p>
+    <p class="why">${b.why}</p>
+    <div><h3>Icon</h3><div class="icons">
+      <figure class="app">${iconSVG(b,128)}<figcaption>APP 128</figcaption></figure>
+      <figure>${iconSVG(b,64)}<figcaption>64</figcaption></figure>
+      <figure>${iconSVG(b,32)}<figcaption>FAVICON 32</figcaption></figure>
+      <figure><div class="tab">${iconSVG(b,16)}<span>${b.name}</span></div><figcaption>BROWSER TAB 16</figcaption></figure>
+    </div></div>
+    <div><h3>Colours</h3><div class="pal">${b.pal.map(([h,n])=>`<div style="background:${h};color:${ink(h)}"><b>${n}</b>${h}</div>`).join('')}</div></div>
+    <div><h3>Share card, 1200×630</h3><a class="card" href="${b.id}/card.png">${b.card()}</a></div>
+    <div class="conf"><h3>Name check</h3><p><span class="risk ${b.conflict.risk}">${b.conflict.risk==='low'?'LOW RISK':'SOME RISK'}</span></p>${b.conflict.notes.map(n=>`<p>${n}</p>`).join('')}</div>
+    <p class="files">Type: ${b.font}. Files: <a href="${b.id}/icon.svg">icon.svg</a> · <a href="${b.id}/icon-180.png">icon-180.png</a> · <a href="${b.id}/card.png">card.png</a></p>
+  </article>`;}
+const chipsHTML=L=>L.map(([g,...ns])=>`<li style="background:none;color:var(--dim);font-family:var(--num);font-size:11px">${g.toUpperCase()}</li>`+ns.map(n=>n.endsWith('*')?`<li class="short">${n.slice(0,-1)}</li>`:n.endsWith('-')?`<li><s>${n.slice(0,-1)}</s></li>`:`<li>${n}</li>`).join('')).join('');
+if(q.get('card')){const b=ALL.find(x=>x.id===q.get('card'));document.body.className='solo';document.body.innerHTML=b.card();}
+else if(q.get('export')){document.body.innerHTML=`<pre id="out"></pre>`;document.getElementById('out').textContent=JSON.stringify(ALL.map(b=>({id:b.id,icon:iconSVG(b,512).replace(' width="512" height="512"','')})));}
+else{
+  if(location.hash&&B.some(b=>'#'+b.id===location.hash))document.getElementById('round1').open=true;
+  if(location.hash&&R2.some(b=>'#'+b.id===location.hash))document.getElementById('round2').open=true;
+  document.getElementById('jump3').innerHTML=R3.map(b=>`<li><a href="#${b.id}">${b.name}</a></li>`).join('');
+  document.getElementById('grid3').innerHTML=R3.map(dirHTML).join('');
+  document.getElementById('rec3').innerHTML=`<h2 style="font:700 22px/1.1 var(--display);margin:0 0 6px">Recommended: Temperance Lanes</h2>
+    <p style="margin:0 0 6px">It points at five-pin's home corner: by one account Tommy Ryan's first regulation alley was at Yonge and Temperance, and five-pin came out of his club in 1909 (same address not confirmed). It reads like a real sign and is not a business anyone runs now (none found). It needs no new look: the game's own Rec Room sign, fonts and colours already are this sign. The word “temperance” also suits the game's choice (knock now or hold back) without making a pun of it.</p>
+    <p style="margin:0;color:var(--dim)">Runner-up: O'Connor Bowl, a real postwar East York alley with a neon sign that matches the After Close hall. Toronto Bowling Club has the strongest history but sits among lawn-bowling clubs and “Bowling Club” apps; Home Bowling Club has the same store problem; Queen City Lanes is the most generic.</p>`;
+  const LONG3=[['Five-pin\'s birthplace','Temperance Lanes*','Toronto Bowling Club*','Yonge & Temperance','Yonge & Richmond','Ryan\'s Alleys','Tommy Ryan\'s'],
+    ['Halls that closed','Home Bowling Club*','O\'Connor Bowl*','Bayview Bowl-','Leaside Lanes','Thorncliffe Bowl','Bathurst Bowlerama-','Glencairn Lanes'],
+    ['Old clubs and streets','Queen City Lanes*','Church Street Lanes','Sherbourne Lanes','Queen & Parliament','King Edward Lanes-'],
+    ['Still open (avoid)','Shamrock Bowl-','Bowlerama-','Danforth Bowl-','Kennedy Bowl-']];
+  document.getElementById('chips3').innerHTML=chipsHTML(LONG3);
+  const DROP3=[
+    ['Shamrock Bowl','A live business: the 1950s alley at 280 Coxwell (Coxwell and Gerrard) was set to reopen as Shamrock Bowl and Restobar in 2019 (<a href="https://media.blogto.com/city/2019/02/new-bowling-alley-toronto">blogTO</a>).'],
+    ['Bowlerama (any)','A live chain name: Rexdale Bowlerama still hosts a league (<a href="https://www.igbo.org/?p=33373">IGBO</a>); West Bowlerama was open in 2017. Bathurst Bowlerama (1962–2018) is closed, but the Bowlerama name isn\'t free.'],
+    ['Bayview Bowl','Toronto\'s closed in 1967 (<a href="https://leasidelife.com/?p=18946">Leaside Life</a>), but <a href="https://www.travelwisconsin.com/sports-facilities/bay-view-bowl-306214">Bay View Bowl</a> in Milwaukee is a live alley about 90 years old. Same name said aloud.'],
+    ['Danforth Bowl, Kennedy Bowl','Operating per <a href="https://www.blogto.com/sports_play/2017/03/bowling-alleys-toronto/">blogTO, 2017</a>; not checked for 2026, so treated as live.'],
+    ['King Edward Lanes','The CBA was founded at the King Edward Hotel in 1927 (<a href="https://www.thecanadianencyclopedia.ca/en/article/indoor-bowling">Canadian Encyclopedia</a>), but the hotel is a live brand.']];
+  document.querySelector('#dropped3 tbody').innerHTML=DROP3.map(([n,t])=>`<tr><td><b>${n}</b></td><td>${t}</td></tr>`).join('');
+  document.getElementById('jump2').innerHTML=R2.map(b=>`<li><a href="#${b.id}">${b.name}</a></li>`).join('');
+  document.getElementById('grid2').innerHTML=R2.map(dirHTML).join('');
+  document.getElementById('rec2').innerHTML=`<h2 style="font:700 22px/1.1 var(--display);margin:0 0 6px">Recommended: Latewood</h2>
+    <p style="margin:0 0 6px">One word with three readings that all fit without spelling out the rules: wood (bowlers' word for pins), late (the hall after hours, and leaving pins standing), and latewood itself, the dense ring a tree grows late in the season, the strongest part. Nothing turned up under it in any store searched. The ring icon is unlike any bowling game's and still reads at 16 px.</p>
+    <p style="margin:0;color:var(--dim)">Runner-up: Comeuppance, the strongest mood (greed, payback) but long and easy to misspell. Sodium Hour is the most atmospheric; Loiter is short but sits one letter from many “Looter” games; Open Tab is the clearest metaphor but too common a phrase to own.</p>`;
+  const LONG2=[['Late night','Sodium Hour*','Hush Hour-','Small Hours-','Wolf Hour-','Gloaming-','Dimmer-','Nightcap-','Ghost Light-','Starlite-','Last Orders','Velvet Hour','Owl Shift','Halflight','Afterglow','Last Call','Moth Hour'],
+    ['What comes back','Comeuppance*','Loiter*','Overstay-','Undertow','Encore','Linger','Kept','Keepsake','Nightkeep'],
+    ['Patience and greed','Open Tab*','Windfall-','Neon Debt-','Slow Burn-','Tenfold-','Let It Ride','Compound','Brass Neck','Threshold'],
+    ['Borrowed and coined words','Latewood*','Mothlight-','Highwater-','Late Bloom-','Lamp Oil']];
+  document.getElementById('chips2').innerHTML=chipsHTML(LONG2);
+  const DROP2=[
+    ['Mothlight','Taken several times: <a href="https://store.steampowered.com/app/687980/Mothlight/">Mothlight on Steam</a>, plus itch.io games by <a href="https://samukun.itch.io/mothlight">Samu</a>, <a href="https://stig6.itch.io/mothlight">Stig6</a> and <a href="https://dreganeite.itch.io/mothlight">Dreganeite</a>.'],
+    ['Highwater','<a href="https://store.steampowered.com/app/2000960/Highwater/">Highwater</a> is a released game on Steam and mobile.'],
+    ['Tenfold','<a href="https://store.steampowered.com/app/3856920">Tenfold</a> on Steam, <a href="https://store.steampowered.com/app/2876800/Tenfold_Loop/">Tenfold Loop</a>, and an itch.io game by <a href="https://prosciuttoman.itch.io/tenfold">ProsciuttoMan</a>.'],
+    ['Late Bloom','Itch.io games: <a href="https://drkr.itch.io/late-bloom-ld43">Late Bloom (Ludum Dare 43)</a>, <a href="https://betelgeuse-studio.itch.io/late-bloom/community">Late Bloom by Betelgeuse Studio</a>, and several “Late Bloomer”s.'],
+    ['Ghost Light','Several games: on Steam, on itch.io (<a href="https://johnqadams.itch.io/ghostlight">johnqadams</a>, <a href="https://robsmith-dev.itch.io/ghostlight">robsmith-dev</a>), and <a href="https://rawg.io/games/ghost-light">Ghost Light</a> on RAWG.'],
+    ['Windfall','An itch.io game by <a href="https://dadiu.itch.io/windfall">DADIU</a>, others on itch.io, and a <a href="https://steambase.io/games/windfall/info">Steam listing</a>.'],
+    ['Overstay','<a href="https://vlada-morgun.itch.io/overstay">Overstay</a> on itch.io, a team project still being updated.'],
+    ['Hush Hour','Two itch.io games: <a href="https://nmnjdev.itch.io/hush-hour">nmnjdev</a> and <a href="https://doteff.itch.io/hush-hour-otw">doteff</a>.'],
+    ['Nightcap','<a href="https://steamcommunity.com/app/551210">Nightcap</a> on Steam, Nightcap Witch and Nightcap Alchemist, and itch.io games by <a href="https://moori.itch.io/nightcap">moori</a> and <a href="https://santiragames.itch.io/nightcap">SantiraGames</a>.'],
+    ['Neon Debt','<a href="https://jflecole.itch.io/neon-debt/devlog/1765992/update-011-fixes-and-thank-you">Neon Debt</a> on itch.io.'],
+    ['Small Hours','<a href="https://behindyou.itch.io/small-hours">Small Hours</a> on itch.io.'],
+    ['Gloaming','The Gloaming (itch.io jam game), <a href="https://store.steampowered.com/app/4388940/GLOAM/">GLOAM</a> and Shadows of Gloaming on Steam.'],
+    ['Dimmer','Several itch.io games called <a href="https://slopenstein.itch.io/dimmer">DIMMER</a>, including jam entries.'],
+    ['Wolf Hour','Itch.io games <a href="https://kuzea1212.itch.io/wolf-hour/devlog/1693770/wolf-hour-first-public-build-">Wolf Hour</a> and <a href="https://trb3944.itch.io/wolfhour/devlog/1678749/wolfhour-v110-controller-support-and-a-new-ice-opening">Wolfhour</a>.'],
+    ['Starlite','<a href="https://en.wikipedia.org/wiki/Starlite_(video_game)">Starlite</a> is an existing video game, plus a STARLITE game on Steam and several on itch.io.'],
+    ['Slow Burn','<a href="https://www.gematsu.com/games/slowburn">Slowburn</a> (Gematsu listing) and <a href="https://stopsignmedia.itch.io/slowburn">an itch.io game</a>.']];
+  document.querySelector('#dropped2 tbody').innerHTML=DROP2.map(([n,t])=>`<tr><td><b>${n}</b></td><td>${t}</td></tr>`).join('');
+
+  document.getElementById('jump').innerHTML=B.map(b=>`<li><a href="#${b.id}">${b.name}</a></li>`).join('');
+  document.getElementById('grid').innerHTML=B.map(dirHTML).join('');
+
+  document.getElementById('rec').innerHTML=`<h2 style="font:700 22px/1.1 var(--display);margin:0 0 6px">Recommended: Ripe Rack</h2>
+    <p style="margin:0 0 6px">It names the decision you make every ball (knock it now, or let it ripen), it reads as bowling (“rack”), and nothing turned up under the name. It also keeps the game's own fonts and Rec Room colours, so applying it changes words, not the look. The gold pin is a strong icon at 16 px.</p>
+    <p style="margin:0;color:var(--dim)">Runner-up: Pin Creep, the most literal about the board advancing on you, held back by Pin-Crawl's similar sound and the insult reading of “creep”. After Close is the most atmospheric but names the hall rather than the rules, and it is an everyday phrase.</p>`;
+
+  const LONG=[['Ripening','Ripe Rack*','Overripe-','Let It Ripen','Ripewood','Pin Harvest','Ripe Pins'],['Advancing','Pin Creep*','Closing In','Red Line','Breakthrough','The Advance','Pins Rising'],
+    ['Lane and hall','After Close*','Last Lane','Night Lane','Lane Thirteen','Rec Room 74'],['Arcade words','Pinburst*','Pinfall-','Pin Pop','Double Up','Topple','Knock 32'],
+    ['Runs and resets','Long Frame*','No Reset-','Never Reset','The Tenth Frame','Endless Rack'],['Bowling words','The Leave-','Sleeper-','Deadwood','Kingpin-','Pixel Pins-']];
+  document.getElementById('chips').innerHTML=chipsHTML(LONG);
+  const DROP=[
+    ['Overripe','At least three games on itch.io already use it: <a href="https://marcmasters.itch.io/overripe">MarcMasters\' jam game</a>, <a href="https://straightforwardgames.itch.io/overripe">Straightforward Games\'</a> (with a devlog), and <a href="https://maryamahmed0.itch.io/overripe">one by maryamahmed0 and Szarry</a>. Clear conflict.'],
+    ['Pinfall','The bowling word for pins knocked down, and an itch.io game named <a href="https://itch.io/games-like/2139456/pinfall">pinfall</a> exists.'],
+    ['Pixel Pins','Taken: <a href="https://apps.apple.com/app/id6478244962">Pixel Pins</a> is on the App Store.'],
+    ['Kingpin','Taken in bowling: <a href="https://apps.apple.com/app/id1279551167">Kingpin Bowling</a> is on the App Store, besides the film and older games.'],
+    ['No Reset','Searched; found nothing exact, but <a href="https://store.steampowered.com/app/1684880/Reset/">Reset</a> is on Steam and the phrase is too plain to be found or owned.'],
+    ['Sleeper','The bowling word for a hidden pin; a search for it brought up only sleep apps (e.g. <a href="https://apps.apple.com/us/app/sleeeper/id6771826385">Sleeeper</a>). Too crowded to be findable.'],
+    ['The Leave','Searched; found nothing, but outside bowling “the leave” means nothing, so it fails the descriptive test.'],
+    ['Anything ending -atro','<a href="https://store.steampowered.com/app/3328100/Bowlatro/">Bowlatro</a> is already a roguelite bowling game on Steam (Reasy, March 2025) with special pins, balls and a shop: the closest game in this space. The name should not lean on Balatro.']];
+  document.querySelector('#dropped tbody').innerHTML=DROP.map(([n,t])=>`<tr><td><b>${n}</b></td><td>${t}</td></tr>`).join('');
+}
+</script>
+</body>
+</html>

@@ -3,7 +3,26 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
-<title>Advancing Ten-Pin</title>
+<title>Temperance Lanes</title>
+<meta name="description" content="Temperance Lanes: a bowling roguelike. Ten pins. Know when to stop.">
+<meta name="theme-color" content="#4c2a1a">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Temperance Lanes">
+<meta property="og:title" content="Temperance Lanes">
+<meta property="og:description" content="A bowling roguelike. Ten pins. Know when to stop.">
+<meta property="og:url" content="https://joshlitwin.github.io/bowl-rogue/">
+<meta property="og:image" content="https://joshlitwin.github.io/bowl-rogue/assets/share.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Temperance Lanes">
+<meta name="twitter:description" content="A bowling roguelike. Ten pins. Know when to stop.">
+<meta name="twitter:image" content="https://joshlitwin.github.io/bowl-rogue/assets/share.png">
+<link rel="icon" href="../../assets/icon.svg" type="image/svg+xml">
+<link rel="icon" href="../../assets/icon-32.png" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="../../assets/icon-180.png">
+<link rel="manifest" href="../../assets/manifest.webmanifest">
+<meta name="apple-mobile-web-app-title" content="Temperance">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@500;700&family=Silkscreen&display=swap" rel="stylesheet">
@@ -1289,7 +1308,7 @@ cv.addEventListener('pointermove',e=>{if(!drag||g.mode!=='aim')return;const dx=(
   fixBend();});
 ['pointerup','pointercancel'].forEach(n=>cv.addEventListener(n,()=>drag=null));
 
-function logText(){const sg=v=>(v>0?'+':'')+v;let t='Advancing Ten-Pin log. Four levels of small, big, boss; ten balls a game at most, ending as soon as the target is reached ($1 per ball left, up to $4). One board per game that never resets. After each ball, pins left standing advance one row toward you and double in value (1, 2, 4, 8, 16); pins that fell come back worth 1 at the back, as far back as they fit. A pin that would advance past the red line breaks through: it costs its value and comes back at the back. A strike (every pin on the board) is worth '+ADV.STRIKEX+'x. Growth: '+ADV.GROW+'. Powers: each pin has three slots; a pin shows them as letters in brackets, e.g. 0:3=8[qqh] (q Quick growth, h Head start, k Spark, l Lantern, w Slow, d Shield, b Bomb, r Rent, t Toll). No pin grows past '+ADV.CAP+'. Rows before the line: '+(ADV.LASTK+1)+' (Short line boss: 4). Bosses, one per level, strike killers and ripen killers alternating: Short line (the line one row closer), Sweep bar (balls 4 and 8: every standing pin swept off for nothing; never in level 1), Bolted rack (only the ball knocks pins down), Rising tentacle (a post that rises at the back of a middle column and advances each ball; it stops the ball). Your ten pins keep their type: Slow, Spark, Shield, Runner, Anchor, Glass, Bomb, Huddle, Crown, Rent, Crowd, Toll; the board lists a type by its first three letters after the value. Rack lists your ten by starting spot 1 to 10. Ball used: the house ball, or the one you bought (Big, Small, Plastic: size and weight; Rush, Brake, Toll, Sweep, Seed: the house ball with an effect on how the board advances). Positions are px from lane centre (lane edges -120/+120). Board lists each pin as column:row=value, columns -3..3 are half a pin spacing apart (34.5 px), row 0 is the back. Hot is how many pins stood on the front row (they break through unless knocked down). Moved is how far the line changed from the previous ball (start + aim + half the bend). Timing is ms early (-) or late (+); drift is how far the ball was pushed off the drawn line. Tips lists the first-time tips that fired since the previous ball (advten-tips flags: throw, advance, redline, broke, early, shop, pick, pw:<power>, onlane, fx:<power>, boss:<boss>, bossgo:<boss>; tips-again when they were reset).\n';
+function logText(){const sg=v=>(v>0?'+':'')+v;let t='Temperance Lanes log. Four levels of small, big, boss; ten balls a game at most, ending as soon as the target is reached ($1 per ball left, up to $4). One board per game that never resets. After each ball, pins left standing advance one row toward you and double in value (1, 2, 4, 8, 16); pins that fell come back worth 1 at the back, as far back as they fit. A pin that would advance past the red line breaks through: it costs its value and comes back at the back. A strike (every pin on the board) is worth '+ADV.STRIKEX+'x. Growth: '+ADV.GROW+'. Powers: each pin has three slots; a pin shows them as letters in brackets, e.g. 0:3=8[qqh] (q Quick growth, h Head start, k Spark, l Lantern, w Slow, d Shield, b Bomb, r Rent, t Toll). No pin grows past '+ADV.CAP+'. Rows before the line: '+(ADV.LASTK+1)+' (Short line boss: 4). Bosses, one per level, strike killers and ripen killers alternating: Short line (the line one row closer), Sweep bar (balls 4 and 8: every standing pin swept off for nothing; never in level 1), Bolted rack (only the ball knocks pins down), Rising tentacle (a post that rises at the back of a middle column and advances each ball; it stops the ball). Your ten pins keep their type: Slow, Spark, Shield, Runner, Anchor, Glass, Bomb, Huddle, Crown, Rent, Crowd, Toll; the board lists a type by its first three letters after the value. Rack lists your ten by starting spot 1 to 10. Ball used: the house ball, or the one you bought (Big, Small, Plastic: size and weight; Rush, Brake, Toll, Sweep, Seed: the house ball with an effect on how the board advances). Positions are px from lane centre (lane edges -120/+120). Board lists each pin as column:row=value, columns -3..3 are half a pin spacing apart (34.5 px), row 0 is the back. Hot is how many pins stood on the front row (they break through unless knocked down). Moved is how far the line changed from the previous ball (start + aim + half the bend). Timing is ms early (-) or late (+); drift is how far the ball was pushed off the drawn line. Tips lists the first-time tips that fired since the previous ball (advten-tips flags: throw, advance, redline, broke, early, shop, pick, pw:<power>, onlane, fx:<power>, boss:<boss>, bossgo:<boss>; tips-again when they were reset).\n';
   t+='run,game,target,ball,ball_used,start,aim,bend,moved,timing_ms,drift_px,setup_seconds,board_value,hot,pins_down,value_down,clean_pins,mult,score,triggers,broke_through,cost,swept,net,result,board_before,board_after,boss,cash,your_ten,gear,shop_before_game,tips\n';
   LOG.forEach(r=>{t+=[r.run,r.game,r.target,r.frame,r.ball||'house',sg(r.start),sg(r.aim),sg(r.bend),r.moved,sg(r.ms),sg(r.drift),r.setup,r.value,r.hot,r.down,r.downValue,r.clean,r.mult,r.score,r.notes||'',r.broke,r.cost,r.swept||0,r.net,r.result,r.rack,r.after,r.boss||'',r.cash||'',r.ten||'',r.gear||'',r.offers||'',r.tips||''].join(',')+'\n';});return t;}
 function openLog(){$('logText').value=LOG.length?logText():'No throws recorded yet.';$('log').hidden=false;}
