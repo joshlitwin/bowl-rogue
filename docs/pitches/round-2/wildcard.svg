@@ -1,0 +1,49 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 180 300">
+<defs>
+<path id="pb" d="M5 0C7.2 0 7.6 2.5 6.6 5C6 6.5 6 7.5 7.5 10C9.6 13.5 9.5 19 8 22Q7.5 24 5 24Q2.5 24 2 22C.5 19 .4 13.5 2.5 10C4 7.5 4 6.5 3.4 5C2.4 2.5 2.8 0 5 0Z"/>
+<symbol id="l1" viewBox="0 0 10 24"><use href="#pb" xlink:href="#pb" fill="#f2e6cf"/><rect x="2.6" y="9" width="4.8" height="1.8" fill="#e0b040"/></symbol>
+<symbol id="l2" viewBox="0 0 10 24"><use href="#pb" xlink:href="#pb" fill="#f2e6cf"/><rect x="2.6" y="9" width="4.8" height="1.8" fill="#e0b040"/><rect x="1.9" y="11.6" width="6.2" height="1.8" fill="#e0b040"/></symbol>
+<symbol id="l3" viewBox="0 0 10 24"><use href="#pb" xlink:href="#pb" fill="#f2e6cf"/><rect x="2.6" y="9" width="4.8" height="1.8" fill="#e0b040"/><rect x="1.9" y="11.6" width="6.2" height="1.8" fill="#e0b040"/><rect x="1.4" y="14.2" width="7.2" height="1.8" fill="#e0b040"/></symbol>
+<symbol id="l4" viewBox="0 0 10 24"><use href="#pb" xlink:href="#pb" fill="#f2e6cf"/><rect x="2.6" y="9" width="4.8" height="1.8" fill="#e0b040"/><rect x="1.9" y="11.6" width="6.2" height="1.8" fill="#e0b040"/><rect x="1.4" y="14.2" width="7.2" height="1.8" fill="#e0b040"/><rect x="1.2" y="16.8" width="7.6" height="1.8" fill="#e0b040"/></symbol>
+<symbol id="al" viewBox="0 0 10 24"><use href="#pb" xlink:href="#pb" fill="#f2e6cf"/><rect x="2.4" y="5" width="5.2" height="4" fill="#c23a2a"/><circle cx="5" cy="7" r="1.2" fill="#ffb08a"/></symbol>
+<symbol id="gd" viewBox="0 0 10 24"><use href="#pb" xlink:href="#pb" fill="#3b2c26"/><rect x="3.2" y="5.6" width="3.6" height="1.4" fill="#f2e6cf"/></symbol>
+</defs>
+<rect width="180" height="300" fill="#2a1a12"/>
+<!-- HUD: four balls left, quota bar empty -->
+<g fill="#c23a2a"><circle cx="12" cy="18" r="4"/><circle cx="23" cy="18" r="4"/><circle cx="34" cy="18" r="4"/><circle cx="45" cy="18" r="4"/></g>
+<rect x="66" y="13" width="102" height="10" fill="none" stroke="#f2e6cf" stroke-width="1"/>
+<text x="168" y="35" font-family="monospace" font-size="8" fill="#f2e6cf" text-anchor="end">$0 / $10</text>
+<!-- back wall and gutters -->
+<rect x="40" y="42" width="100" height="10" fill="#160c08"/>
+<polygon points="48,52 132,52 178,292 2,292" fill="#1e120c"/>
+<!-- lane -->
+<polygon points="55,52 125,52 170,290 10,290" fill="#c8843e"/>
+<g stroke="#a8652a" stroke-width=".6">
+<line x1="63.75" y1="52" x2="30" y2="290"/><line x1="72.5" y1="52" x2="50" y2="290"/><line x1="81.25" y1="52" x2="70" y2="290"/>
+<line x1="98.75" y1="52" x2="110" y2="290"/><line x1="107.5" y1="52" x2="130" y2="290"/><line x1="116.25" y1="52" x2="150" y2="290"/>
+</g>
+<!-- low house light: one pool on the deck -->
+<ellipse cx="90" cy="84" rx="46" ry="32" fill="#e0a560" opacity=".45"/>
+<polygon points="10,290 55,52 22,52 0,290" fill="#2a1a12" opacity=".35"/>
+<polygon points="170,290 125,52 158,52 180,290" fill="#2a1a12" opacity=".35"/>
+<!-- lane arrows -->
+<g fill="#a8652a"><polygon points="60,212 64,200 68,212"/><polygon points="76,212 80,200 84,212"/><polygon points="96,212 100,200 104,212"/><polygon points="112,212 116,200 120,212"/></g>
+<!-- the rack, back to front: 7 8 9 10, 4 5 6, 2 3, 1 -->
+<use href="#l4" xlink:href="#l4" x="55.2" y="46" width="6.7" height="16"/>
+<use href="#l1" xlink:href="#l1" x="76.2" y="46" width="6.7" height="16"/>
+<use href="#l1" xlink:href="#l1" x="97.2" y="46" width="6.7" height="16"/>
+<use href="#l4" xlink:href="#l4" x="118.2" y="46" width="6.7" height="16"/>
+<use href="#l2" xlink:href="#l2" x="63.9" y="58" width="7.5" height="18"/>
+<use href="#l3" xlink:href="#l3" x="86.3" y="58" width="7.5" height="18"/>
+<use href="#l2" xlink:href="#l2" x="108.7" y="58" width="7.5" height="18"/>
+<use href="#l1" xlink:href="#l1" x="73.9" y="71" width="8.3" height="20"/>
+<use href="#gd" xlink:href="#gd" x="97.9" y="71" width="8.3" height="20"/>
+<use href="#al" xlink:href="#al" x="85.4" y="85" width="9.2" height="22"/>
+<!-- the throw being set: start right, no bend, aim at the headpin's right edge -->
+<line x1="115" y1="268" x2="95" y2="107" stroke="#f2e6cf" stroke-width="1" stroke-dasharray="2 3" opacity=".8"/>
+<ellipse cx="95" cy="107" rx="7" ry="2.6" fill="none" stroke="#e07a2a" stroke-width="1.4"/>
+<polygon points="104.5,180 109,186 104.5,192 100,186" fill="#c23a2a" stroke="#2a1a12" stroke-width=".6"/>
+<ellipse cx="115" cy="279" rx="10" ry="2.5" fill="#2a1a12" opacity=".5"/>
+<circle cx="115" cy="270" r="9" fill="#c23a2a"/>
+<circle cx="112" cy="267" r="2.5" fill="#e06a50"/>
+</svg>
