@@ -35,6 +35,7 @@ function shopBuy(){let guard=0;while(guard++<12){
   if(run.gearOffer&&!run.gearOffer.bought&&run.cash>=run.gearOffer.cost)buy(run.gearOffer);}
 function playRun(){newRun();if('${BOSSLIST}'){run.bosses='${BOSSLIST}'.split(',');BOSS=bossOf(run.game);}if(${ALL}){TGT=run.target;run.target=0;}const out=[];let k=0;
   while(k++<200){if(g.mode==='aim'){throwOne();continue;}
+    if(!document.getElementById('win').hidden){document.getElementById('winNext').click();}
     const shop=!document.getElementById('shop').hidden,over=!document.getElementById('over').hidden;
     if(shop||over){const gm=g.frames.flatMap(f=>f.marks);out.push({game:run.game+1,kind:kindOf3(run.game),boss:BOSS?BOSS.name:'',t:total(),target:${ALL}?TARGETS[run.game]:run.target,strikes:gm.filter(m=>m==='X').length,balls:gm.length,stage:document.body.dataset.stage});
       if(over)break;shopBuy();run.bought=true;skipAsk=true;document.getElementById('shopNext').click();if(${ALL})run.target=0;continue;}

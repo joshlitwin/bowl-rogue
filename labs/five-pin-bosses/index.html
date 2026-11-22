@@ -274,6 +274,18 @@ button.slot:active{transform:translateY(1px)}
 .placing .row button.main{background:transparent;color:var(--chalk);border-color:var(--dim);box-shadow:none}
 /* end of run */
 .track{display:grid;grid-template-columns:repeat(6,1fr);gap:4px}
+/* win card: the score, then each line of pay with why, then the shop */
+#win .box{justify-content:center;gap:14px}
+.winscore{text-align:center;font-family:var(--num);font-size:44px;line-height:1;padding:10px 0 2px}
+.winscore small{font-size:20px;color:var(--dim)}
+.winscore em{display:block;font-style:normal;font-family:var(--display);font-size:14px;color:var(--dim);margin-top:8px}
+.wlist{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px}
+.wlist li{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:6px;background:rgba(0,0,0,.25);font-family:var(--display);font-size:15px}
+.wlist li span{flex:1;min-width:0}
+.wlist li small{display:block;font-size:12px;color:var(--dim)}
+.wlist li b{font-family:var(--num);font-weight:400;font-size:17px;color:var(--coin)}
+.wlist li.next{background:transparent;border:2px dashed var(--dim)}
+.wlist li.next b{color:var(--chalk)}
 .track span{flex:1;text-align:center;font-family:var(--num);font-size:11px;line-height:1;padding:6px 0;border-radius:4px;border:2px solid var(--dim);color:var(--dim)}
 .track span.won{background:var(--accent);border-color:var(--accent);color:var(--ink)}
 .track span.lost{background:var(--go);border-color:var(--go);color:var(--go-ink)}
@@ -390,6 +402,12 @@ button.slot:active{transform:translateY(1px)}
 <div class="controls">
   <button id="throw" type="button">THROW</button>
 </div>
+<div class="sheet" id="win" hidden><div class="box">
+  <div class="shead"><h2 id="winTitle"></h2><b class="chip" id="winCash"></b></div>
+  <div class="winscore" id="winScore"></div>
+  <ul class="wlist" id="winList"></ul>
+  <div class="row"><button class="main" id="winNext" type="button">Shop<i class="tri r"></i></button></div>
+</div></div>
 <div class="sheet" id="over" hidden><div class="box">
   <div class="shead"><h2 id="overTitle"></h2><b class="chip" id="overCash"></b></div>
   <div class="track" id="overTrack"></div>
@@ -628,7 +646,7 @@ function startGame(){run.target=TARGETS[run.game];run.tips=0;
   BOSS=bossOf(run.game);RACK=layoutSpots(run.layout,run.rack.length);run.offerNote=run.seen.join(' / ');run.seen=[];
   const sr=startRange(),sx0=clamp(180,sr[0],sr[1]);
   g={bx:180,zoneAt:.2,ready:false,t0:performance.now(),pend:null,frame:0,frames:Array.from({length:FRAMES},()=>({balls:[],marks:[]})),pins:rackRun(),rackBalls:0,sx:sx0,ex:180,bend:0,power:1,phase:.5,mode:'aim',sim:null,trail:[],intended:null,err:0,toast:null,toastT:0,wait:0,stopped:0};
-  ['over','shop','rackSheet','log'].forEach(id=>$(id).hidden=true);topBar();strip();board();hint();setBtn();
+  ['over','win','shop','rackSheet','log'].forEach(id=>$(id).hidden=true);topBar();strip();board();hint();setBtn();
   if(BOSS){g.toast='boss';$('toast').innerHTML=`<strong>${BOSS.name}</strong><b>Boss · beat ${run.target}</b>`;g.toastT=2.6;}}
 function topBar(){const h=$('title');h.setAttribute('aria-label',`Game ${run.game+1} of ${TARGETS.length}`);h.innerHTML=TARGETS.map((_,i)=>`<i class="${i<run.game?'won':i===run.game?'cur':''}${i%3===2?' boss':''}"></i>`).join('');
   $('cash').textContent='$'+run.cash;$('camBtn').dataset.cam=T.cam;}
@@ -683,9 +701,20 @@ function resolve(){const fell=g.pins.filter(p=>p.down),left=g.pins.filter(p=>!p.
   else{g.mode='aim';g.ready=false;g.t0=performance.now();board();hint();}
   setBtn();
 }
+// the win card: what you scored, each line of pay and why, what comes next; then the shop
+function showWin(){const p=run.pay,k=kindOf3(run.game),bo=BOSS,n=run.game+1,nb=bossOf(n),marks=g.frames.flatMap(f=>f.marks),balls=g.frames.flatMap(f=>f.balls);
+  $('winTitle').textContent=bo?'Boss beaten':k+' game won';$('winCash').textContent='$'+run.cash;
+  $('winScore').innerHTML=`${p.t}<small> / ${p.target}</small><em>${marks.filter(m=>m==='X').length} of ${marks.length} balls struck · best ball +${Math.max(0,...balls)}</em>`;
+  const pct=Math.floor((p.t/p.target-1)*100);
+  $('winList').innerHTML=`<li><span>${bo?'Beat '+bo.name:'Won the '+k.toLowerCase()+' game'}<small>Small $${PAY[0]} · big $${PAY[1]} · boss $${PAY[2]}</small></span><b>+$${p.base}</b></li>`
+    +`<li><span>${pct}% over the target<small>+$1 for every 10% over, up to $4</small></span><b>+$${p.extra}</b></li>`
+    +(run.tips?`<li><span>Tip jar<small>Paid during the game, $1 a strike</small></span><b>+$${run.tips}</b></li>`:'')
+    +`<li class="next"><span>Next: ${nb?'Boss · '+nb.name:kindOf3(n)+' game'}<small>${n%3===0?'Level '+(Math.floor(n/3)+1)+' · ':''}beat ${TARGETS[n]}</small></span><b>${n+1}/12</b></li>`;
+  $('win').hidden=false;}
+$('winNext').addEventListener('click',()=>{$('win').hidden=true;showShop();});
 function endGame(){const t=total(),won=t>=run.target,final=run.game===TARGETS.length-1;
   if(won&&!final){const extra=Math.min(4,Math.floor((t/run.target-1)*10)),earn=PAY[run.game%3]+extra;run.cash+=earn;run.rerolls=0;run.bought=false;topBar();rollOffers();
-    run.pay={t,target:run.target,extra,earn,base:PAY[run.game%3],fresh:true};pending=null;sel=null;gsel=null;showShop();return;}
+    run.pay={t,target:run.target,extra,earn,base:PAY[run.game%3],fresh:true};pending=null;sel=null;gsel=null;showWin();return;}
   $('overTitle').textContent=won?'Run complete':'Run over';$('overCash').textContent='$'+run.cash;
   $('overTrack').innerHTML=TARGETS.map((v,i)=>`<span class="${i<run.game||(won&&i===run.game)?'won':i===run.game?'lost':''}">${v}</span>`).join('');
   run.end={t,target:run.target};osel=null;ogsel=null;showOver();}
