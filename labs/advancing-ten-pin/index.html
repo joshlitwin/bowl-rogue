@@ -474,6 +474,11 @@ img.bp{flex:none;width:auto;height:52px;image-rendering:pixelated}
 .pinfo.callout img.bp{height:auto;width:auto}
 .pinfo.callout canvas.bandcard{width:48px;height:40px}
 .pinfo.callout img.gear{flex:none;width:33px;height:33px;image-rendering:pixelated}
+.lanepeek{z-index:4;width:max-content;max-width:calc(100% - 20px);padding:6px 10px 7px 8px;pointer-events:none}
+.lanepeek p.now{margin-top:4px;color:var(--coin)}
+.lanepeek h3 small{margin-left:7px;font:400 12px var(--num);color:var(--coin)}
+.lanepeek .arw{position:absolute;width:0;height:0;border:7px solid transparent;margin-left:-7px}
+.lanepeek .arw.up{top:-14px;border-bottom-color:var(--chalk)}.lanepeek .arw.dn{bottom:-14px;border-top-color:var(--chalk)}
 .pinfo h3 .pr{margin-left:7px;font:400 13px var(--num);color:var(--coin)}
 .pinfo.callout .x{position:absolute;top:3px;right:3px;width:22px;height:22px;padding:0;border:0;border-radius:3px;background:transparent;color:var(--dim);font:700 16px/1 var(--display)}
 .pinfo.callout .buy{flex:none;align-self:center;padding:8px 10px;border-radius:6px;border:2px solid var(--accent);background:var(--accent);color:var(--ink);font:700 13px var(--display)}
@@ -542,6 +547,11 @@ img.bp{flex:none;width:auto;height:52px;image-rendering:pixelated}
 #rackTips{flex:none;margin-left:auto;padding:4px 8px;border:2px solid var(--dim);border-radius:4px;background:transparent;color:var(--dim);font:400 12px/1 var(--display);white-space:nowrap}
 #rackTips.ask{border-color:var(--accent);color:var(--chalk)}
 #rackSheet .shead h2{margin-right:0}
+/* a read pin lists each power's full rule: the strip grows to fit, the rack's grid gives up its padding */
+#rackMsg,#overMsg{height:auto;min-height:54px}
+#rackMsg p,#overMsg p{line-height:1.2}
+#rackSheet.reading #rackPows{display:none}
+#rackMsg img.bp{display:none}
 #shop .tray[hidden],#shopReroll[hidden],#rackTips[hidden]{display:none}
 #shop .box{position:relative}
 </style>
@@ -560,6 +570,7 @@ img.bp{flex:none;width:auto;height:52px;image-rendering:pixelated}
   <canvas id="lane" width="180" height="300" aria-label="Bowling lane. Drag the ball, the bend handle and the aim ring."></canvas>
   <div class="toast" id="toast" aria-live="polite"></div>
   <div class="tipline" id="tipLine" hidden></div>
+  <div class="pinfo callout lanepeek" id="laneInfo" hidden aria-live="polite"></div>
 </div>
 <p class="hint" id="hint"></p>
 <div class="controls">
@@ -816,31 +827,31 @@ const kindOf3=gi=>KINDS[gi%3],bossOf=gi=>gi%3===2?BOSSES[run.bosses[Math.floor(g
 // values: the headpin 5, the 2 and 3 pins 3, the rest 2 (the five-pin colours and values, so the art and pins carry over)
 const SLOTV=SPOTS.map(p=>p.v),SLOTN=['1 pin (headpin)','2 pin','3 pin','4 pin','5 pin','6 pin','7 pin','8 pin','9 pin','10 pin'],ADJ=[[1,2],[0,2,3,4],[0,1,4,5],[1,4,6,7],[1,2,3,5,7,8],[2,4,8,9],[3,7],[3,4,6,8],[4,5,7,9],[5,8]];
 const PINS={
-  slow:{gone:1,name:'Slow pin',cost:4,text:()=>'Advances every other ball, doubling every ball, up to 64.'},
-  spark:{gone:1,name:'Spark pin',cost:5,text:()=>'Knocked down fresh (worth 1): the whole ball scores 1 more ×.'},
-  shield:{gone:1,name:'Shield pin',cost:5,text:()=>'Stands back up after its first hit, each time it comes back.'},
+  slow:{gone:1,name:'Slow pin',cost:4,text:()=>'Advances every other ball but doubles every ball, up to 64.'},
+  spark:{gone:1,name:'Spark pin',cost:5,text:()=>'Knock it down on its first ball up: that ball scores ×2 (a strike ×3).'},
+  shield:{gone:1,name:'Shield pin',cost:5,text:()=>'Takes one hit without falling. Resets each time it’s knocked down and returns.'},
   plain:{name:'Plain pin',text:()=>'Doubles each ball it stands.'},
   runner:{name:'Runner pin',cost:6,text:()=>'Advances two rows a ball and grows ×4.'},
   anchor:{name:'Anchor pin',cost:5,text:()=>'Never advances. Doubles up to 32.'},
-  glass:{name:'Glass pin',cost:6,text:()=>'Grows ×3 a ball, up to 81. Any pin that touches it knocks it down.'},
-  bomb:{gone:1,name:'Bomb pin',cost:6,text:()=>'Falling, it knocks down every pin near it.'},
-  huddle:{name:'Huddle pin',cost:4,text:()=>'Pins come back packed close around it.'},
-  crown:{name:'Crown pin',cost:7,text:()=>'A strike that takes it on the front two rows is ×3.'},
-  rent:{gone:1,name:'Rent pin',cost:4,text:()=>'+2 points each ball it stays up. Never grows; breaking through is free.'},
-  crowd:{name:'Crowd pin',cost:7,text:()=>'+1 point per pin left up, each ball it stays up.'},
-  toll:{gone:1,name:'Toll pin',cost:4,text:()=>'$1 when you take it on the front row, up to $3 a game.'}
+  glass:{name:'Glass pin',cost:6,text:()=>'Grows ×3 a ball, up to 81. Falls if any pin touches it.'},
+  bomb:{gone:1,name:'Bomb pin',cost:6,text:()=>'When it falls, the pins next to it fall too.'},
+  huddle:{name:'Huddle pin',cost:4,text:()=>'Knocked-down pins return in a tight group around it.'},
+  crown:{name:'Crown pin',cost:7,text:()=>'A strike is ×3, not ×2, if it stood on the front two rows.'},
+  rent:{gone:1,name:'Rent pin',cost:4,text:()=>'+2 points each ball it stands. Never grows. Breaking through costs nothing.'},
+  crowd:{name:'Crowd pin',cost:7,text:()=>'Each ball it stands: +1 point for every pin still standing.'},
+  toll:{gone:1,name:'Toll pin',cost:4,text:()=>'Knock it down on the front row: +$1, up to $3 a game.'}
 };
 // powers go in a pin's three slots; text(n) is what n of them do together. c: the band's light and dark colour on the pin's neck
 const POWERS={
-  quick:{s:n=>`×${2+n} a ball`,name:'Quick growth',cost:4,c:['#5ed67a','#23803c'],text:n=>`Grows ×${2+n} a ball, not ×2.`,more:'Again: ×4, ×5'},
-  head:{s:n=>`back at ${2**n}`,name:'Head start',cost:4,c:['#6aa8f0','#2a5a9a'],text:n=>`Comes back worth ${2**n}.`,more:'Again: 4, 8'},
-  spark:{s:n=>n>1?`+1 × in its first ${n} balls`:'+1 × fresh',name:'Spark',cost:5,c:['#ff9a3a','#b8541a'],text:n=>n>1?`Knocked down in its first ${n} balls back: the whole ball scores 1 more ×.`:`Knocked down fresh: the whole ball scores 1 more ×.`,more:'Again: stays fresh 2 balls, 3'},
-  lantern:{s:n=>`neighbours grow faster`,name:'Lantern',cost:5,c:['#ffe85a','#c09a18'],text:n=>`Pins near it grow 1 faster while it stands.`,more:'Again: reaches further'},
-  slow:{s:n=>n>=3?'never advances':`advances every ${['','2nd','3rd'][n]} ball`,name:'Slow',cost:3,c:['#4cc4c8','#1f7a80'],text:n=>n>=3?'Never advances.':`Advances every ${['','2nd','3rd'][n]} ball.`,more:'Again: every 3rd, never'},
-  shield:{s:n=>`${n} hit${n>1?'s':''} shrugged off`,name:'Shield',cost:4,c:['#f0f4fa','#8e98aa'],text:n=>`Stands back up after its first ${n>1?n+' hits':'hit'}, each time it comes back.`,more:'Again: 2 hits, 3'},
-  bomb:{s:n=>['','blast','wider blast','widest blast'][n],name:'Bomb',cost:5,c:['#4a4a56','#16161c'],text:n=>`Falling, it knocks down every pin within ${[0,'a pin spacing','1½ spacings','2 spacings'][n]}.`,more:'Again: further'},
-  rent:{s:n=>`+${2*n} a ball standing`,name:'Rent',cost:3,c:['#b48aee','#5a2f8a'],text:n=>`+${2*n} points each ball it stays up.`,more:'Again: +4, +6'},
-  toll:{s:n=>`$${n} on the front row`,name:'Toll',cost:3,c:['#ff86aa','#b8406a'],text:n=>`$${n} when you take it on the front row, up to $3 a game.`,more:'Again: $2, $3'}
+  quick:{s:n=>`grows ×${2+n}`,name:'Quick growth',cost:4,c:['#5ed67a','#23803c'],text:n=>`Grows ×${2+n} a ball instead of ×2.`,more:'Twice on a pin: ×4. Three times: ×5.'},
+  head:{s:n=>`returns at ${2**n}`,name:'Head start',cost:4,c:['#6aa8f0','#2a5a9a'],text:n=>`After it’s knocked down, it returns worth ${2**n} instead of 1.`,more:'Twice on a pin: 4. Three times: 8.'},
+  spark:{s:n=>n>1?`×2 if down within ${n} balls`:'×2 if down on first ball',name:'Spark',cost:5,c:['#ff9a3a','#b8541a'],text:n=>n>1?`Knock it down within its first ${n} balls up: that ball scores ×2 (a strike ×3).`:`Knock it down on its first ball up: that ball scores ×2 (a strike ×3).`,more:'Twice on a pin: within 2 balls. Three times: 3. Two Sparks in one ball: ×3.'},
+  lantern:{s:n=>`neighbours grow faster`,name:'Lantern',cost:5,c:['#ffe85a','#c09a18'],text:n=>`While it stands, pins next to it grow one step faster: ×2 becomes ×3.`,more:'More on a pin: reaches further.'},
+  slow:{s:n=>n>=3?'never advances':`advances every ${['','2nd','3rd'][n]} ball`,name:'Slow',cost:3,c:['#4cc4c8','#1f7a80'],text:n=>n>=3?'Never advances.':`Advances only every ${['','2nd','3rd'][n]} ball. Still doubles every ball.`,more:'Twice on a pin: every 3rd ball. Three times: never.'},
+  shield:{s:n=>`takes ${n} hit${n>1?'s':''}`,name:'Shield',cost:4,c:['#f0f4fa','#8e98aa'],text:n=>`Takes ${n>1?n+' hits':'one hit'} without falling. Resets each time it’s knocked down and returns.`,more:'Twice on a pin: 2 hits. Three times: 3.'},
+  bomb:{s:n=>['','takes neighbours','wider','widest'][n],name:'Bomb',cost:5,c:['#4a4a56','#16161c'],text:n=>`When it falls, ${[0,'the pins next to it','pins up to 1½ spaces away','pins up to 2 spaces away'][n]} fall too.`,more:'More on a pin: wider.'},
+  rent:{s:n=>`+${2*n} a ball`,name:'Rent',cost:3,c:['#b48aee','#5a2f8a'],text:n=>`+${2*n} points each ball it stands.`,more:'Twice on a pin: +4. Three times: +6.'},
+  toll:{s:n=>`$${n} on front row`,name:'Toll',cost:3,c:['#ff86aa','#b8406a'],text:n=>`Knock it down on the front row: +$${n}, up to $3 a game.`,more:'Twice on a pin: $2. Three times: $3.'}
 };
 const pwOf=it=>(it&&it.pw)||[],pwCount=(it,k)=>pwOf(it).filter(x=>x===k).length;
 // ---------- bands: a power is shown as its band on a pin's neck, everywhere (shop cards, the rack, the build view, counts). Boss pictures stay 9x9 glyphs ----------
@@ -878,7 +889,7 @@ const BOSSG={
 };
 // each boss's rule in one line (player-facing; pins advance, never "step")
 const BOSSUI={short:{rule:'The red line is one row closer to the pins.'},sweep:{rule:'After balls 4 and 8, a bar sweeps every standing pin into the pit.'},
-  bolted:{rule:'Only the ball knocks pins down.'},tentacle:{rule:'A tentacle stops the ball and advances one row each ball.'}};
+  bolted:{rule:'Only the ball knocks pins down. A pin hit by another pin stays up.'},tentacle:{rule:'A tentacle rises at the back and advances a row each ball. It stops the ball.'}};
 const GLYC={};
 function bossIcon(k){if(GLYC['b'+k])return GLYC['b'+k];const t=mk(9,9),q=t.getContext('2d');q.fillStyle='#2a160e';q.fillRect(0,0,9,9);
   q.drawImage(sprite(BOSSG[k],{r:'#ff5a3a',w:'#f3e2b8',g:'#9aa4b4',W:'#2a2e38',v:'#b48aee',V:'#5a3a86',y:'#ffd866',d:'#7a4a2c'}),0,0);return GLYC['b'+k]=t.toDataURL();}
@@ -904,19 +915,19 @@ const PAL={
 };
 Object.assign(PAL,{slow:PAL.sweep,spark:PAL.gold,shield:PAL.wing,runner:PAL.leader,anchor:PAL.trophy,glass:PAL.twin,huddle:PAL.picket,rent:PAL.wall,crowd:PAL.buddy,toll:PAL.tip});
 const GEAR={
-  bell:{name:'Lane bell',cost:6,b:'strike',text:'Strikes are worth 1 more ×.'},
-  chain:{name:'Strike chain',cost:7,b:'strike',text:'Each strike in a row is worth 1 more: ×2, ×3, ×4, up to ×5.'},
-  home:{name:'Home rack',cost:6,b:'strike',text:'After a strike the pins come back as the full triangle.'},
-  overtime:{name:'Overtime',cost:8,b:'strike',text:'12 balls a game. Breaking through costs double.'},
-  stand:{name:'Last stand',cost:8,b:'ripen',text:'A pin about to break through waits one ball on the red line and doubles again.'},
+  bell:{name:'Lane bell',cost:6,b:'strike',text:'Strikes are ×3, not ×2.'},
+  chain:{name:'Strike chain',cost:7,b:'strike',text:'Strikes in a row climb: ×2, ×3, ×4, up to ×5.'},
+  home:{name:'Home rack',cost:6,b:'strike',text:'After a strike, pins return as the full triangle.'},
+  overtime:{name:'Overtime',cost:8,b:'strike',text:'12 balls a game, but breaking through costs double.'},
+  stand:{name:'Last stand',cost:8,b:'ripen',text:'A pin about to break through waits one ball on the red line and doubles once more.'},
   hothouse:{name:'Hothouse',cost:7,b:'ripen',text:'Pins on the front two rows grow ×3, not ×2.'},
-  net:{name:'Catch net',cost:5,b:'ripen',text:'The first pin to break through each game costs nothing.'},
-  harvest:{name:'Harvest bell',cost:7,b:'harvest',text:'Strikes are ×1 until the last two balls, then ×5.'},
-  rebound:{name:'Rebound',cost:8,b:'harvest',text:'After a strike, pins come back worth half what they fell at.'},
-  front:{name:'Full front',cost:6,b:'harvest',text:'A strike is worth 1 more for each pin it took on the front row.'},
-  steady:{name:'Steady hands',cost:4,text:'Green zone 30 ms wider each side.'},
-  breath:{name:'Slow breath',cost:4,text:'The needle moves a fifth slower.'},
-  wrist:{name:'Strong wrist',cost:4,text:'The line bends a third further.'}
+  net:{name:'Catch net',cost:5,b:'ripen',text:'The first break-through each game costs nothing.'},
+  harvest:{name:'Harvest bell',cost:7,b:'harvest',text:'Strikes are ×1, but ×5 on a game’s last two balls.'},
+  rebound:{name:'Rebound',cost:8,b:'harvest',text:'After a strike, pins return worth half what they fell at.'},
+  front:{name:'Full front',cost:6,b:'harvest',text:'A strike’s ×2 goes up 1 for each front-row pin it takes, up to ×6.'},
+  steady:{name:'Steady hands',cost:4,text:'A wider green zone on the timing bar.'},
+  breath:{name:'Slow breath',cost:4,text:'The timing needle moves slower.'},
+  wrist:{name:'Strong wrist',cost:4,text:'The ball’s path bends further.'}
 };
 {let q;try{q=new URLSearchParams(location.search);}catch(e){q=new URLSearchParams('');}if(q.get('line'))ADV.LASTK=Math.max(2,Math.min(5,+q.get('line')));if(q.get('strike'))ADV.STRIKEX=+q.get('strike')||1;if(q.get('breach')==='0')ADV.BREACH=0;if(q.get('grow')==='add')ADV.GROW='add';if(q.get('cap'))ADV.CAP=Math.max(8,+q.get('cap')||32);}
 let LOG=[];try{LOG=JSON.parse(localStorage.getItem('advten-log')||'[]');}catch(e){}
@@ -946,14 +957,14 @@ const newItem=t=>({t,lv:1,gain:0,pw:[]});
 const kindOf=(it,slot)=>it.t==='plain'?'p5':it.t;
 function applyKit(){T.win=80+(run.gear.steady?30:0);T.bend=90*(run.gear.wrist?4/3:1);T.speed=.45*(run.gear.breath?.8:1);if(!OPT.balls)run.ball=run.gear.big?'big':'house';RB=BALLS[run.ball].rb;MB=BALLS[run.ball].mb;}
 const BALLOFFERS={
-  big:{name:'Big ball',cost:8,text:'A wider ball. Strikes more often.'},
-  small:{name:'Small ball',cost:8,text:'A narrower ball. Easier to take one pin.'},
-  plastic:{name:'Plastic ball',cost:8,text:'Light as a pin. Stops on a full hit, so the pins behind stay.'},
-  rush:{name:'Rush ball',cost:12,text:'After it, standing pins advance two rows and grow twice.'},
-  brake:{name:'Brake ball',cost:10,text:'Once a game: after it, standing pins grow but don’t advance.'},
-  toll:{name:'Toll ball',cost:10,text:'After it, pins that break through pay their value instead of costing it.'},
-  sweep:{name:'Sweep ball',cost:10,text:'Back-row pins left standing don’t stop a strike.'},
-  seed:{name:'Seed ball',cost:12,text:'After a strike with it, the pins come back worth 2.'}
+  big:{name:'Big ball',cost:8,text:'Wider. Strikes more often.'},
+  small:{name:'Small ball',cost:8,text:'Narrower. Easier to pick off one pin.'},
+  plastic:{name:'Plastic ball',cost:8,text:'Light as a pin: it stops on a full hit, so pins behind stay up.'},
+  rush:{name:'Rush ball',cost:12,text:'After it, standing pins advance two rows and double twice.'},
+  brake:{name:'Brake ball',cost:10,text:'Once a game: after it, standing pins double but don’t advance.'},
+  toll:{name:'Toll ball',cost:10,text:'After it, a break-through adds its value instead of costing it.'},
+  sweep:{name:'Sweep ball',cost:10,text:'A strike still counts if only back-row pins are left standing.'},
+  seed:{name:'Seed ball',cost:12,text:'After a strike with it, pins return worth 2.'}
 };;
 const SPOTCOST={5:6,6:8},LAYCOST=3;
 function rackRun(){return rack().map((p,i)=>{p.slot=i;p.item=run.rack[i];p.kind=kindOf(p.item,i);return p;});}
@@ -1336,7 +1347,8 @@ const PICU={};
 function picOf(sp,id){return PICU[id]||(PICU[id]=sp.cv.toDataURL());}
 const pinPic=(it,H)=>{const big=!!H;H=H||24;const pw=pwOf(it),k=kindOf(it),sp=bigPin(H,k,pw,{slots:pw.length>0});return `<img class="bp" src="${picOf(sp,'p'+H+k+pw.join())}" alt=""${big?` style="width:${sp.w*ART}px;height:${sp.h*ART}px"`:''}>`;};
 const pwPic=k=>{const id='w'+POWLOOK+k;if(!PICU[id]){const t=mk(24,20);drawPowerArt(t.getContext('2d'),24,20,k);PICU[id]=t.toDataURL();}return `<img class="bp" src="${PICU[id]}" alt="" style="width:48px;height:40px">`;};
-function pinInfo(i,H){const it=run.rack[i],pw=pwOf(it);return `${pinPic(it,H)}<div><h3>${short(PINS[it.t].name)}${slots(it)}</h3><p>${pw.length?(it.t!=='plain'?rich(PINS[it.t].text(it.lv))+' ':'')+pwText2(it):rich(PINS[it.t].text(it.lv))}</p></div>`;}
+function pinInfo(i,H){return itemInfo(run.rack[i],H);}
+function itemInfo(it,H,tag){const pw=pwOf(it);return `${pinPic(it,H)}<div><h3>${short(PINS[it.t].name)}${slots(it)}${tag||''}</h3><p>${pw.length?(it.t!=='plain'?rich(PINS[it.t].text(it.lv))+'<br>':'')+pwText2(it):rich(PINS[it.t].text(it.lv))}</p></div>`;}
 // one power across the rack: its rule, and which pins hold it
 function powInfo(k){const on=run.rack.map((it,i)=>[i,pwCount(it,k)]).filter(a=>a[1]);
   return `${pwPic(k)}<div><h3>${POWERS[k].name}<small>${on.length?'pin'+(on.length>1?'s ':' ')+on.map(([i,n])=>(i+1)+(n>1?' ×'+n:'')).join(', '):''}</small></h3><p>${rich(POWERS[k].text(1))} <small class="ag">${POWERS[k].more}</small></p></div>`;}
@@ -1345,7 +1357,9 @@ function bossInfo(k,gi){return `${bossImg(k,'big')}<div><h3>${BOSSES[k].name}<sm
 // three slots as three bands: filled in the power's colours and pattern, empty as outlines
 const slots=it=>`<span class="slots">${[0,1,2].map(j=>{const k=pwOf(it)[j];return k?pwImg(k):'<i class="e"></i>';}).join('')}</span>`;
 // a built pin's powers, each with what it adds up to on this pin
-const pwText2=it=>[...new Set(pwOf(it))].map(k=>`<b>${POWERS[k].name}</b> ${POWERS[k].s(pwCount(it,k))}`).join(' · ');
+const pwText2=it=>[...new Set(pwOf(it))].map(k=>`<b>${POWERS[k].name}${pwCount(it,k)>1?' ×'+pwCount(it,k):''}:</b> ${POWERS[k].text(pwCount(it,k))}`).join('<br>');
+// an offer's rule, read from the rules now (an offer saved in an older shop keeps its card, not its old wording)
+const offerText=o=>o.kind==='pow'&&POWERS[o.t]?POWERS[o.t].text(1):o.kind==='pin'&&PINS[o.t]?PINS[o.t].text(1):o.kind==='ball'&&BALLOFFERS[o.t]?BALLOFFERS[o.t].text:o.kind==='gear'&&GEAR[o.t]?GEAR[o.t].text:o.text;
 function gearInfo(k){return `<img class="gear" src="${gicon(k)}" alt=""><div><h3>${GEAR[k].name}<small>Gear</small></h3><p>${rich(GEAR[k].text)}</p></div>`;}
 function buy(o){if(run.cash<o.cost)return;run.cash-=o.cost;run.bought=true;
   if(o.kind==='gear'){run.gear[o.t]=true;o.bought=true;applyKit();}
@@ -1367,7 +1381,7 @@ function showShop(){const box=$('shop').firstElementChild,el=$('shopList'),chip=
   const have=powerCounts();
   run.offers.forEach(o=>{const b=document.createElement('button'),on=pending===o||pick===o,poor=!o.bought&&run.cash<o.cost&&!on;b.type='button';
     b.dataset.oi=run.offers.indexOf(o);b.className='offer '+o.kind+(o.bought?' got':'')+(on?' pend':'')+(poor?' poor':'');b.disabled=o.bought||poor;
-    b.setAttribute('aria-label',o.bought?o.name+', sold':`${o.name}, $${o.cost}. ${o.text}${o.kind==='pow'&&have[o.t]?' You have '+have[o.t]+'.':''}`);
+    b.setAttribute('aria-label',o.bought?o.name+', sold':`${o.name}, $${o.cost}. ${offerText(o)}${o.kind==='pow'&&have[o.t]?' You have '+have[o.t]+'.':''}`);
     const tag=`<span class="c">${on?'×':'$'+o.cost}</span>`;
     b.innerHTML=o.kind==='pin'?`${tag}<canvas data-t="${o.t}" aria-hidden="true"></canvas><strong>${short(o.name)}</strong>`
       :o.kind==='pow'?`${tag}${tipNew(o)}<canvas class="bandcard" data-k="${o.t}" aria-hidden="true"></canvas>${have[o.t]&&!o.bought?`<em class="have" aria-hidden="true">×${have[o.t]}</em>`:''}<strong>${o.name}</strong>`
@@ -1402,17 +1416,17 @@ function shopInfo(){const inf=$('shopInfo'),deck=$('shopDeck'),box=$('shop').fir
   if(INFO==='callout'&&inf.parentNode!==box)box.appendChild(inf);   // the callout floats over the trays, never over the rack
   const o=pending||(INFO==='callout'?pick:null),on=!!o||sel!==null;inf.hidden=!on;deck.classList.toggle('split',on&&INFO==='closeup');if(!on){inf.innerHTML='';return;}
   if(INFO==='closeup'){
-    if(o&&o.kind==='pow')inf.innerHTML=`<canvas class="bandcard tall" data-k="${o.t}" aria-hidden="true"></canvas><div class="cside"><h3>${o.name}</h3><p>${rich(o.text)}</p><p class="ag">${POWERS[o.t].more}</p></div>`;
-    else if(o)inf.innerHTML=`<canvas class="closeup" data-t="${o.t}" aria-hidden="true"></canvas><div class="cside"><h3>${short(o.name)}</h3><p>${rich(o.text)}</p></div>`;
+    if(o&&o.kind==='pow')inf.innerHTML=`<canvas class="bandcard tall" data-k="${o.t}" aria-hidden="true"></canvas><div class="cside"><h3>${o.name}</h3><p>${rich(offerText(o))}</p><p class="ag">${POWERS[o.t].more}</p></div>`;
+    else if(o)inf.innerHTML=`<canvas class="closeup" data-t="${o.t}" aria-hidden="true"></canvas><div class="cside"><h3>${short(o.name)}</h3><p>${rich(offerText(o))}</p></div>`;
     else{const it=run.rack[sel],pw=pwOf(it),n=k=>pwCount(it,k);
       inf.innerHTML=`<canvas class="closeup" data-i="${sel}" aria-hidden="true"></canvas><div class="cside"><h3>${short(PINS[it.t].name)}</h3><div class="cslots">${[0,1,2].map(j=>{const k=pw[j];
         return k?`<span>${POWERS[k].name}${pw.indexOf(k)===j?` <b>${POWERS[k].s(n(k))}</b>`:''}</span>`:'<span class="free">free</span>';}).join('')}</div>${it.t!=='plain'||!pw.length?`<p>${rich(PINS[it.t].text(it.lv))}</p>`:''}</div>`;}}
   else if(INFO==='callout'){const pic=!o?'':o.kind==='pow'?`<canvas class="bandcard" data-k="${o.t}" aria-hidden="true"></canvas>`:o.kind==='pin'?pinPic(newItem(o.t),30):`<img class="gear" src="${gicon(o.t)}" alt="">`;
-    inf.innerHTML=(o?`${pic}<div><h3>${o.kind==='pow'?o.name:short(o.name)}<b class="pr">$${o.cost}</b></h3><p>${rich(o.text)}${o.kind==='pow'?` <small class="ag">${POWERS[o.t].more}</small>`:''}</p></div>`
+    inf.innerHTML=(o?`${pic}<div><h3>${o.kind==='pow'?o.name:short(o.name)}<b class="pr">$${o.cost}</b></h3><p>${rich(offerText(o))}${o.kind==='pow'?` <small class="ag">${POWERS[o.t].more}</small>`:''}</p></div>`
       +(o===pick?`<button type="button" class="buy" id="shopBuy"${run.cash<o.cost?' disabled':''}>Buy</button>`:''):pinInfo(sel,24))+'<button type="button" class="x" aria-label="Close">×</button>';
     inf.querySelector('.x').addEventListener('click',()=>{pending=null;pick=null;sel=null;showShop();});}
-  else inf.innerHTML=o&&o.kind==='pow'?`<canvas class="bandcard" data-k="${o.t}" aria-hidden="true"></canvas><div><h3>${o.name}</h3><p>${rich(o.text)} <small class="ag">${POWERS[o.t].more}</small></p></div>`
-    :o?`${pinPic(newItem(o.t))}<div><h3>${short(o.name)}</h3><p>${rich(o.text)}</p></div>`:pinInfo(sel);
+  else inf.innerHTML=o&&o.kind==='pow'?`<canvas class="bandcard" data-k="${o.t}" aria-hidden="true"></canvas><div><h3>${o.name}</h3><p>${rich(offerText(o))} <small class="ag">${POWERS[o.t].more}</small></p></div>`
+    :o?`${pinPic(newItem(o.t))}<div><h3>${short(o.name)}</h3><p>${rich(offerText(o))}</p></div>`:pinInfo(sel);
   inf.insertAdjacentHTML('afterbegin',INFO==='callout'?'<i class="arw" aria-hidden="true"></i>':'');}
 // the callout: anchored to the picked card (below the pins row, above the others) or, for a tapped pin, sitting on the rack's top edge pointing down at it.
 // It never covers the rack, Reroll or the leave button; if a spot would, the next one is tried, narrowing it beside Reroll if that is all that's in the way
@@ -1460,7 +1474,7 @@ function showRack(){const m=$('rackMsg');$('rackCash').textContent='$'+run.cash;
   pe.querySelectorAll('.pwchip').forEach(b=>b.addEventListener('click',()=>{const k=b.dataset.k;rpw=rpw===k?null:k;rsel=null;rgsel=null;showRack();}));
   drawGear($('rackGear'),k=>{rgsel=rgsel===k?null:k;rsel=null;rpw=null;showRack();},rgsel);
   m.className='strip'+(rsel===null&&!rgsel&&!rpw?' tally':'');
-  m.innerHTML=rsel!==null?pinInfo(rsel):rgsel?gearInfo(rgsel):rpw?powInfo(rpw):'<span>Pins double each ball</span><span><i>Strike</i>×2</span>';}
+  $('rackSheet').classList.toggle('reading',rsel!==null);m.innerHTML=rsel!==null?pinInfo(rsel):rgsel?gearInfo(rgsel):rpw?powInfo(rpw):'<span>Pins double each ball</span><span><i>Strike</i>×2</span>';}
 function openBuild(){rsel=null;rgsel=null;rpw=null;newAsk=false;$('rackNew').textContent='New run';tipsAsk=false;$('rackTips').textContent='Tips again';$('rackTips').classList.remove('ask');$('rackTips').hidden=TIPS.off;showRack();}
 $('rackBtn').addEventListener('click',openBuild);
 $('rackClose').addEventListener('click',()=>$('rackSheet').hidden=true);
@@ -1481,14 +1495,28 @@ const HY={ball:G.SY,aim:G.EY,bend:(G.SY+G.EY)/2};
 // pointer: three bands pick the handle, drag is relative so nothing jumps
 let drag=null;
 function pt(e){const r=cv.getBoundingClientRect();return{x:(e.clientX-r.left)/r.width*LW,y:(e.clientY-r.top)/r.height*LH};}
-cv.addEventListener('pointerdown',e=>{if(g.mode!=='aim'||!$('shop').hidden||!$('rackSheet').hidden)return;if(g.ready){g.ready=false;setBtn();}g.keep=null;hint();const p=pt(e),cm=CAM[T.cam];const which=cm.band(p.y);
+cv.addEventListener('pointerdown',e=>{peekOff();if(g.mode!=='aim'||!$('shop').hidden||!$('rackSheet').hidden)return;tap0={...pt(e),t:performance.now()};if(g.ready){g.ready=false;setBtn();}g.keep=null;hint();const p=pt(e),cm=CAM[T.cam];const which=cm.band(p.y);
   drag={which,x0:p.x,v0:which==='ball'?g.sx:which==='aim'?g.ex:g.bx,k:cm.proj(180,HY[which]).k};try{cv.setPointerCapture(e.pointerId);}catch(_){ }e.preventDefault();});
 cv.addEventListener('pointermove',e=>{if(!drag||g.mode!=='aim')return;const dx=(pt(e).x-drag.x0)/drag.k;
   if(drag.which==='ball'){const sr=startRange();g.sx=clamp(drag.v0+dx,sr[0],sr[1]);}
   else if(drag.which==='aim')g.ex=clamp(drag.v0+dx,G.L+8,G.R-8);
   else g.bx=drag.v0+dx;
   fixBend();});
-['pointerup','pointercancel'].forEach(n=>cv.addEventListener(n,()=>drag=null));
+['pointerup','pointercancel'].forEach(n=>cv.addEventListener(n,e=>{drag=null;const t0=tap0;tap0=null;
+  if(n==='pointerup'&&t0&&g.mode==='aim'){const p=pt(e);if(Math.hypot(p.x-t0.x,p.y-t0.y)<3&&performance.now()-t0.t<450){const pin=pinAt(p);if(pin)peek(pin);}}}));
+// ---------- reading a pin on the lane: a tap that doesn't move (a drag aims as before) shows what the pin does, until the next touch or the throw ----------
+let tap0=null,PEEK=null;
+function pinAt(p){const cm=CAM[T.cam],lane=cm.id==='lane';let best=null,bd=1e9;
+  for(const q of g.pins){if(q.down||q.gone)continue;const s=cm.proj(q.x,q.y),dx=Math.abs(p.x-s.X),top=s.Y-(lane?24:18);
+    if(dx<=6&&p.y>=top&&p.y<=s.Y+4&&dx<bd){bd=dx;best=q;}}return best;}
+function peek(q){PEEK=q;const el=$('laneInfo'),cm=CAM[T.cam],s=cm.proj(q.x,q.y),r=cv.getBoundingClientRect(),st=el.parentNode.getBoundingClientRect(),k=r.width/LW;
+  const sp=pc(q,'spark')+(q.item.t==='spark'?1:0),live=sp&&(q.item.t==='spark'&&!q.b||pc(q,'spark')>(q.b||0));
+  let ht=itemInfo(q.item,30,`<small>worth ${q.v}</small>`);if(sp){const i=ht.lastIndexOf("</div>");ht=ht.slice(0,i)+`<p class="now">${live?'Spark is live: knock it down this ball.':'Spark is spent until it’s knocked down and returns.'}</p>`+ht.slice(i);}
+  el.innerHTML=ht+"<i class=\"arw\"></i>";el.hidden=false;
+  const X=r.left-st.left+s.X*k,Ytop=r.top-st.top+(s.Y-(CAM[T.cam].id==='lane'?24:18))*k,Ybot=r.top-st.top+(s.Y+3)*k,w=el.offsetWidth,h=el.offsetHeight;
+  const below=Ybot+14+h<=st.height-4,left=Math.max(6,Math.min(st.width-w-6,X-w/2));
+  el.style.left=left+'px';el.style.top=(below?Ybot+12:Ytop-12-h)+'px';const a=el.querySelector('.arw');a.className='arw '+(below?'up':'dn');a.style.left=(X-left)+'px';}
+function peekOff(){if(!PEEK)return;PEEK=null;const el=$('laneInfo');el.hidden=true;el.innerHTML='';}
 
 function logText(){const sg=v=>(v>0?'+':'')+v;let t='Temperance Lanes log. Four levels of '+NAMES.join(', ')+' (small, big, boss); ten balls a game at most, ending as soon as the target is reached ($1 per ball left, up to $4). One board per game that never resets. After each ball, pins left standing advance one row toward you and double in value (1, 2, 4, 8, 16); pins that fell come back worth 1 at the back, as far back as they fit. A pin that would advance past the red line breaks through: it costs its value and comes back at the back. A strike (every pin on the board) is worth '+ADV.STRIKEX+'x. Growth: '+ADV.GROW+'. Powers: each pin has three slots; a pin shows them as letters in brackets, e.g. 0:3=8[qqh] (q Quick growth, h Head start, k Spark, l Lantern, w Slow, d Shield, b Bomb, r Rent, t Toll). No pin grows past '+ADV.CAP+'. Rows before the line: '+(ADV.LASTK+1)+' (Short line boss: 4). Bosses, one per level, strike killers and ripen killers alternating: Short line (the line one row closer), Sweep bar (balls 4 and 8: every standing pin swept off for nothing; never in level 1), Bolted rack (only the ball knocks pins down), Rising tentacle (a post that rises at the back of a middle column and advances each ball; it stops the ball). Your ten pins keep their type: Slow, Spark, Shield, Runner, Anchor, Glass, Bomb, Huddle, Crown, Rent, Crowd, Toll; the board lists a type by its first three letters after the value. Rack lists your ten by starting spot 1 to 10. Ball used: the house ball, or the one you bought (Big, Small, Plastic: size and weight; Rush, Brake, Toll, Sweep, Seed: the house ball with an effect on how the board advances). Positions are px from lane centre (lane edges -120/+120). Board lists each pin as column:row=value, columns -3..3 are half a pin spacing apart (34.5 px), row 0 is the back. Hot is how many pins stood on the front row (they break through unless knocked down). Moved is how far the line changed from the previous ball (start + aim + half the bend). Timing is ms early (-) or late (+); drift is how far the ball was pushed off the drawn line. Tips lists the first-time tips that fired since the previous ball (advten-tips flags: throw, advance, redline, broke, early, shop, pick, pw:<power>, onlane, fx:<power>, boss:<boss>, bossgo:<boss>; tips-again when they were reset).\n';
   t+='run,game,target,ball,ball_used,start,aim,bend,moved,timing_ms,drift_px,setup_seconds,board_value,hot,pins_down,value_down,clean_pins,mult,score,triggers,broke_through,cost,swept,net,result,board_before,board_after,boss,cash,your_ten,gear,shop_before_game,tips\n';
@@ -1840,6 +1868,7 @@ function draw(){
     px(c,X-4,Y,2,1,o.hi);px(c,X-3,Y-1,1,3,o.hi);px(c,X+3,Y,2,1,o.hi);px(c,X+3,Y-1,1,3,o.hi);c.globalAlpha=1;
     if(!tipSeen('throw')){label(o,'AIM',aimPos.X+aimPos.rx+8,aimPos.Y-2);label(o,'BEND',X+11,Y-2);if(ballPos)label(o,'START',ballPos.X+ballPos.r+4,ballPos.Y-2);}
   }
+  if(PEEK){if(g.mode!=='aim'||PEEK.down)peekOff();else{const q=cm.proj(PEEK.x,PEEK.y);ringPx(c,Math.round(q.X),Math.round(q.Y)+(lane?1:3),lane?8:7,lane?3:6,'#fff8e8');}}
   if(TIP&&TIP.draw&&!sheetUp())TIP.draw(o,cm,TIP.t);
   for(const q of g.pops)drawPop(cm,q);
   drawNeedle(o);
@@ -1941,7 +1970,7 @@ function drawTipFx(o,cm,t){const T=TIP,lane=cm.id==='lane';c.globalAlpha=t>T.dur
 // --- moment at aim: front row warning (a ghost of the pin slides past the red line; its value flies off the score), twice ---
 function tipsAim(){if(TIP&&TIP.aim)tipEnd();if(TIPS.off||!tipSeen('advance'))return;
   const front=g.pins.filter(p=>p.k===LK()&&!p.stand&&!p.broke).sort((a,b)=>b.v-a.v);
-  if(front.length)moment('redline',{dur:3.2,pin:front[0],line:'Past the red line it costs its value.',draw:drawTipRed});}
+  if(front.length)moment('redline',{dur:3.2,pin:front[0],line:'Past the red line, a pin costs you its value.',draw:drawTipRed});}
 function drawTipRed(o,cm,t){const p=TIP.pin,u=(t%1.6)/1.6,ly=LINEY(),lane=cm.id==='lane';
   if(Math.floor(t*5)%2===0)for(let x=G.L;x<=G.R;x+=6){const a=cm.proj(x,ly),b=cm.proj(Math.min(G.R,x+4),ly);plotLine(c,Math.round(a.X),Math.round(a.Y)-1,Math.round(b.X),Math.round(b.Y)-1,'#ff6a52');plotLine(c,Math.round(a.X),Math.round(a.Y)+1,Math.round(b.X),Math.round(b.Y)+1,'#ff6a52');}
   const ga=ease(u/.5),gy=p.y+ADV.STEP*ga,q=cm.proj(p.x,gy);
@@ -1952,7 +1981,7 @@ function drawTipRed(o,cm,t){const p=TIP.pin,u=(t%1.6)/1.6,ly=LINEY(),lane=cm.id=
 function tipsGame(){if(TIPS.off||TIPHOLD)return;tipEnd();tipKey='';if(BOSS)return;   // the boss game waits for its intro card to close
   const k=lvlBoss(run.game);if(moment('boss:'+k,{dur:2.4,start(){const b=$('bossBtn');b.classList.remove('tip');void b.offsetWidth;b.classList.add('tip');},end(){$('bossBtn').classList.remove('tip');}}))return;
   tipsOnLane();}
-function tipsOnLane(){if(run.rack.some(it=>pwOf(it).length))moment('onlane',{dur:2.4,draw:drawTipOnLane});}
+function tipsOnLane(){if(run.rack.some(it=>pwOf(it).length))moment('onlane',{dur:3.2,line:'Tap a pin to see what it does.',draw:drawTipOnLane});}
 function drawTipOnLane(o,cm,t){const lane=cm.id==='lane',on=Math.floor(t*4)%2===0;
   for(const p of g.pins){const pw=pwOf(p.item);if(!pw.length||p.down)continue;const q=cm.proj(p.x,p.y),X=Math.round(q.X),Y=Math.round(q.Y);
     if(on)ringPx(c,X,Y+(lane?1:3),lane?8:7,lane?3:6,POWERS[pw[0]].c[0]);c.drawImage(bandCanvas(pw[0]),X-6,Y-(lane?(p.v>1?33:27):(p.v>1?27:21)));}}

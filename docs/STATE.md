@@ -227,5 +227,14 @@ UI only. Details and shots: `docs/design/new-run/`.
 - New run in the shop (beside the leave button) and on the cover (beside Labs, only with a save); both confirm on a second tap. The cover's opens the game with `?new=1`, which drops the save and then leaves the URL.
 - On the standing pins, a band under three rows shows one colour instead of its pattern: Shield mid steel, Bomb black, Toll pink. At 360x600 the patterns read as other powers. The lane and larger pins keep the patterns.
 
+## Runs on 22 November, evening (log in Josh's paste)
+Runs 4-6 on current targets: run 4 lost game 9 to Sweep bar (235/250), run 5 stops after winning game 3 (dropped with New run, it seems), run 6 lost game 6 to the Rising tentacle (135/150). He spread single powers across many pins (run 6: six pins with one power each) and said: "Still a bit tough to remember which pins does what… so hard to execute a meaningful strategy in the round." Some descriptions didn't read clearly.
+
+## Reading pins in play (22 November, branch `ui/readable-pins`)
+UI and text only. Details: `docs/design/readable-pins/`.
+- A still tap on a standing pin while aiming shows what it does, its value, and whether its Spark is live. Drags aim as before.
+- Every pin readout lists each power's full rule.
+- All rule texts rewritten for a new player (no "fresh", no bare "1 more ×", no "pin spacing").
+
 ## Next
 Josh plays Advancing Ten-Pin with powers and pastes logs. Check: does he build one pin up or spread powers; does Shield earn its place (bots say no); is the cap of 32 the right ceiling; is the bottom of level 1 still where runs end. Before powers: did the best throw change between balls; did he leave pins to grow on purpose; did each boss hurt the way he played. The fix list in `docs/IDEATION.md` (level-up versus replace, dead pieces) still stands.

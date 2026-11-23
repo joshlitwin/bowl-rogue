@@ -107,6 +107,13 @@ const S={
   'bands-small-shop':{js:`run.rack.forEach((it,i)=>it.pw=[['slow'],['quick'],['shield'],[],['bomb'],['spark'],['toll'],['rent'],['lantern'],['head']][i]);toShop();`},
   'bands-small-lane':{js:`run.rack.forEach((it,i)=>it.pw=[['slow'],['quick'],['shield'],[],['bomb'],['spark'],['toll'],['rent'],['lantern'],['head']][i]);startGame();quiet();`},
   'bands-small-lane-front':{js:`run.rack.forEach((it,i)=>it.pw=[['slow'],['quick'],['shield'],[],['bomb'],['spark'],['toll'],['rent'],['lantern'],['head']][i]);startGame();play(3);quiet();`},
+  // reading pins (branch ui/readable-pins): a still tap on a lane pin, through the real pointer path; the longer readouts in the shop and the rack
+  'peek-front':{js:`build();startGame();play(2);quiet();var q=g.pins.filter(p=>!p.down&&pwOf(p.item).length).sort((a,b)=>b.y-a.y)[0]||g.pins[0];peek(q);`},
+  'peek-back':{js:`build();startGame();play(1);quiet();var q=g.pins.filter(p=>!p.down&&pwOf(p.item).length).sort((a,b)=>a.y-b.y)[0]||g.pins[0];peek(q);`},
+  'peek-three':{js:`build();startGame();quiet();var q=g.pins.find(p=>pwOf(p.item).length===3);peek(q);`},
+  'shop-rack-three':{js:`build();toShop();shopTap(5);`},
+  'rack-three':{js:`build();quiet();openBuild();document.querySelector('#rackGrid [data-i="5"]').click();`},
+  'rack-three-back':{js:`build();quiet();openBuild();document.querySelector('#rackGrid [data-i="9"]').click();`},
   'bands-sheet':{js:`quiet();const d=document.createElement('div');d.style.cssText='position:fixed;inset:0;z-index:9;background:#1d100a;display:grid;grid-template-columns:repeat(3,1fr);gap:8px 6px;align-content:center;padding:10px;color:#f3e2b8;font:700 12px/1.2 "Pixelify Sans",sans-serif;text-align:center';
     const put=(sp,w)=>{const cv=document.createElement('canvas');cv.width=sp.w;cv.height=sp.h;cv.getContext('2d').drawImage(sp.cv,0,0);cv.style.cssText='width:'+sp.w*2+'px;height:'+sp.h*2+'px;image-rendering:pixelated;vertical-align:bottom';w.appendChild(cv);};
     Object.keys(POWERS).forEach(k=>{const w=document.createElement('div'),r=document.createElement('div');r.style.cssText='display:flex;gap:8px;justify-content:center;align-items:flex-end;margin-bottom:4px';
