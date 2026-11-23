@@ -410,7 +410,7 @@ img.gl.boss{box-shadow:0 0 0 1px #2a160e,0 0 0 2px var(--go)}
 .toast.wrap b{display:block;font-family:var(--body);font-size:14px;line-height:1.3;color:var(--chalk);margin-top:4px}
 /* boss intro: the boss's name, a moving picture of what it does, its rule in one line */
 #intro .box{gap:10px}
-.bosspic{position:relative;flex:none;height:210px;border-radius:6px;border:2px solid var(--ink);background:var(--ink);overflow:hidden}
+.bosspic{position:relative;flex:none;height:210px;border-radius:6px;border:2px solid var(--ink);background:#1d100a;overflow:hidden}
 .bosspic canvas{position:absolute;left:0;top:0;border-radius:0}
 #introRule{height:auto;min-height:58px}
 #introRule p{font-size:14px;color:var(--chalk)}
@@ -439,6 +439,10 @@ img.gl.boss{box-shadow:0 0 0 1px #2a160e,0 0 0 2px var(--go)}
 .wtray{display:block}
 .wtray .offer{height:72px;padding:6px 0 3px}
 .wtray .offer canvas.bandcard{flex:1;width:100%;min-height:0;border-radius:4px 4px 0 0;touch-action:manipulation}
+body[data-power="ring"] .wtray .offer{background:transparent;border-color:transparent;box-shadow:none}
+body[data-power="ring"] .wtray .offer.pend{background:rgba(255,255,255,.06);border-color:var(--accent)}
+body[data-power="swatch"] .wtray .offer{border-radius:3px;border:2px dashed #4a2c38;background:#24141b}
+body[data-power="ring"] img.bd{width:24px;height:16px}
 .wtray .offer strong{flex:none}
 .wtray .offer .have{position:absolute;right:5px;bottom:17px;font-style:normal;font-family:var(--num);font-size:11px;line-height:1;color:var(--chalk);background:rgba(20,10,6,.8);padding:1px 2px}
 .wtray .offer strong{padding:0 2px}
@@ -464,7 +468,14 @@ img.bp{flex:none;width:auto;height:52px;image-rendering:pixelated}
 .pinfo canvas.bandcard{flex:none;width:30px;height:40px}
 .pinfo.strip{left:0;right:0;top:0;min-height:46px;padding:3px 8px;border-bottom:2px solid var(--ink);border-radius:4px 4px 0 0}
 #shopDeck[data-info="callout"]{overflow:visible}
-.pinfo.callout{padding:6px 9px 7px;border:2px solid var(--chalk);border-radius:6px;box-shadow:0 4px 0 rgba(0,0,0,.45);pointer-events:none;overflow:visible}
+.pinfo.callout{z-index:5;padding:6px 28px 7px 9px;border:2px solid var(--chalk);border-radius:6px;box-shadow:0 4px 0 rgba(0,0,0,.5);overflow:visible}
+.pinfo.callout img.bp{height:auto;width:auto}
+.pinfo.callout canvas.bandcard{width:48px;height:40px}
+.pinfo.callout img.gear{flex:none;width:33px;height:33px;image-rendering:pixelated}
+.pinfo h3 .pr{margin-left:7px;font:400 13px var(--num);color:var(--coin)}
+.pinfo.callout .x{position:absolute;top:3px;right:3px;width:22px;height:22px;padding:0;border:0;border-radius:3px;background:transparent;color:var(--dim);font:700 16px/1 var(--display)}
+.pinfo.callout .buy{flex:none;align-self:center;padding:8px 10px;border-radius:6px;border:2px solid var(--accent);background:var(--accent);color:var(--ink);font:700 13px var(--display)}
+.pinfo.callout .buy:disabled{background:transparent;color:var(--dim);border-color:var(--dim)}
 .pinfo.callout .arw{position:absolute;top:-14px;width:0;height:0;border:7px solid transparent;border-bottom-color:var(--chalk)}
 .pinfo.callout.down .arw{top:auto;bottom:-14px;border-bottom-color:transparent;border-top-color:var(--chalk)}
 .pinfo.closeup{left:0;top:0;bottom:0;width:56%;align-items:stretch;gap:6px;padding:6px 6px 6px 4px;background:rgba(20,10,6,.62);border-right:2px solid var(--ink)}
@@ -534,6 +545,7 @@ img.bp{flex:none;width:auto;height:52px;image-rendering:pixelated}
 </style>
 </head>
 <body data-stage="rec">
+<script>document.body.dataset.power=["ring","swatch"].includes(new URLSearchParams(location.search).get("power"))?new URLSearchParams(location.search).get("power"):"ring";</script>
 <div class="hud">
   <button id="rackBtn" type="button"><img alt=""><span></span></button>
   <div class="hudR">
@@ -794,7 +806,9 @@ const NAMES=NAMESETS[UIQ.get('names')]||NAMESETS['open-league-match'];
 const kindName=gi=>NAMES[gi%3];
 const VIEWS={rack:'Your rack',gear:'Your gear',bag:'Your bag',locker:'Locker',kit:'Your kit'};
 const VIEW=VIEWS[UIQ.get('view')]||VIEWS.rack;   // the build view's name: one line, used for its heading and the top-left button
-const INFO=['callout','strip','closeup'].includes(UIQ.get('info'))?UIQ.get('info'):'closeup';
+// how a power looks when it isn't on a pin (?power=): ring, "Collar ring" — the band as a loose collar on a round token; swatch, "Band swatch" — a flat strip of the band like a fabric tag on a dark card
+const POWLOOK=['ring','swatch'].includes(UIQ.get('power'))?UIQ.get('power'):'ring';
+const INFO=['callout','strip','closeup'].includes(UIQ.get('info'))?UIQ.get('info'):'callout';
 function pickBosses(){return Math.random()<.5?['short','tentacle','sweep','bolted']:['bolted','sweep','short','tentacle'];}
 const kindOf3=gi=>KINDS[gi%3],bossOf=gi=>gi%3===2?BOSSES[run.bosses[Math.floor(gi/3)]]:null;
 // values: the headpin 5, the 2 and 3 pins 3, the rest 2 (the five-pin colours and values, so the art and pins carry over)
@@ -837,8 +851,17 @@ function bandCol(k,lit,x,r,h){const B=BANDPAT[k],base=B&&B.base||POWERS[k].c,col
   return (x%3===1&&(h<3||r===Math.floor((h-1)/2)))?c2:col;}
 // a band on its own (12x6 art pixels, shown at 2x): counts, slots in the info, the first-time tips
 const BANDC={};
-function bandCanvas(k){if(BANDC[k])return BANDC[k];const t=mk(12,6),q=t.getContext('2d');if(!q)return t;q.fillStyle='#2a160e';q.fillRect(0,0,12,6);
-  for(let r=0;r<4;r++)for(let x=0;x<10;x++){q.fillStyle=bandCol(k,r<3&&x<8,x,r,4);q.fillRect(x+1,r+1,1,1);}return BANDC[k]=t;}
+function bandCanvas(k){if(BANDC[k])return BANDC[k];let t;
+  if(POWLOOK==='ring'){t=mk(12,8);const q=t.getContext('2d');if(!q)return t;drawCollar(q,k,6,4,5,3,.42);}
+  else{t=mk(12,6);const q=t.getContext('2d');if(!q)return t;q.fillStyle='#2a160e';q.fillRect(0,0,12,6);for(let r=0;r<4;r++)for(let x=0;x<10;x++){q.fillStyle=bandCol(k,r<3&&x<8,x,r,4);q.fillRect(x+1,r+1,1,1);}}
+  return BANDC[k]=t;}
+// a power's band as a loose collar seen from a little above: the far half (its inside, in shade) then the near half (lit from the left), outlined
+function drawCollar(q,k,cx,cy,R,hh,kk){const W=Math.ceil(2*R+4),H=Math.ceil(2*R*kk+hh+4),t=mk(W,H),c=t.getContext('2d'),ox=Math.round(cx-W/2),oy=Math.round(cy-H/2),mx=W/2,my=H/2,ry=R*kk;
+  for(const front of [0,1])for(let x=0;x<W;x++){const u=(x+.5-mx)/R;if(Math.abs(u)>1)continue;const th=Math.acos(u),yc=my+(front?1:-1)*Math.sqrt(1-u*u)*ry,xs=Math.round((front?th:6.283-th)*R/1.3);
+    for(let r=0;r<hh;r++){c.fillStyle=bandCol(k,front&&u<.45,xs,r,hh);c.fillRect(x,Math.round(yc-hh/2+r),1,1);}}
+  const d=c.getImageData(0,0,W,H).data,on=(x,y)=>x>=0&&y>=0&&x<W&&y<H&&d[(y*W+x)*4+3]>0;q.fillStyle='#1d100a';
+  for(let y=-1;y<=H;y++)for(let x=-1;x<=W;x++)if(!on(x,y)&&(on(x-1,y)||on(x+1,y)||on(x,y-1)||on(x,y+1)))q.fillRect(ox+x,oy+y,1,1);
+  q.drawImage(t,ox,oy);}
 const BANDU={};
 const bandSrc=k=>BANDU[k]||(BANDU[k]=bandCanvas(k).toDataURL());
 const pwImg=(k,cls)=>`<img class="bd${cls?' '+cls:''}" src="${bandSrc(k)}" alt="${POWERS[k].name}">`;
@@ -849,8 +872,8 @@ const BOSSG={
   tentacle:['....vv...','...vV....','...vv....','....vV...','.....vv..','....vV...','...vvv...','..vvVv...','.vvvvvv..']
 };
 // each boss's rule in one line (player-facing; pins advance, never "step")
-const BOSSUI={short:{rule:'The red line is one row nearer, so pins break through sooner.'},sweep:{rule:'After balls 4 and 8, every standing pin is swept off for nothing.'},
-  bolted:{rule:'Only the ball knocks pins down. A pin hit by a pin stays bolted.'},tentacle:{rule:'A tentacle advances a row each ball and stops the ball dead.'}};
+const BOSSUI={short:{rule:'The red line is one row closer to the pins.'},sweep:{rule:'After balls 4 and 8, a bar sweeps every standing pin into the pit.'},
+  bolted:{rule:'Only the ball knocks pins down.'},tentacle:{rule:'A tentacle stops the ball and advances one row each ball.'}};
 const GLYC={};
 function bossIcon(k){if(GLYC['b'+k])return GLYC['b'+k];const t=mk(9,9),q=t.getContext('2d');q.fillStyle='#2a160e';q.fillRect(0,0,9,9);
   q.drawImage(sprite(BOSSG[k],{r:'#ff5a3a',w:'#f3e2b8',g:'#9aa4b4',W:'#2a2e38',v:'#b48aee',V:'#5a3a86',y:'#ffd866',d:'#7a4a2c'}),0,0);return GLYC['b'+k]=t.toDataURL();}
@@ -1205,8 +1228,17 @@ function drawCard(cv,key){cv.style.width='';cv.style.height='';const r=cv.getBou
   const sp=bigPin(Math.max(12,Math.min(H-8,Math.floor((W-6)/.37))),key),bx=W/2,by=H-3;
   floorShadow(q,bx,by,sp,FLOORS.rec);q.drawImage(sp.cv,Math.round(bx-sp.w/2),Math.round(by-sp.base));}
 // a power for sale (and a picked power in the info): a close-up of a pin's head and neck wearing that power's band, on dark felt
-function drawBandCard(cv,k){cv.style.width='';cv.style.height='';const r=cv.getBoundingClientRect(),[W,Hc]=fitArt(cv,r.width,r.height),q=cv.getContext('2d');
-  q.fillStyle='#2a160e';q.fillRect(0,0,W,Hc);const sp=bigPin(Math.max(16,Math.floor((Hc-2)/.5)),'p5',[k],{zone:[.235,.43]});q.drawImage(sp.cv,Math.round(W/2-sp.w/2),3);}
+function drawBandCard(cv,k){cv.style.width='';cv.style.height='';const r=cv.getBoundingClientRect(),[W,H]=fitArt(cv,r.width,r.height),q=cv.getContext('2d');q.clearRect(0,0,W,H);drawPowerArt(q,W,H,k);}
+// the power on its own, in the chosen look: a collar on a token, or a band swatch on cloth
+function drawPowerArt(q,W,H,k){
+  if(POWLOOK==='ring'){const cx=Math.round(W/2),cy=Math.round(H/2),T=Math.min(Math.floor(H/2)-1,Math.floor(W/2)-2);   // a round token, the collar lying on it
+    disc(q,cx,cy+1,T,'#120a06');disc(q,cx,cy,T,'#5a3420');disc(q,cx,cy,T-1,'#2a160e');disc(q,cx-1,cy-1,Math.max(1,T-3),'#33190f');
+    drawCollar(q,k,cx,cy,Math.max(4,Math.round(T*.8)),Math.max(3,Math.round(T*.42)),.4);}
+  else{for(let y=0;y<H;y++)for(let x=0;x<W;x++){q.fillStyle=((x+y)&1)?'#2a1820':'#24141b';q.fillRect(x,y,1,1);}   // dark cloth
+    const w=Math.min(W-6,Math.round(H*2.2)),h=Math.max(5,Math.round(H*.42)),x0=Math.round((W-w)/2),y0=Math.round((H-h)/2);
+    px(q,x0-1,y0-1,w+2,h+2,'#120a06');for(let r=0;r<h;r++)for(let x=0;x<w;x++){q.fillStyle=bandCol(k,r<h-2&&x<w-2,x,r,h);q.fillRect(x0+x,y0+r,1,1);}
+    for(let x=x0+3;x<x0+w-2;x+=3){px(q,x,y0+1,1,1,'rgba(0,0,0,.35)');px(q,x,y0+h-2,1,1,'rgba(0,0,0,.35)');}   // stitching
+    disc(q,x0+3,y0+Math.floor(h/2),1,'#120a06');}}   // the tag's eyelet
 // one pin up close on the floor: its three slots as bands (empty ones as grooves); key and pw as for bigPin
 function drawCloseup(cv,key,pw,slotsOn){cv.style.width='';cv.style.height='';const r=cv.getBoundingClientRect(),[W,H]=fitArt(cv,r.width,r.height),q=cv.getContext('2d'),wd=floorPal();
   drawFloor(q,W,H,-H*1.6,7,wd);const sp=bigPin(Math.max(12,Math.min(H-8,Math.floor((W-4)/.37))),key,pw,{slots:slotsOn}),bx=Math.round(W/2),by=H-4;
@@ -1221,49 +1253,45 @@ function paintInfoArt(root){root.querySelectorAll('canvas.bandcard').forEach(c=>
     box.querySelectorAll('svg.lead').forEach(x=>x.remove());box.insertAdjacentHTML('beforeend',`<svg class="lead" width="${box.clientWidth}" height="${box.clientHeight}" aria-hidden="true">${svg}</svg>`);});}
 // ---------- the boss intro picture: the deck from above, 96x64 art pixels scaled whole, one short loop of what the boss does ----------
 // T: loop length (s); still: the moment shown when motion is reduced
-const BOSSPIC={short:{T:3.4,still:2.2},sweep:{T:4,still:2.1},bolted:{T:3,still:1.2},tentacle:{T:3.6,still:2.5}};
+// each loop is one cause and its effect, about 3 s; still: the moment shown when motion is reduced. The art fills the picture box at a whole-pixel scale
+const BOSSPIC={short:{T:3.4,still:2.3},sweep:{T:3.8,still:2.2},bolted:{T:3.2,still:1.3},tentacle:{T:3.2,still:2}};
 const PTOP=['..o..','.owo.','.owo.','..o..','.oRo.','owwwo','owwwo','owwwo','.ooo.'],PFELL=['..ooo.oo.','.owwwoRwo','owwwwoRwo','.owwwoRwo','..ooo.oo.'],BTOP=['..ooo..','.orrrro.','orrwrrro','orrrrro','orrrrro','.orrro.','..ooo..'];
-function drawBossPic(cv,k,t){const box=cv.parentElement,bw=box.clientWidth,bh=box.clientHeight,S=Math.max(1,Math.floor(Math.min(bw/96,bh/64))),q=cv.getContext('2d'),wd=floorPal();
-  if(cv.width!==96){cv.width=96;cv.height=64;}Object.assign(cv.style,{width:96*S+'px',height:64*S+'px',left:Math.floor((bw-96*S)/2)+'px',top:Math.floor((bh-64*S)/2)+'px'});
-  q.setTransform(1,0,0,1,0,0);q.imageSmoothingEnabled=false;
-  const R=(x,y,w,h,col)=>{q.fillStyle=col;q.fillRect(Math.round(x),Math.round(y),w,h);},ease=a=>{a=clamp(a,0,1);return a*a*(3-2*a);},lerp=(a,b,u)=>a+(b-a)*u;
+function drawBossPic(cv,k,t){const box=cv.parentElement,bw=box.clientWidth,bh=box.clientHeight,S=Math.max(2,Math.floor(Math.min(bw/84,bh/56))),W=Math.ceil(bw/S),H=Math.ceil(bh/S),q=cv.getContext('2d'),wd=floorPal();
+  if(cv.width!==W||cv.height!==H){cv.width=W;cv.height=H;}Object.assign(cv.style,{width:W*S+'px',height:H*S+'px',left:Math.floor((bw-W*S)/2)+'px',top:Math.floor((bh-H*S)/2)+'px'});
+  q.setTransform(1,0,0,1,0,0);q.imageSmoothingEnabled=false;q.globalAlpha=1;
+  const R=(x,y,w,h,col)=>{q.fillStyle=col;q.fillRect(Math.round(x),Math.round(y),w,h);},ease=a=>{a=clamp(a,0,1);return a*a*(3-2*a);},lerp=(a,b,u)=>a+(b-a)*u,seg=(a,b)=>clamp((t-a)/(b-a),0,1);
   const SP={};const spr=(rows,pal)=>{const id=rows.join()+JSON.stringify(pal);return SP[id]||(SP[id]=sprite(rows,pal));};
-  const pinAt=(x,y,a,band)=>{if(a<=0)return;q.globalAlpha=Math.min(1,a);q.drawImage(spr(PTOP,{o:'#2a160e',w:'#fff8e8',R:band||'#d83a2a'}),Math.round(x)-2,Math.round(y)-6);q.globalAlpha=1;};
-  const fellAt=(x,y)=>q.drawImage(spr(PFELL,{o:'#2a160e',w:'#fff8e8',R:'#d83a2a'}),Math.round(x)-4,Math.round(y)-2);
+  const C=Math.floor(W/2),D=C-6,SPX=Math.max(7,Math.min(10,Math.floor((2*D-10)/7))),CX=c=>Math.round(C+c*SPX),RY=r=>18+r*9,LY=RY(3)+5;   // columns half a pin spacing apart; rows back (0) to front (3); the red line below the front row
+  const pinAt=(x,y,a,band,body)=>{if(a<=0)return;q.globalAlpha=Math.min(1,a);q.drawImage(spr(PTOP,{o:'#2a160e',w:body||'#fff8e8',R:band||'#d83a2a'}),Math.round(x)-2,Math.round(y)-8);q.globalAlpha=1;};
+  const fellAt=(x,y,flip)=>{const sp=spr(PFELL,{o:'#2a160e',w:'#fff8e8',R:'#d83a2a'});if(flip){q.save();q.translate(Math.round(x)+5,0);q.scale(-1,1);q.drawImage(sp,0,Math.round(y)-3);q.restore();}else q.drawImage(sp,Math.round(x)-4,Math.round(y)-3);};
   const ballAt=(x,y)=>q.drawImage(spr(BTOP,{o:'#2a160e',r:'#c63a2e',w:'#ffd9b0'}),Math.round(x)-3,Math.round(y)-3);
-  const ring=(x,y,r,col)=>{q.fillStyle=col;for(let i=0;i<24;i++){const a=i/24*6.283;q.fillRect(Math.round(x+Math.cos(a)*r),Math.round(y+Math.sin(a)*r),1,1);}};
-  const CX=c=>48+c*10,RY=r=>10+r*10;
-  // the deck: wood between dark gutters, the pit at the back, the approach in front
-  R(0,0,96,64,wd.sh);R(10,4,76,60,wd.base);for(let x=10;x<86;x+=6)R(x,4,1,60,wd.seam);R(10,4,76,1,wd.hi);R(0,0,96,4,'#0a0605');
-  const line=(y,col,dash)=>{for(let x=10;x<86;x+=dash?4:1)R(x,Math.round(y),dash?2:1,1,col);};
-  if(k!=='short'){line(55,'#d83a2a');line(56,'#9c2218');}
-  if(k==='short'){const ly=lerp(55,45,ease((t-.4)/.8));
-    if(t>.4){line(55,wd.ring,true);q.globalAlpha=.45;line(56,wd.ring,true);q.globalAlpha=1;}
-    line(ly,'#d83a2a');line(ly+1,'#9c2218');
-    if(t>.4&&t<1.6)for(const x of [26,48,70]){R(x,Math.round(ly)+3,1,1,'#fff8e8');R(x-1,Math.round(ly)+4,3,1,'#fff8e8');}   // little arrows: the line moved back
-    [[-2,1],[0,1],[2,1],[-3,2],[1,2],[-1,3]].forEach(([c,r])=>pinAt(CX(c),RY(r),1));
-    // a pin on the last row advances over the moved line: it breaks through, red, and is gone
-    const u=ease((t-1.6)/.4),py=lerp(RY(3),RY(4),u),gone=t>2.1?1-ease((t-2.4)/.5):1;if(u>=1&&Math.floor(t*6)%2)ring(CX(1),py,4,'#ff4a32');pinAt(CX(1),py,gone,u>=1?'#ff4a32':null);}
-  else if(k==='sweep'){const cur=Math.min(3,Math.floor(t/.45)),go=t>1.7,by=go?lerp(57,2,ease((t-1.7)/.9)):6;
-    for(let i=0;i<10;i++){const x=19+i*6,lit=i===cur&&t<2.8;R(x,58,5,4,'#2a160e');R(x+1,59,3,2,lit?'#fff8e8':(i===3||i===7)?'#d83a2a':wd.mid);}   // the ten balls; 4 and 8 are sweep balls
-    const pins=[[-2,1],[0,1],[2,1],[-1,2],[1,2],[-3,3],[0,3],[2,4]];
-    for(const [c,r] of pins){const y=go?Math.min(RY(r),by-4):RY(r);pinAt(CX(c),y,go?clamp((y-2)/8,0,1):1);}
-    if(t>3)[[-3,0],[-1,0],[1,0],[3,0],[0,1]].forEach(([c,r])=>pinAt(CX(c),RY(r),ease((t-3)/.5)));   // ten fresh at the back
-    // the bar: hangers from the ceiling, hazard stripes; it blinks low on ball 4, then sweeps from the line to the pit
-    if(!go&&cur===3&&Math.floor(t*5)%2===0)q.globalAlpha=.55;R(12,0,1,by,'#9aa4b4');R(83,0,1,by,'#9aa4b4');
-    for(let x=10;x<86;x++){R(x,by,1,3,((x>>2)&1)?'#ffd866':'#d83a2a');}R(10,by+3,76,1,'#2a160e');q.globalAlpha=1;}
-  else if(k==='bolted'){const pins=[[-3,1],[-1,1],[1,1],[3,1],[-2,2],[0,2],[2,2],[-1,3],[1,3]];
-    const hit=t>=.7,u=ease((t-.7)/.4),hx=lerp(CX(0),CX(-1)+4,u),hy=lerp(RY(4),RY(3)+5,u),clank=t>1.1&&t<1.8;
-    for(const [c,r] of pins){const sh=clank&&c===-1&&r===3?(Math.floor(t*30)%2?1:-1):0;R(CX(c)-3+sh,RY(r)+3,7,1,'#9aa4b4');R(CX(c)-3+sh,RY(r)+3,1,1,'#2a2e38');R(CX(c)+3+sh,RY(r)+3,1,1,'#2a2e38');pinAt(CX(c)+sh,RY(r),1);}   // every pin on a steel plate
-    if(clank){ring(CX(-1),RY(3),5+Math.floor((t-1.1)*8),'#fff8e8');}
-    R(CX(0)-3,RY(4)+3,7,1,'#9aa4b4');if(!hit)pinAt(CX(0),RY(4),1);else fellAt(hx,hy);   // the ball fells the headpin; the headpin can't fell the pin it hits
-    if(t<.7)ballAt(lerp(50,CX(0)+1,t/.7),lerp(64,RY(4)+6,t/.7));else if(t<1){q.globalAlpha=1-(t-.7)/.3;ballAt(CX(0)+2,RY(4)+5);q.globalAlpha=1;}}
-  else if(k==='tentacle'){const step=t>1&&t<1.35?ease((t-1)/.35):t>=1.35?1:0,ty=lerp(RY(1),RY(2),step),col=0;
-    for(let r=(step>=1?3:2);r<=4;r++)for(let i=0;i<2;i++)R(CX(col),RY(r)-1+i*3,1,1,'#b48aee');   // where it advances next
-    [[-3,0],[-1,0],[1,0],[3,0],[-2,1],[2,1],[-1,2],[1,2],[2,3]].forEach(([c,r])=>pinAt(CX(c),RY(r),1));
-    R(CX(col)-3,Math.round(ty)+1,7,2,'#120a1c');q.drawImage(spr(['.oo...','ovvo..','.ovo..','..ovo.','..ovo.','.ovvo.','.ovo..','ovVo..','ovVvo.','oVvVo.','oVvvVo','.oooo.'],{o:'#120a1c',V:'#5a3a86',v:'#b48aee'}),CX(col)-3,Math.round(ty)-10);
-    const bt=clamp((t-1.6)/.6,0,1),stopY=ty+7,byy=lerp(64,stopY,bt);if(t>1.6)ballAt(CX(col),byy);
-    if(t>2.2&&t<2.9)ring(CX(col),stopY-3,4+Math.floor((t-2.2)*10),'#fff8e8');}
+  const ring=(x,y,r,col)=>{q.fillStyle=col;for(let i=0;i<28;i++){const a=i/28*6.283;q.fillRect(Math.round(x+Math.cos(a)*r),Math.round(y+Math.sin(a)*r*.7),1,1);}};
+  const plate=(x,y,glint)=>{R(x-3,y+1,7,1,'#9aa4b4');R(x-3,y+1,1,1,'#2a2e38');R(x+3,y+1,1,1,'#2a2e38');if(glint){R(x+3,y-1,1,5,'#fff8e8');R(x+1,y+1,5,1,'#fff8e8');R(x+3,y+1,1,1,'#ffd866');}};
+  const line=(y,col,dash)=>{for(let x=C-D;x<C+D;x+=dash?4:1)R(x,Math.round(y),dash?2:1,1,col);};
+  // the deck, filling the picture: wood between gutters, the pit at the back
+  R(0,0,W,H,'#1d100a');R(C-D-4,0,2*D+8,H,'#120a06');R(C-D,0,2*D,H,wd.base);for(let x=C-D;x<C+D;x+=6)R(x,0,1,H,wd.seam);R(0,0,W,5,'#0a0605');R(C-D,5,2*D,1,wd.hi);
+  if(k!=='short'){line(LY,'#d83a2a');line(LY+1,'#9c2218');}
+  if(k==='bolted'){   // the ball takes the pins it touches; the headpin, falling, hits the 3 pin, which rocks and stays: its bolt glints
+    const spots=[[-3,0],[-1,0],[1,0],[3,0],[-2,1],[0,1],[2,1],[-1,2],[1,2],[0,3]],bx=C-3,by=lerp(H+5,-6,seg(.1,1.3));
+    const down={'-1,0':.98,'-1,2':.72,'0,3':.5};
+    for(const [c,r] of spots){const x=CX(c),y=RY(r),d=down[c+','+r];plate(x,y,c===1&&r===2&&t>.95&&t<1.9&&Math.floor(t*6)%2===0);
+      if(d!==undefined&&t>=d){if(c===0)fellAt(lerp(x,CX(1)-SPX+1,ease((t-d)/.35)),y-2,false);else fellAt(x-3-ease((t-d)/.3)*3,y-2,true);continue;}
+      const rock=c===1&&r===2&&t>.85&&t<1.45?(Math.floor(t*14)%2?1:-1):0;pinAt(x+rock,y,1);}
+    if(t<1.3)ballAt(bx,by);}
+  else if(k==='sweep'){   // the ball count ticks to 4; the bar drops in front of the pins and pushes every standing pin into the pit
+    const n=Math.min(4,Math.floor(seg(.1,1.3)*4.01)+(t>.1?1:0)),drop=seg(1.4,1.8),push=seg(1.95,2.8),gone=t>2.9,bar=t<1.4?-4:push>0?lerp(RY(3)+4,-4,ease(push)):lerp(-4,RY(3)+4,ease(drop));
+    for(let i=0;i<4;i++){const x=C-13+i*9,on=i<n;R(x-1,H-8,6,6,'#2a160e');R(x,H-7,4,4,on?(i===3?'#ff5a3a':'#ffd866'):'#4c2a1a');}
+    for(const [c,r] of [[-2,1],[0,1],[2,1],[-1,2],[1,2],[-3,0],[1,0],[0,3]]){const y=Math.min(RY(r),bar-2);pinAt(CX(c),y,gone?0:clamp((y-3)/6,0,1));}
+    if(t>=1.4&&t<2.9){R(C-D-2,0,1,Math.max(0,bar),'#9aa4b4');R(C+D+1,0,1,Math.max(0,bar),'#9aa4b4');for(let x=C-D;x<C+D;x++)R(x,bar,1,3,((x>>2)&1)?'#ffd866':'#d83a2a');R(C-D,bar+3,2*D,1,'#2a160e');}}
+  else if(k==='short'){   // the red line slides one row closer; the pins advance, and the front one is past it and breaks through
+    const ly=lerp(LY,LY-9,ease(seg(.3,1.1))),adv=ease(seg(1.5,1.9));if(t>.3){q.globalAlpha=.5;line(LY,'#d83a2a',true);q.globalAlpha=1;}line(ly,'#d83a2a');line(ly+1,'#9c2218');
+    for(const [c,r] of [[-2,1],[0,1],[2,1],[-3,0],[1,0],[3,0],[-1,2],[1,2]]){const y=RY(r)+adv*9,past=y>ly&&adv>=1,a=past?1-seg(2.5,2.9):1;
+      if(past&&t<2.5&&Math.floor(t*8)%2)ring(CX(c),y-3,6,'#ff4a32');pinAt(CX(c),y,a,past?'#9c2218':null,past?'#ff6a52':null);}}   // past the line: it breaks through, red, and goes
+  else if(k==='tentacle'){   // the tentacle rises in front of the pins; the ball rolls up and stops dead against it
+    for(const [c,r] of [[-3,0],[-1,0],[1,0],[3,0],[-2,1],[0,1],[2,1],[-1,2],[1,2]])pinAt(CX(c),RY(r),1);
+    const hx=C,hy=RY(3)+3,rise=ease(seg(.1,.8));R(hx-4,hy,9,2,'#120a1c');
+    q.save();q.beginPath();q.rect(0,0,W,hy+1);q.clip();q.drawImage(spr(['.oo...','ovvo..','.ovo..','..ovo.','..ovo.','.ovvo.','.ovo..','ovVo..','ovVvo.','oVvVo.','oVvvVo','.oooo.'],{o:'#120a1c',V:'#5a3a86',v:'#b48aee'}),hx-3,Math.round(hy-11+(1-rise)*13));q.restore();
+    const bt=ease(seg(1,1.55)),stopY=hy+5;if(t>1)ballAt(hx,lerp(H+5,stopY,bt));if(t>1.55&&t<2.3)ring(hx,stopY-2,3+Math.floor((t-1.55)*9),'#fff8e8');}
 }
 // your ten in perspective: headpin nearest, back row smaller and higher; sized to fill the deck
 function layoutRack(W,H,L){const D=7,el=.85,se=Math.sin(el),ce=Math.cos(el),DEPTH=.693,SPC=1.02,f=z=>D/(D+z*DEPTH);
@@ -1301,9 +1329,9 @@ function drawGear(el,onTap,selK){el.innerHTML='';if(run.hook){const w=document.c
 // small pictures for the info strips: a pin as it stands (its powers as bands, free slots as grooves), or a plain pin wearing one power's band wide
 const PICU={};
 function picOf(sp,id){return PICU[id]||(PICU[id]=sp.cv.toDataURL());}
-const pinPic=(it,H)=>{H=H||24;const pw=pwOf(it),k=kindOf(it);return `<img class="bp" src="${picOf(bigPin(H,k,pw,{slots:pw.length>0}),'p'+H+k+pw.join())}" alt="">`;};
-const pwPic=(k,H)=>{H=H||24;return `<img class="bp" src="${picOf(bigPin(H,'p5',[k],{zone:[.25,.41]}),'w'+H+k)}" alt="">`;};
-function pinInfo(i){const it=run.rack[i],pw=pwOf(it);return `${pinPic(it)}<div><h3>${short(PINS[it.t].name)}${slots(it)}</h3><p>${pw.length?(it.t!=='plain'?rich(PINS[it.t].text(it.lv))+' ':'')+pwText2(it):rich(PINS[it.t].text(it.lv))}</p></div>`;}
+const pinPic=(it,H)=>{const big=!!H;H=H||24;const pw=pwOf(it),k=kindOf(it),sp=bigPin(H,k,pw,{slots:pw.length>0});return `<img class="bp" src="${picOf(sp,'p'+H+k+pw.join())}" alt=""${big?` style="width:${sp.w*ART}px;height:${sp.h*ART}px"`:''}>`;};
+const pwPic=k=>{const id='w'+POWLOOK+k;if(!PICU[id]){const t=mk(24,20);drawPowerArt(t.getContext('2d'),24,20,k);PICU[id]=t.toDataURL();}return `<img class="bp" src="${PICU[id]}" alt="" style="width:48px;height:40px">`;};
+function pinInfo(i,H){const it=run.rack[i],pw=pwOf(it);return `${pinPic(it,H)}<div><h3>${short(PINS[it.t].name)}${slots(it)}</h3><p>${pw.length?(it.t!=='plain'?rich(PINS[it.t].text(it.lv))+' ':'')+pwText2(it):rich(PINS[it.t].text(it.lv))}</p></div>`;}
 // one power across the rack: its rule, and which pins hold it
 function powInfo(k){const on=run.rack.map((it,i)=>[i,pwCount(it,k)]).filter(a=>a[1]);
   return `${pwPic(k)}<div><h3>${POWERS[k].name}<small>${on.length?'pin'+(on.length>1?'s ':' ')+on.map(([i,n])=>(i+1)+(n>1?' ×'+n:'')).join(', '):''}</small></h3><p>${rich(POWERS[k].text(1))} <small class="ag">${POWERS[k].more}</small></p></div>`;}
@@ -1333,7 +1361,7 @@ function showShop(){const box=$('shop').firstElementChild,el=$('shopList'),chip=
   if(p&&p.fresh){p.fresh=false;chip.insertAdjacentHTML('beforeend',`<span class="fly">+$${p.earn}</span>`);}
   const have=powerCounts();
   run.offers.forEach(o=>{const b=document.createElement('button'),on=pending===o||pick===o,poor=!o.bought&&run.cash<o.cost&&!on;b.type='button';
-    b.className='offer '+o.kind+(o.bought?' got':'')+(on?' pend':'')+(poor?' poor':'');b.disabled=o.bought||poor;
+    b.dataset.oi=run.offers.indexOf(o);b.className='offer '+o.kind+(o.bought?' got':'')+(on?' pend':'')+(poor?' poor':'');b.disabled=o.bought||poor;
     b.setAttribute('aria-label',o.bought?o.name+', sold':`${o.name}, $${o.cost}. ${o.text}${o.kind==='pow'&&have[o.t]?' You have '+have[o.t]+'.':''}`);
     const tag=`<span class="c">${on?'×':'$'+o.cost}</span>`;
     b.innerHTML=o.kind==='pin'?`${tag}<canvas data-t="${o.t}" aria-hidden="true"></canvas><strong>${short(o.name)}</strong>`
@@ -1351,14 +1379,13 @@ function showShop(){const box=$('shop').firstElementChild,el=$('shopList'),chip=
     b.disabled=!on&&run.cash+run.layoutPaid<l.cost;b.innerHTML=`${rackDiagram(l.id)}<span>${LAYOUTS[l.id].name}</span>${l.cost?`<b>$${l.cost}</b>`:''}`;b.setAttribute('aria-label',`Next rack: ${LAYOUTS[l.id].name}${l.cost?', $'+l.cost:''}`);
     b.addEventListener('click',()=>{if(on)return;run.cash+=run.layoutPaid;run.layoutPaid=l.cost;run.cash-=l.cost;run.nextLayout=l.id;topBar();showShop();});lays.appendChild(b);});
   // the header strip: ball and gear offers (with Buy), your gear, the next boss, the first shop's line; a pin's explanation shows by the rack (shopInfo)
-  const m=$('shopMsg'),head=pick||gsel||bsel||SHOPTIP==='shop';m.className='strip'+(head?' info':' idle');
-  m.innerHTML=pick?`<img class="gear" src="${pick.kind==='spot'?icon(pick.t):gicon(pick.t)}" alt=""><div><h3>${short(pick.name)}</h3><p>${rich(pick.text)}</p></div><button type="button" class="buy" id="shopBuy"${run.cash<pick.cost?' disabled':''}>Buy <b>$${pick.cost}</b></button>`
+  const m=$('shopMsg'),hp=INFO==='callout'?null:pick,head=hp||gsel||bsel||SHOPTIP==='shop';m.className='strip'+(head?' info':' idle');
+  m.innerHTML=hp?`<img class="gear" src="${pick.kind==='spot'?icon(pick.t):gicon(pick.t)}" alt=""><div><h3>${short(pick.name)}</h3><p>${rich(pick.text)}</p></div><button type="button" class="buy" id="shopBuy"${run.cash<pick.cost?' disabled':''}>Buy <b>$${pick.cost}</b></button>`
     :gsel?gearInfo(gsel):bsel?bossInfo(lvlBoss(run.game+1),bossGame(run.game+1))
     :SHOPTIP==='shop'?'<div><h3>Fit a power to a pin.</h3></div>':'';
   $('shopResult').hidden=!m.classList.contains('idle');{const nk=lvlBoss(run.game+1);$('shopResult').innerHTML=(p?`<b>${p.t}<small> / ${p.target}</small></b><span><i>Won</i>+$${p.earn}</span>`:'')+`<button type="button" class="bchip" id="shopBoss" aria-label="Boss: ${BOSSES[nk].name}">${bossImg(nk)}</button>`;
     $('shopBoss').addEventListener('click',()=>{bsel=true;sel=null;gsel=null;pending=null;pick=null;showShop();});}   // the win card has the breakdown
-  if(pick)$('shopBuy').addEventListener('click',()=>buy(pick));
-  shopInfo();
+  shopInfo();if(pick&&$('shopBuy'))$('shopBuy').addEventListener('click',()=>buy(pick));
   drawMap($('shopMap'),shopTap,sel,pending,OPT.layout?run.nextLayout:run.layout);drawGear($('shopGear'),k=>{gsel=gsel===k?null:k;sel=null;pending=null;pick=null;bsel=false;showShop();},gsel);
   placeInfo();
   const rc=2+run.rerolls,rb=$('shopReroll');rb.innerHTML=`<b>$${rc}</b><span class="ro">⟳</span>Reroll`;rb.setAttribute('aria-label',`Reroll pins and powers, $${rc}`);rb.disabled=run.cash<rc;
@@ -1366,27 +1393,42 @@ function showShop(){const box=$('shop').firstElementChild,el=$('shopList'),chip=
 // where a pin's explanation shows in the shop (?info=): strip, a strip on the rack's top edge that the rack shares (it moves down);
 // callout, a bubble on the tapped pin (a picked offer's bubble sits on the rack's top edge, pointing in); closeup, the rack moves right and the pin stands big on the left, each band named beside it.
 // Shown for a tapped pin, and for a picked pin or power while you choose where it goes.
-function shopInfo(){const inf=$('shopInfo'),deck=$('shopDeck');deck.dataset.info=INFO;inf.className='pinfo '+INFO;
-  const o=pending,on=!!o||sel!==null;inf.hidden=!on;deck.classList.toggle('split',on&&INFO==='closeup');if(!on){inf.innerHTML='';return;}
+function shopInfo(){const inf=$('shopInfo'),deck=$('shopDeck'),box=$('shop').firstElementChild;deck.dataset.info=INFO;inf.className='pinfo '+INFO;
+  if(INFO==='callout'&&inf.parentNode!==box)box.appendChild(inf);   // the callout floats over the trays, never over the rack
+  const o=pending||(INFO==='callout'?pick:null),on=!!o||sel!==null;inf.hidden=!on;deck.classList.toggle('split',on&&INFO==='closeup');if(!on){inf.innerHTML='';return;}
   if(INFO==='closeup'){
     if(o&&o.kind==='pow')inf.innerHTML=`<canvas class="bandcard tall" data-k="${o.t}" aria-hidden="true"></canvas><div class="cside"><h3>${o.name}</h3><p>${rich(o.text)}</p><p class="ag">${POWERS[o.t].more}</p></div>`;
     else if(o)inf.innerHTML=`<canvas class="closeup" data-t="${o.t}" aria-hidden="true"></canvas><div class="cside"><h3>${short(o.name)}</h3><p>${rich(o.text)}</p></div>`;
     else{const it=run.rack[sel],pw=pwOf(it),n=k=>pwCount(it,k);
       inf.innerHTML=`<canvas class="closeup" data-i="${sel}" aria-hidden="true"></canvas><div class="cside"><h3>${short(PINS[it.t].name)}</h3><div class="cslots">${[0,1,2].map(j=>{const k=pw[j];
         return k?`<span>${POWERS[k].name}${pw.indexOf(k)===j?` <b>${POWERS[k].s(n(k))}</b>`:''}</span>`:'<span class="free">free</span>';}).join('')}</div>${it.t!=='plain'||!pw.length?`<p>${rich(PINS[it.t].text(it.lv))}</p>`:''}</div>`;}}
+  else if(INFO==='callout'){const pic=!o?'':o.kind==='pow'?`<canvas class="bandcard" data-k="${o.t}" aria-hidden="true"></canvas>`:o.kind==='pin'?pinPic(newItem(o.t),30):`<img class="gear" src="${gicon(o.t)}" alt="">`;
+    inf.innerHTML=(o?`${pic}<div><h3>${o.kind==='pow'?o.name:short(o.name)}<b class="pr">$${o.cost}</b></h3><p>${rich(o.text)}${o.kind==='pow'?` <small class="ag">${POWERS[o.t].more}</small>`:''}</p></div>`
+      +(o===pick?`<button type="button" class="buy" id="shopBuy"${run.cash<o.cost?' disabled':''}>Buy</button>`:''):pinInfo(sel,24))+'<button type="button" class="x" aria-label="Close">×</button>';
+    inf.querySelector('.x').addEventListener('click',()=>{pending=null;pick=null;sel=null;showShop();});}
   else inf.innerHTML=o&&o.kind==='pow'?`<canvas class="bandcard" data-k="${o.t}" aria-hidden="true"></canvas><div><h3>${o.name}</h3><p>${rich(o.text)} <small class="ag">${POWERS[o.t].more}</small></p></div>`
     :o?`${pinPic(newItem(o.t))}<div><h3>${short(o.name)}</h3><p>${rich(o.text)}</p></div>`:pinInfo(sel);
   inf.insertAdjacentHTML('afterbegin',INFO==='callout'?'<i class="arw" aria-hidden="true"></i>':'');}
+// the callout: anchored to the picked card (below the pins row, above the others) or, for a tapped pin, sitting on the rack's top edge pointing down at it.
+// It never covers the rack, Reroll or the leave button; if a spot would, the next one is tried, narrowing it beside Reroll if that is all that's in the way
+function placeCallout(inf){const box=$('shop').firstElementChild,br=box.getBoundingClientRect(),R=el=>{const r=el.getBoundingClientRect();return{l:r.left-br.left,t:r.top-br.top,r:r.right-br.left,b:r.bottom-br.top};};
+  const W=box.clientWidth,deck=R($('shopDeck')),next=R($('shopNext')),rr=$('shopReroll').hidden?null:R($('shopReroll')),hit=(a,b)=>a.l<b.r&&a.r>b.l&&a.t<b.b&&a.b>b.t,arw=inf.querySelector('.arw'),o=pending||pick;
+  let tries=[],ax;
+  if(o){const card=box.querySelector(`.offer[data-oi="${run.offers.indexOf(o)}"]`);if(!card)return;const c=R(card);ax=(c.l+c.r)/2;
+    const below={y:c.b+10,down:false},above={y:c.t-12,down:true,up:1};tries=o.kind==='pin'?[below,above]:[above,below];}
+  else{const h=($('shopMap')._hit||[]).find(h=>h.i===sel);if(!h)return;const m=R($('shopMap'));ax=m.l+h.x;tries=[{y:deck.t-9,down:true,up:1}];}
+  let best=null;
+  for(const t of tries){for(const narrow of [0,1]){let w=Math.min(320,W-12),l=Math.round(clamp(ax-w/2,6,W-w-6));
+      if(narrow&&rr){w=Math.min(w,Math.round(rr.l-10));l=Math.round(clamp(ax-w/2,6,rr.l-4-w));}
+      inf.style.width=w+'px';const hgt=inf.offsetHeight,top=Math.round(t.up?t.y-hgt:t.y),r={l,t:top,r:l+w,b:top+hgt};
+      const ok=top>=2&&!hit(r,deck)&&!hit(r,next)&&!(rr&&hit(r,rr));if(ok||!best)best={l,top,w,down:t.down};if(ok){best.ok=1;break;}}
+    if(best&&best.ok)break;}
+  Object.assign(inf.style,{left:best.l+'px',top:best.top+'px',width:best.w+'px'});inf.classList.toggle('down',best.down);if(arw)arw.style.left=Math.round(clamp(ax-best.l-7,8,best.w-22))+'px';}
 // size the rack around the info, then put a callout on its pin; paints the close-up last, once the panel has its size
 function placeInfo(){const inf=$('shopInfo'),map=$('shopMap');if(inf.hidden){if(map.style.top||map.style.left){map.style.top=map.style.left='';drawMap(map,...map._map);}return;}
   if(INFO==='strip'){const t=inf.offsetHeight+'px';if(map.style.top!==t){map.style.top=t;map.style.left='';drawMap(map,...map._map);}}
   else if(INFO==='closeup'){const l=inf.offsetWidth+'px';if(map.style.left!==l){map.style.left=l;map.style.top='';drawMap(map,...map._map);}}
-  else{if(map.style.top||map.style.left){map.style.top=map.style.left='';drawMap(map,...map._map);}
-    const deck=$('shopDeck'),dw=deck.clientWidth,bw=Math.min(250,dw-8),bh=inf.offsetHeight,arw=inf.querySelector('.arw');inf.style.width=bw+'px';
-    const h=sel!==null&&!pending?(map._hit||[]).find(h=>h.i===sel):null;
-    if(!h){Object.assign(inf.style,{left:Math.round((dw-bw)/2)+'px',top:-(inf.offsetHeight+8)+'px'});inf.classList.add('down');arw.style.left=Math.round(bw/2-7)+'px';}
-    else{const top=h.y-h.ry*.95,bot=h.y+h.ry*.8,above=h.y>deck.clientHeight*.45,x=Math.round(clamp(h.x-bw/2,4,dw-bw-4));
-      Object.assign(inf.style,{left:x+'px',top:Math.round(above?top-inf.offsetHeight-8:bot+8)+'px'});inf.classList.toggle('down',above);arw.style.left=Math.round(clamp(h.x-x-7,8,bw-22))+'px';}}
+  else{if(map.style.top||map.style.left){map.style.top=map.style.left='';drawMap(map,...map._map);}placeCallout(inf);}
   paintInfoArt(inf);}
 function shopTap(i){gsel=null;pick=null;bsel=false;
   if(pending&&pending.kind==='pow'){const o=pending,it=run.rack[i];if(pwOf(it).length>=3){sel=i;pending=null;showShop();return;}   // full: show its build instead
