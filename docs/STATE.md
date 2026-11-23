@@ -222,5 +222,10 @@ After Josh played round 2 ("Pin up close" made choosing the pin hard; pins and p
 - Powers off a pin no longer look like pins: `?power=ring` "Collar ring" (default: the band as a loose collar on a round token) or `?power=swatch` "Band swatch" (a flat strip on dark cloth). Used on power cards, callouts, the build view's counts and info, and the first-time tips. Pins in the rack keep their bands.
 - Boss intro loops redrawn to fill the picture, each one cause and its effect: Bolted rack (a pin hit by a pin rocks and stays; its bolt glints), Sweep bar (four balls tick, the bar pushes the pins into the pit), Short line (the line moves up a row; the pins that advance past it break through), Rising tentacle (it rises; the ball stops against it). Rules cut to one plain sentence each.
 
+## New run and thin bands (22 November, branch `ui/new-run`)
+UI only. Details and shots: `docs/design/new-run/`.
+- New run in the shop (beside the leave button) and on the cover (beside Labs, only with a save); both confirm on a second tap. The cover's opens the game with `?new=1`, which drops the save and then leaves the URL.
+- On the standing pins, a band under three rows shows one colour instead of its pattern: Shield mid steel, Bomb black, Toll pink. At 360x600 the patterns read as other powers. The lane and larger pins keep the patterns.
+
 ## Next
 Josh plays Advancing Ten-Pin with powers and pastes logs. Check: does he build one pin up or spread powers; does Shield earn its place (bots say no); is the cap of 32 the right ceiling; is the bottom of level 1 still where runs end. Before powers: did the best throw change between balls; did he leave pins to grow on purpose; did each boss hurt the way he played. The fix list in `docs/IDEATION.md` (level-up versus replace, dead pieces) still stands.

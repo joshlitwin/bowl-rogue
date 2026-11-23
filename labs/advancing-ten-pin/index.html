@@ -344,6 +344,8 @@ i.pw.big{flex:none;width:22px;height:11px;border-radius:3px}
 #shop .strip{height:48px}
 #shop .deck{min-height:0;padding:3px 28px 11px}
 #shop .row button.main{flex:1}
+#shopNew{flex:none;color:var(--dim)}
+#shopNew.ask{border-color:var(--accent);color:var(--chalk)}
 .tray .offer img{align-self:center}
 .ptray .offer{height:62px;padding-top:11px}
 .tray .offer strong{line-height:1.15;flex:none}
@@ -585,7 +587,7 @@ img.bp{flex:none;width:auto;height:52px;image-rendering:pixelated}
   <div class="trays"><div class="tray btray" id="shopBallTray"><span class="ttag">Balls</span><div class="offers" id="shopBalls"></div></div><div class="tray gtray" id="shopGearTray"><span class="ttag">Gear</span><div class="offers" id="shopGearBuy"></div></div></div>
   <div class="tray ltray" id="shopLayTray"><span class="ttag">Next rack</span><div class="lays" id="shopLays"></div></div>
   <div class="deck" id="shopDeck"><div class="rackmap" id="shopMap"></div><div class="shelf" id="shopGear"></div><div class="pinfo" id="shopInfo" hidden aria-live="polite"></div></div>
-  <div class="row"><button class="main" id="shopNext" type="button"></button></div>
+  <div class="row"><button id="shopNew" type="button">New run</button><button class="main" id="shopNext" type="button"></button></div>
 </div></div>
 <div class="sheet" id="rackSheet" hidden><div class="box">
   <div class="shead"><h2 id="rackTitle"></h2><button id="rackTips" type="button">Tips again</button><b class="chip" id="rackCash"></b></div>
@@ -845,7 +847,10 @@ const pwOf=it=>(it&&it.pw)||[],pwCount=(it,k)=>pwOf(it).filter(x=>x===k).length;
 // colours are the power's own; where two sit close, the band also carries a pattern drawn in pixels: Slow a check, Shield a white stripe on steel, Bomb sparks, Toll coins
 const BANDPAT={slow:{p:'check',c2:['#16585c','#0c3a3e']},shield:{p:'stripe',base:['#9aa4b4','#5e687a'],c2:['#ffffff','#d8dee8']},bomb:{p:'dots',c2:['#ff7a3a','#e0501e']},toll:{p:'dots',c2:['#ffe066','#e8a020']}};
 // the colour of one pixel of k's band: lit or in shade, x across, r rows down a band h rows tall
-function bandCol(k,lit,x,r,h){const B=BANDPAT[k],base=B&&B.base||POWERS[k].c,col=lit?base[0]:base[1];if(!B)return col;const c2=lit?B.c2[0]:B.c2[1];
+// on the standing pins (shop rack, build view) a band under three rows is too thin for a pattern: there Shield, Bomb and Toll show one colour each, chosen to stay apart from the solid bands.
+// Slow's check still reads, and the lane sprites keep every pattern (their bands are wider).
+const BANDTHIN={shield:['#7f8ca0','#556074'],bomb:['#1c1c22','#0c0c10'],toll:['#ff86aa','#c04c74']};
+function bandCol(k,lit,x,r,h,thin){if(thin&&h<3&&BANDTHIN[k])return BANDTHIN[k][lit?0:1];const B=BANDPAT[k],base=B&&B.base||POWERS[k].c,col=lit?base[0]:base[1];if(!B)return col;const c2=lit?B.c2[0]:B.c2[1];
   if(B.p==='check')return (((x>>1)+(h>2?r>>1:0))&1)?c2:col;
   if(B.p==='stripe'){const e=Math.floor(h/3);return h>=3&&r>=e&&r<h-e?c2:col;}
   return (x%3===1&&(h<3||r===Math.floor((h-1)/2)))?c2:col;}
@@ -1190,7 +1195,7 @@ function bigPin(H,key,pw,opt){H=Math.max(12,Math.round(H));pw=pw||[];opt=opt||{}
       const s=(hwAt(yy+1)-hwAt(yy-1))/2,nl=Math.hypot(u,s,cz),I=(u*PLV[0]-s*PLV[1]+cz*PLV[2])/nl;
       const tc=(yy-hw*BAND_EL*cz)/H;   // where this pixel sits on the turned surface, so the neck band curves round the pin
       const bd=bands.find(b=>tc>=b[0]&&tc<b[1]),bh=bd?Math.max(1,Math.round((bd[1]-bd[0])*H)):0,br=bd?Math.min(bh-1,Math.floor((tc-bd[0])*H)):0;
-      if(bd&&bd[2])col=bandCol(bd[2],I>.42,x,br,bh);
+      if(bd&&bd[2])col=bandCol(bd[2],I>.42,x,br,bh,true);
       else if(bd&&bd[2]===null)col=I>.42?pal.R:pal.r;
       else if(bd&&br===Math.floor((bh-1)/2))col=I>.38?pal.m:pal.d;   // an empty slot: a groove round the neck
       else if(metal)col=I>.8?pal.w:I>.62?pal.m:I>.4?pal.l:I>.18?pal.m:pal.d;   // Anchor: chrome
@@ -1389,7 +1394,7 @@ function showShop(){const box=$('shop').firstElementChild,el=$('shopList'),chip=
   drawMap($('shopMap'),shopTap,sel,pending,OPT.layout?run.nextLayout:run.layout);drawGear($('shopGear'),k=>{gsel=gsel===k?null:k;sel=null;pending=null;pick=null;bsel=false;showShop();},gsel);
   placeInfo();
   const rc=2+run.rerolls,rb=$('shopReroll');rb.innerHTML=`<b>$${rc}</b><span class="ro">⟳</span>Reroll`;rb.setAttribute('aria-label',`Reroll pins and powers, $${rc}`);rb.disabled=run.cash<rc;
-  saveRun('shop');skipAsk=false;{const n=run.game+1,bo=bossOf(n);$('shopNext').innerHTML=`${bo?bossImg(lvlBoss(n))+bo.name:kindName(n)} · beat <b>${tgtOf(n)}</b><i class="tri r"></i>`;}}
+  saveRun('shop');skipAsk=false;shopNewAsk=false;$('shopNew').textContent='New run';$('shopNew').classList.remove('ask');{const n=run.game+1,bo=bossOf(n);$('shopNext').innerHTML=`${bo?bossImg(lvlBoss(n))+bo.name:kindName(n)} · beat <b>${tgtOf(n)}</b><i class="tri r"></i>`;}}
 // where a pin's explanation shows in the shop (?info=): strip, a strip on the rack's top edge that the rack shares (it moves down);
 // callout, a bubble on the tapped pin (a picked offer's bubble sits on the rack's top edge, pointing in); closeup, the rack moves right and the pin stands big on the left, each band named beside it.
 // Shown for a tapped pin, and for a picked pin or power while you choose where it goes.
@@ -2023,6 +2028,11 @@ function loadRun(){let d=null;try{d=JSON.parse(localStorage.getItem(SAVE)||'null
     return true;}catch(e){console.error(e);clearSave();return false;}}
 // New run from the Rack sheet: a second tap confirms, since it drops the saved run
 let newAsk=false;
+// New run from the shop: the same second-tap confirm
+let shopNewAsk=false;
+$('shopNew').addEventListener('click',e=>{const b=e.currentTarget;if(!shopNewAsk){shopNewAsk=true;b.textContent='Drop run?';b.classList.add('ask');return;}shopNewAsk=false;b.textContent='New run';b.classList.remove('ask');$('shop').hidden=true;newRun();});
+// ?new=1 (New run on the cover): drop the save first, then take the flag off the URL so a reload doesn't drop the next run
+if(new URLSearchParams(location.search).get('new')==='1'){clearSave();try{const u=new URL(location.href);u.searchParams.delete('new');history.replaceState(null,'',u.pathname+u.search+u.hash);}catch(e){}}
 $('rackNew').addEventListener('click',e=>{if(!newAsk){newAsk=true;e.currentTarget.textContent='Drop this run?';return;}newAsk=false;e.currentTarget.textContent='New run';$('rackSheet').hidden=true;newRun();});
 if(!loadRun())newRun();fit();requestAnimationFrame(loop);
 </script>

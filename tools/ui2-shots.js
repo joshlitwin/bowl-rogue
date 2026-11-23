@@ -98,6 +98,15 @@ const S={
   'lane-night':{js:`run.game=4;stage='night';setChrome('night');startGame();play(1);quiet();`},
   'lane-game-start':{js:`run.bosses[0]='bolted';winNow();$('winNext').click();run.bought=true;skipAsk=true;$('shopNext').click();`,wait:400},
   // every power's band: as on a power card (a pin's neck, big), on a pin in the rack, and as the swatch used in counts
+  // New run in the shop (branch ui/new-run): as it sits, after the first tap, and next to the longest leave label (a boss next)
+  'newrun-shop':{js:`build();toShop();`},
+  'newrun-shop-ask':{js:`build();toShop();$('shopNew').click();`},
+  'newrun-shop-boss-next':{js:`build();run.bosses[0]='sweep';run.game=1;run.cash=9;startGame();winNow();$('winNext').click();run.cash=14;offers();showShop();`},
+  'newrun-shop-dropped':{js:`build();toShop();$('shopNew').click();$('shopNew').click();quiet();`},
+  // the four patterned bands beside the solid ones they could be mistaken for, on the smallest pins (branch ui/new-run)
+  'bands-small-shop':{js:`run.rack.forEach((it,i)=>it.pw=[['slow'],['quick'],['shield'],[],['bomb'],['spark'],['toll'],['rent'],['lantern'],['head']][i]);toShop();`},
+  'bands-small-lane':{js:`run.rack.forEach((it,i)=>it.pw=[['slow'],['quick'],['shield'],[],['bomb'],['spark'],['toll'],['rent'],['lantern'],['head']][i]);startGame();quiet();`},
+  'bands-small-lane-front':{js:`run.rack.forEach((it,i)=>it.pw=[['slow'],['quick'],['shield'],[],['bomb'],['spark'],['toll'],['rent'],['lantern'],['head']][i]);startGame();play(3);quiet();`},
   'bands-sheet':{js:`quiet();const d=document.createElement('div');d.style.cssText='position:fixed;inset:0;z-index:9;background:#1d100a;display:grid;grid-template-columns:repeat(3,1fr);gap:8px 6px;align-content:center;padding:10px;color:#f3e2b8;font:700 12px/1.2 "Pixelify Sans",sans-serif;text-align:center';
     const put=(sp,w)=>{const cv=document.createElement('canvas');cv.width=sp.w;cv.height=sp.h;cv.getContext('2d').drawImage(sp.cv,0,0);cv.style.cssText='width:'+sp.w*2+'px;height:'+sp.h*2+'px;image-rendering:pixelated;vertical-align:bottom';w.appendChild(cv);};
     Object.keys(POWERS).forEach(k=>{const w=document.createElement('div'),r=document.createElement('div');r.style.cssText='display:flex;gap:8px;justify-content:center;align-items:flex-end;margin-bottom:4px';
