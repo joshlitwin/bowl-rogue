@@ -79,6 +79,12 @@ const S={
   'power-swatch-picked':{qs:'?power=swatch',js:`build();toShop();pending=run.offers.filter(o=>o.kind==='pow')[1];showShop();`},
   'power-ring-build':{qs:'?power=ring',js:`build();quiet();openBuild();document.querySelector('#rackPows .pwchip').click();`},
   'power-swatch-build':{qs:'?power=swatch',js:`build();quiet();openBuild();document.querySelector('#rackPows .pwchip').click();`},
+  'boss-quota-0_8':{js:`run.bosses[0]='quota';run.game=2;startGame();const raf=window.requestAnimationFrame;window.requestAnimationFrame=()=>0;showIntro();window.requestAnimationFrame=raf;drawBossPic($('introPic'),'quota',0.8);`},
+  'boss-quota-2_7':{js:`run.bosses[0]='quota';run.game=2;startGame();const raf=window.requestAnimationFrame;window.requestAnimationFrame=()=>0;showIntro();window.requestAnimationFrame=raf;drawBossPic($('introPic'),'quota',2.7);`},
+  'boss-flat-0_9':{js:`run.bosses[0]='flat';run.game=2;startGame();const raf=window.requestAnimationFrame;window.requestAnimationFrame=()=>0;showIntro();window.requestAnimationFrame=raf;drawBossPic($('introPic'),'flat',0.9);`},
+  'boss-flat-2_3':{js:`run.bosses[0]='flat';run.game=2;startGame();const raf=window.requestAnimationFrame;window.requestAnimationFrame=()=>0;showIntro();window.requestAnimationFrame=raf;drawBossPic($('introPic'),'flat',2.3);`},
+  'boss-cold-1_2':{js:`run.bosses[0]='cold';run.game=2;startGame();const raf=window.requestAnimationFrame;window.requestAnimationFrame=()=>0;showIntro();window.requestAnimationFrame=raf;drawBossPic($('introPic'),'cold',1.2);`},
+  'boss-cold-2_2':{js:`run.bosses[0]='cold';run.game=2;startGame();const raf=window.requestAnimationFrame;window.requestAnimationFrame=()=>0;showIntro();window.requestAnimationFrame=raf;drawBossPic($('introPic'),'cold',2.2);`},
   'boss-bolted-0_3':{js:`run.bosses[0]='bolted';run.game=2;startGame();const raf=window.requestAnimationFrame;window.requestAnimationFrame=()=>0;showIntro();window.requestAnimationFrame=raf;drawBossPic($('introPic'),'bolted',0.3);`},
   'boss-bolted-0_6':{js:`run.bosses[0]='bolted';run.game=2;startGame();const raf=window.requestAnimationFrame;window.requestAnimationFrame=()=>0;showIntro();window.requestAnimationFrame=raf;drawBossPic($('introPic'),'bolted',0.6);`},
   'boss-bolted-1_1':{js:`run.bosses[0]='bolted';run.game=2;startGame();const raf=window.requestAnimationFrame;window.requestAnimationFrame=()=>0;showIntro();window.requestAnimationFrame=raf;drawBossPic($('introPic'),'bolted',1.1);`},
@@ -114,6 +120,10 @@ const S={
   'shop-rack-three':{js:`build();toShop();shopTap(5);`},
   'rack-three':{js:`build();quiet();openBuild();document.querySelector('#rackGrid [data-i="5"]').click();`},
   'rack-three-back':{js:`build();quiet();openBuild();document.querySelector('#rackGrid [data-i="9"]').click();`},
+  // playtest fixes (branch balance/playtest-fixes): a ball you can't afford is readable; a pin you can't afford too; the hall sign on a boss game
+  'poor-ball':{js:`build();toShop();run.cash=2;showShop();document.querySelector('#shop .offer.ball').click();`},
+  'poor-pin':{js:`build();toShop();run.cash=1;showShop();document.querySelector('#shop .offer.pin').click();`},
+  'match-sign':{js:`run.bosses[0]='quota';run.game=2;startGame();$('intro').hidden=true;quiet();`},
   'bands-sheet':{js:`quiet();const d=document.createElement('div');d.style.cssText='position:fixed;inset:0;z-index:9;background:#1d100a;display:grid;grid-template-columns:repeat(3,1fr);gap:8px 6px;align-content:center;padding:10px;color:#f3e2b8;font:700 12px/1.2 "Pixelify Sans",sans-serif;text-align:center';
     const put=(sp,w)=>{const cv=document.createElement('canvas');cv.width=sp.w;cv.height=sp.h;cv.getContext('2d').drawImage(sp.cv,0,0);cv.style.cssText='width:'+sp.w*2+'px;height:'+sp.h*2+'px;image-rendering:pixelated;vertical-align:bottom';w.appendChild(cv);};
     Object.keys(POWERS).forEach(k=>{const w=document.createElement('div'),r=document.createElement('div');r.style.cssText='display:flex;gap:8px;justify-content:center;align-items:flex-end;margin-bottom:4px';

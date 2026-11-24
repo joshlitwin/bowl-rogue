@@ -236,5 +236,10 @@ UI and text only. Details: `docs/design/readable-pins/`.
 - Every pin readout lists each power's full rule.
 - All rule texts rewritten for a new player (no "fresh", no bare "1 more ×", no "pin spacing").
 
+## Agent playtest and fixes (23 November, branch `balance/playtest-fixes`)
+Nine agent playtesters (five new players, four experts) played through `tools/play.js` (docs/playtests/). Findings: the ripen-and-harvest loop is the hook; the Toll ball gutter loop, Crowd stacking with single Sparks, Spark on every pin, Home rack and reload-retry broke choices; the break-through penalty, strike value and "LAST GAME" sign confused new players; two bugs. Josh: a well-built plan can carry but should hit a hard moment; no plan should win every time; bosses need variety so any plan is a risk.
+Done on the branch (details `docs/design/playtest-fixes/`): bug fixes; Toll ball costs nothing instead of paying; Crowd capped at +6 and only one Crowd pays a ball; at most two Sparks a ball; save at the throw with a seeded run stream; a pool of seven bosses drawn each run (new: Pin quota, Flat rate, Cold lane); targets 90/140/235 on boss games and 320/360 for games 11-12; break-through cost shown on the lane; strike tip; MATCH PLAY sign; score pop off the front row; unaffordable offers readable; ball texts and prices.
+Ball shelf (branch `shop/ball-shelf-levels`, included here): the whole shelf restocks after each boss.
+
 ## Next
 Josh plays Advancing Ten-Pin with powers and pastes logs. Check: does he build one pin up or spread powers; does Shield earn its place (bots say no); is the cap of 32 the right ceiling; is the bottom of level 1 still where runs end. Before powers: did the best throw change between balls; did he leave pins to grow on purpose; did each boss hurt the way he played. The fix list in `docs/IDEATION.md` (level-up versus replace, dead pieces) still stands.
