@@ -37,6 +37,7 @@ npm run advancing-bot  # Advancing Rack Lab: greedy, strike and patient bots per
 npm run advancing-run-bot  # Advancing Ten-Pin: whole runs, shopping for one build (strike, ripen, harvest)
 npm run powers-bot -- stack|combo|runs  # Advancing Ten-Pin powers: one power stacked on a pin, Lantern with Quick growth, whole runs buying powers
 npm run save-test  # Advancing Ten-Pin: saves mid-game, on the win card and in the shop, and opens the page again from each
+npm run progress-test  # Temperance Lanes progress from run to run: starter shop, milestones, totals, pieces opening, records, boss wall, All pieces
 npm run boss-bot       # Five-Pin Boss Lab: whole runs by a bot that aims the best line each ball (args: runs, timing ms, 'all' to play all 12 games, boss ids)
 npm run variety-bot    # Five-Pin Variety Lab: strike lines per layout and ball, and how many of the standard layout's still strike (add 7 for seven pins)
 npm run rules-bot      # Five-Pin Rules Lab: best frame per build, strike-only against best plan (add a build name and a ms spread to play games)

@@ -49,6 +49,12 @@ body{background:#120a06;color:var(--chalk);font-family:var(--display);overflow:h
 .links{display:flex;justify-content:center}
 .labs[hidden]{display:none}
 .labs.ask{color:var(--chalk)}
+/* records (advten-progress), shown once there are any: a small score panel over Play */
+.rec{display:flex;gap:calc(var(--px)*2);padding:calc(var(--px)*2);background:var(--ink);border:var(--px) solid #3a2016;box-shadow:0 var(--px) 0 #000}
+.rec[hidden]{display:none}
+.rec span{display:grid;justify-items:center;gap:4px;min-width:64px;padding:6px 8px 5px;background:#2a160e}
+.rec small{font:700 9px/1 var(--display);letter-spacing:.14em;text-transform:uppercase;color:var(--dim)}
+.rec b{font:400 16px/1 var(--num);color:var(--chalk)}
 </style>
 </head>
 <body>
@@ -56,10 +62,15 @@ body{background:#120a06;color:var(--chalk);font-family:var(--display);overflow:h
 <h1 class="sr">Temperance Lanes</h1>
 <p class="sr">A bowling roguelike</p>
 <nav class="ui" aria-label="Play">
+  <div class="rec" id="rec" hidden></div>
   <a class="play" id="play" href="labs/advancing-ten-pin/">Play</a>
   <div class="links"><a class="labs" id="fresh" href="labs/advancing-ten-pin/?new=1" hidden>New run</a><a class="labs" href="labs/">Labs</a></div>
 </nav>
 <script>
+// records kept by the game (advten-progress): furthest game, best ball, best run total
+try{const P=JSON.parse(localStorage.getItem('advten-progress')||'null'),r=P&&P.rec;if(r&&r.game){const e=document.getElementById('rec');
+  e.innerHTML=[['Game',r.game],['Ball',r.ball],['Run',r.run]].map(([l,v])=>`<span><small>${l}</small><b>${v}</b></span>`).join('');
+  e.setAttribute('aria-label',`Records: furthest game ${r.game}, best ball ${r.ball}, best run ${r.run}`);e.setAttribute('role','img');e.hidden=false;}}catch(e){}
 // a run in progress (saved by the game at each ball and in the shop): the button says where it stands
 try{const d=JSON.parse(localStorage.getItem('advten-save')||'null');if(d&&d.run){const n=d.run.game+1;document.getElementById('play').textContent=`Continue · game ${n} of 12`;
   // New run beside Labs: a second tap confirms, then the game opens with ?new=1 and drops the save

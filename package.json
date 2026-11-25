@@ -17,7 +17,8 @@
     "advancing-run-bot": "node tools/advancing-run-bot.js",
     "powers-bot": "node tools/advancing-powers-bot.js",
     "save-test": "node tools/advancing-save-test.js",
-    "tips-test": "node tools/advancing-tips-test.js"
+    "tips-test": "node tools/advancing-tips-test.js",
+    "progress-test": "node tools/progress-test.js"
   },
   "devDependencies": {
     "@napi-rs/canvas": "^1.1.1",

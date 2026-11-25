@@ -1,6 +1,6 @@
 // Advancing Ten-Pin first-time tips (advten-tips): walks a first run through the real page code and checks
 // that each moment fires once, that the flags survive a reload (and a new run), that Tips again replays them,
-// that ?tips=off and the bots' default skip them, that ?gate=on opens the first shops one tray at a time, and that tips never touch the run save.
+// that ?tips=off and the bots' default skip them, and that tips never touch the run save.
 // Touch input is not covered: taps are jsdom clicks and direct calls. usage: node tools/advancing-tips-test.js
 const {JSDOM,VirtualConsole}=require('jsdom');const fs=require('fs');
 const html=fs.readFileSync(require('path').join(__dirname,'../labs/advancing-ten-pin/index.html'),'utf8');
@@ -87,23 +87,12 @@ let fails=0;const ok=(name,cond,extra)=>{console.log((cond?'ok   ':'FAIL ')+name
   // ---- ?tips=reset clears on load ----
   {const C=open('?tips=reset',A.store());await wait(200);ok('?tips=reset clears flags on load',C.ev('Object.keys(TIPS.seen).length')<=1&&!C.ev('TIPS.off'),C.ev('JSON.stringify(TIPS.seen)'));}
 
-  // ---- ?tips=off: no moments, no labels, the full shop even with ?gate=on ----
-  {const D=open('?tips=off&gate=on');await wait(200);D.ev(PLAY);D.ev('play(2)');D.ev("run.target=1;g.frames[0].balls.push(500);play(1);$('winNext').click()");
+  // ---- ?tips=off: no moments, no labels, the full shop ----
+  {const D=open('?tips=off');await wait(200);D.ev(PLAY);D.ev('play(2)');D.ev("run.target=1;g.frames[0].balls.push(500);play(1);$('winNext').click()");
     ok('?tips=off: no flags, no moments',D.ev("Object.keys(TIPS.seen).length===0&&localStorage.getItem('advten-tips')===null"));
     ok('?tips=off: the full shop (pins, reroll, powers)',D.ev("!$('shop').querySelector('.ptray').hidden&&!$('shopReroll').hidden&&run.offers.some(o=>o.kind==='pin')"));}
 
-  // ---- ?gate=on: the first shops one tray at a time ----
-  {const E=open('?tips=on&gate=on');await wait(200);E.ev(PLAY);
-    const visible=`run.offers.filter(o=>!o.bought).every(o=>{const b=[...document.querySelectorAll('#shop .offer')].find(b=>b.getAttribute('aria-label').startsWith(o.name+','));return b&&b.offsetParent!==null||!b.closest('[hidden]');})`;
-    const noHidden=`run.offers.every(o=>o.kind==='pow'?true:o.kind==='pin'?!$('shop').querySelector('.ptray').hidden:o.kind==='ball'?!$('shopBallTray').hidden:!$('shopGearTray').hidden)`;
-    const shop=()=>{E.ev("run.target=1;g.frames[0].balls.push(500);play(1);$('winNext').click()");return JSON.parse(E.ev(`JSON.stringify({n:TIPS.shops,kinds:[...new Set(run.offers.map(o=>o.kind))].sort().join(' '),pows:run.offers.filter(o=>o.kind==='pow').map(o=>o.t),pins:run.offers.filter(o=>o.kind==='pin').map(o=>o.t),pinTray:!$('shop').querySelector('.ptray').hidden,reroll:!$('shopReroll').hidden,noHidden:${noHidden}})`));};
-    const leave=()=>E.ev("run.bought=true;skipAsk=true;$('shopNext').click();if(!$('intro').hidden)$('introGo').click()");
-    let s=shop();ok('gate visit 1: Powers only, starter five',s.n===1&&s.kinds==='pow'&&!s.pinTray&&!s.reroll&&s.pows.every(k=>['quick','head','spark','rent','slow'].includes(k))&&s.noHidden,JSON.stringify(s));
-    E.ev("run.cash=20;showShop()");ok('gate visit 1: the leave guard only counts offers on show',E.ev("run.offers.every(o=>o.kind==='pow')"));
-    leave();s=shop();ok('gate visit 2: Powers and Pins (Runner, Anchor, Crown), no reroll',s.n===2&&s.kinds==='pin pow'&&s.pinTray&&!s.reroll&&s.pins.every(k=>['runner','anchor','crown'].includes(k))&&s.noHidden,JSON.stringify(s));
-    leave();s=shop();ok('gate visit 3: plus Reroll; no balls or gear yet',s.n===3&&s.kinds==='pin pow'&&s.reroll&&s.noHidden,JSON.stringify(s));
-    E.ev("run.cash=30;$('shopReroll').click()");ok('gate visit 3: reroll stays inside the gated pools',E.ev("run.offers.filter(o=>o.kind==='pow').every(o=>!['shield'].includes(o.t))&&run.offers.every(o=>o.kind==='pin'||o.kind==='pow')"));
-    leave();s=shop();ok('gate visit 4: the full shop',s.n===4&&/pin pow/.test(s.kinds)&&s.reroll,JSON.stringify(s));}
+  // (the shop opening up over runs moved from ?gate=on to advten-progress: tools/progress-test.js)
 
   // ---- tips never touch the run save ----
   {const F=open('?tips=on');await wait(200);F.ev(PLAY);F.ev('play(2)');const G2=open('?tips=off');await wait(200);G2.ev(PLAY);G2.ev('play(2)');

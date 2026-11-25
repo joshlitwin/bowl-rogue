@@ -1,6 +1,6 @@
 # State of the design
 
-Last updated 21 November 2026.
+Last updated 24 November 2026.
 
 ## What exists
 - **Five-Pin Run** (`game/`): six games of three frames, three balls a frame. The rack of five pins is the build: each spot holds a pin type with a trigger effect, and a ball scores (points of pins that fell) × Mult. A shop after each won game sells pins and gear. The hall changes a little every game and goes "After Close" at game 4.
@@ -245,6 +245,15 @@ Ball shelf (branch `shop/ball-shelf-levels`, included here): the whole shelf res
 Josh: balls bounced off the gutter, the active ball was unclear, the house ball wasn't red in later looks; run 9 hit Sweep bar as a wall. Then the nine agent players ran again (results in the playtest doc and `docs/design/playtest-fixes/`): round-1 exploits closed; two Rent-on-Anchor builds won every simulated run; Flat rate and Cold lane locked whole builds out; Short line walled unbuilt racks at game 3; Sweep bar stopped mattering.
 Done: gutter drop for a free ball; house ball red everywhere; ball icons from the lane sprite; swap button shows both balls and saves the choice; Sweep bar once after ball 5 (Josh: fine if only strong builds pass it); two Crowns count; true Quick growth numbers per pin; Head start text; full-pin message; Tentacle reopen and first-ball replays exact; log rows not doubled. Tuning Josh approved: all Rent together pays at most +8 a ball; Flat rate counts multipliers half; Cold lane caps growth at x3; Bolted rack pins fall to a very hard hit (boltK 300); level-1 pool is Rising tentacle, Pin quota, Flat rate, Cold lane (Short line moved later); targets 70 85 90 / 115 135 140 / 200 250 290 / 320 400 480.
 Teaching follow-up (branch `teach/round-2`): first early win explains the end; "break-through" gone from player text; Shield arc on the lane; tap the game dots for the target ladder; Toll power renamed Fare; one live tab. Opening rack stays fixed by Josh's choice. Open: dead pieces; whether the existing advance and red-line tips land for a real player (Josh replays with Tips again).
+
+## Progress from run to run (24 November, branch `progress/run-to-run`)
+From the progression research and Josh's answers (details, pacing and screenshots: `docs/design/progress/`). Rules, numbers and the throw are unchanged; bots run with the whole shop open.
+- A first run gets a starter shop: five powers (Quick growth, Head start, Spark, Rent, Slow) and three pins (Runner, Anchor, Crown). The other 29 pieces (including Reroll, every ball and every gear) open in a fixed order, two pips each, when a run ends.
+- Pips: each boss met for the first time 1, beaten for the first time 1, each level reached for the first time 1, the first full-run win 3, plus growing steps of lifetime points, pins knocked down, strikes and cash. A first run to game 4 opens about three pieces; the whole shop is open after about 15 runs.
+- Records (game reached, best ball, best run total) on the run-over screen (new bests lit) and over Play on the cover. The run-over screen shows the pieces the run opened and pips toward the next (tap for what counted).
+- Boss wall under the target ladder: faint until met, chalk once met, coloured once beaten.
+- **All pieces** switch in the Your rack sheet's header. Stored in `advten-progress`, apart from the run save; `?gate=on` is gone. League ranks skipped and starting kits parked, per Josh.
+- Fixed: the hidden target ladder showed as an empty box at the top of the lane and over every sheet.
 
 ## Next
 Josh plays Advancing Ten-Pin with powers and pastes logs. Check: does he build one pin up or spread powers; does Shield earn its place (bots say no); is the cap of 32 the right ceiling; is the bottom of level 1 still where runs end. Before powers: did the best throw change between balls; did he leave pins to grow on purpose; did each boss hurt the way he played. The fix list in `docs/IDEATION.md` (level-up versus replace, dead pieces) still stands.

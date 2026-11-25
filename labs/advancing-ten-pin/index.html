@@ -478,6 +478,7 @@ img.bp{flex:none;width:auto;height:52px;image-rendering:pixelated}
 .pinfo.callout img.gear{flex:none;width:33px;height:33px;image-rendering:pixelated}
 /* the run's twelve targets, opened from the game dots at the top: a level a row, its boss last */
 #ladder{position:absolute;z-index:6;top:6px;left:50%;transform:translateX(-50%);display:grid;gap:4px;padding:8px 10px;background:var(--ink);color:var(--chalk);border:2px solid var(--chalk);border-radius:6px;box-shadow:0 4px 0 rgba(0,0,0,.5);font-family:var(--num);font-size:14px}
+#ladder[hidden]{display:none}   /* the ladder's own display:grid had kept an empty box showing over the lane and every sheet */
 #ladder span{display:grid;grid-template-columns:repeat(3,44px) auto;gap:4px;align-items:center}
 #ladder b{font-weight:400;text-align:center;padding:2px 0;border:2px solid var(--dim);border-radius:3px}
 #ladder b.boss{border-color:var(--go)}
@@ -565,6 +566,45 @@ img.bp{flex:none;width:auto;height:52px;image-rendering:pixelated}
 #rackMsg img.bp{display:none}
 #shop .tray[hidden],#shopReroll[hidden],#rackTips[hidden]{display:none}
 #shop .box{position:relative}
+/* ---------- progress on the run-over screen: records, the pieces this run opened, pips toward the next ---------- */
+#over.sheet .deck{flex:1 1 auto;height:auto;min-height:100px}
+.orec{flex:none;display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.orec span{display:flex;flex-wrap:wrap;justify-content:center;align-items:baseline;column-gap:5px;row-gap:3px;padding:4px 2px 5px;border-radius:6px;background:var(--ink);color:var(--chalk);border:2px solid var(--ink)}
+.orec small{flex:1 0 100%;text-align:center}
+.orec small{font:700 9px/1 var(--display);letter-spacing:.12em;text-transform:uppercase;color:var(--dim)}
+.orec b{font:400 18px/1 var(--num)}
+.orec i{font:400 10px/1 var(--display);font-style:normal;color:var(--dim);padding:2px 3px}
+.orec span.new{border-color:#ffd866}.orec span.new b{color:#ffd866}.orec span.new i{color:var(--ink);background:#ffd866;border-radius:3px;font-weight:700;letter-spacing:.08em;text-transform:uppercase}
+@media (prefers-reduced-motion:no-preference){.orec span.new{animation:best 1.1s steps(2) 3}}
+@keyframes best{50%{border-color:var(--ink)}}
+.oprog{padding:11px 6px 6px}.oprog[hidden]{display:none}
+#overNew{display:flex;align-items:center;gap:6px}
+#overNew button{position:relative;flex:none;width:44px;height:42px;display:grid;place-items:center;padding:0;border-radius:6px;border:2px solid var(--dim);background:var(--panel)}
+#overNew button.fresh{border-color:#ffd866;box-shadow:0 0 0 2px rgba(255,216,102,.25)}
+#overNew button.on{border-color:var(--chalk);background:var(--ink)}
+#overNew button img{image-rendering:pixelated;width:15px;height:30px}#overNew button img.gear,#overNew button img.bd{width:26px;height:26px}#overNew button img.bd{height:17px}
+#overNew button .ro{font:400 22px/1 var(--display);color:var(--chalk)}
+#overNew button em{position:absolute;top:-8px;left:50%;transform:translateX(-50%);font:700 8px/1 var(--display);letter-spacing:.1em;text-transform:uppercase;font-style:normal;padding:2px 3px;border-radius:3px;background:#ffd866;color:var(--ink)}
+#overNew .next{flex:1 1 auto;min-width:70px;width:auto;display:flex;justify-content:flex-start;gap:8px;padding:0 8px;border-style:dashed}
+#overNew .next .q{flex:none;width:28px;height:28px;display:grid;place-items:center;border-radius:4px;background:var(--ink);color:var(--dim);font:400 16px/1 var(--num)}
+#overNew .pips{display:flex;gap:4px}
+#overNew .pips i{width:11px;height:11px;border-radius:2px;border:2px solid var(--dim)}
+#overNew .pips i.on{background:var(--dim)}#overNew .pips i.now{background:#ffd866;border-color:#ffd866}
+#overNew .done{font:400 11px/1 var(--display);color:var(--dim)}
+/* the boss wall under the target ladder: dark until met, outlined when met, lit when beaten */
+#ladder .wall{display:flex;justify-content:space-between;gap:3px;padding-top:6px;margin-top:2px;border-top:2px solid #3a2418}
+#ladder .wall img{width:22px;height:22px;image-rendering:pixelated;border-radius:3px}
+#ladder .wall img.dark{box-shadow:0 0 0 2px #3a2418}
+#ladder .wall img.met{box-shadow:0 0 0 2px var(--dim)}
+#ladder .wall img.lit{box-shadow:0 0 0 2px var(--go),0 0 6px 1px rgba(255,216,102,.55)}
+/* the "All pieces" switch in the rack sheet's header */
+#rackAll{flex:none;display:flex;align-items:center;gap:5px;padding:4px 7px;border:2px solid var(--dim);border-radius:4px;background:transparent;color:var(--dim);font:400 12px/1 var(--display);white-space:nowrap}
+#rackAll i{width:10px;height:10px;border:2px solid currentColor;border-radius:2px}
+#rackAll[aria-pressed="true"]{color:var(--chalk);border-color:var(--chalk)}#rackAll[aria-pressed="true"] i{background:var(--accent);border-color:var(--accent)}
+#rackTips{margin-left:auto}#rackTips[hidden]+#rackAll{margin-left:auto}#rackTips.ask+#rackAll{display:none}#rackTips+#rackAll{margin-left:0}
+/* with Tips again showing too, both buttons and the title tighten to stay on one line */
+#rackSheet .shead.two{gap:6px}#rackSheet .shead.two #rackTips,#rackSheet .shead.two #rackAll{padding:4px 5px;font-size:11px}#rackSheet .shead.two #rackAll{gap:4px}#rackSheet .shead.two #rackAll i{width:9px;height:9px}
+@media (max-width:380px){#rackSheet .shead.two h2{font-size:17px;letter-spacing:.02em}}
 </style>
 </head>
 <body data-stage="rec">
@@ -602,6 +642,8 @@ img.bp{flex:none;width:auto;height:52px;image-rendering:pixelated}
   <div class="shead"><h2 id="overTitle"></h2><b class="chip" id="overCash"></b></div>
   <div class="track" id="overTrack"></div>
   <div class="strip" id="overMsg" aria-live="polite"></div>
+  <div class="orec" id="overRec"></div>
+  <div class="tray oprog" id="overProg"><span class="ttag">Pro shop</span><div id="overNew"></div></div>
   <div class="deck"><div class="rackmap" id="overMap"></div><div class="shelf" id="overGear"></div></div>
   <div class="row"><button id="overLog" type="button">Results log</button><button class="main" id="again" type="button">New run</button></div>
 </div></div>
@@ -615,7 +657,7 @@ img.bp{flex:none;width:auto;height:52px;image-rendering:pixelated}
   <div class="row"><button id="shopNew" type="button">New run</button><button class="main" id="shopNext" type="button"></button></div>
 </div></div>
 <div class="sheet" id="rackSheet" hidden><div class="box">
-  <div class="shead"><h2 id="rackTitle"></h2><button id="rackTips" type="button">Tips again</button><b class="chip" id="rackCash"></b></div>
+  <div class="shead"><h2 id="rackTitle"></h2><button id="rackTips" type="button">Tips again</button><button id="rackAll" type="button" aria-pressed="false"><i></i>All pieces</button><b class="chip" id="rackCash"></b></div>
   <div class="bgrid"><div id="rackGrid"></div><div class="shelf" id="rackGear"></div></div>
   <div class="btot" id="rackPows"></div>
   <div class="strip" id="rackMsg" aria-live="polite"></div>
@@ -1020,11 +1062,11 @@ function scoreBall(fell,left,fresh){const cleared=left.length===0&&fell.length>0
   if(cleared&&!strike)run.rack.forEach(it=>{if(it.t==='sweep'){m+=it.lv;notes.push('Sweeper +'+it.lv);}});
   if(strike)run.rack.forEach(it=>{if(it.t==='crown'){m*=1+.5*it.lv;notes.push('Crown ×'+(1+.5*it.lv));}});
   return{pts,m,score:Math.round(pts*m),strike,cleared,notes};}
-function newRun(){runNo++;run=null;const rs=(Math.random()*4294967296)>>>0;run={rs,n:runNo,game:0,target:TARGETS[0],cash:0,hook:null,rack:[0,1,2,3,4,5,6,7,8,9].map(()=>newItem('plain')),layout:'standard',seen:[],ballStock:[],nextLayout:null,layoutOpts:[],layoutPaid:0,gear:{},ball:'house',bosses:[],offers:[],rerolls:0,thrown:false,tips:0};run.bosses=pickBosses();applyKit();stage='rec';fx=null;setChrome('rec');startGame();}
+function newRun(){if(run&&!run.done&&run.tot&&run.tot.balls)progCommit(run,false);runNo++;run=null;const rs=(Math.random()*4294967296)>>>0;run={rs,n:runNo,game:0,target:TARGETS[0],cash:0,hook:null,rack:[0,1,2,3,4,5,6,7,8,9].map(()=>newItem('plain')),layout:'standard',seen:[],ballStock:[],nextLayout:null,layoutOpts:[],layoutPaid:0,gear:{},ball:'house',bosses:[],offers:[],rerolls:0,thrown:false,tips:0};run.bosses=pickBosses();run.p0=pipSrc(PROG);runTot();applyKit();stage='rec';fx=null;setChrome('rec');startGame();}
 function tgtOf(i){return TARGETS[i];}
 function startGame(){run.target=tgtOf(run.game);run.tips=0;
   if(OPT.layout&&run.game>0)run.layout=run.nextLayout||randLayout();run.nextLayout=null;run.layoutPaid=0;
-  BOSS=bossOf(run.game);RACK=layoutSpots(run.layout,run.rack.length);run.offerNote=run.seen.join(' / ');run.seen=[];
+  BOSS=bossOf(run.game);RACK=layoutSpots(run.layout,run.rack.length);if(BOSS)progMark('met',lvlBoss(run.game));if(run.game%3===0&&run.game>0)progMark('lv',run.game/3+1);run.offerNote=run.seen.join(' / ');run.seen=[];
   const sr=startRange(),sx0=clamp(180,sr[0],sr[1]);
   g={bx:180,zoneAt:.2,ready:false,t0:performance.now(),pend:null,frame:0,pops:[],live:0,frames:Array.from({length:12},()=>({balls:[],marks:[]})),chain:0,netUsed:false,pins:boardStart(run.rack),lastLine:null,breaks:0,rackBalls:0,sx:sx0,ex:180,bend:0,power:1,phase:.5,mode:'aim',sim:null,trail:[],intended:null,err:0,toast:null,toastT:0,wait:0,stopped:0};
   ['over','win','shop','rackSheet','log','intro'].forEach(id=>$(id).hidden=true);if(BOSS&&BOSS.tent){BOSS.tent={c:[-1,0,1][Math.floor(rng()*3)],k:0};BOSS.posts=[{x:colX(BOSS.tent.c),y:rowY(0),r:13}];g.pins=boardStart(run.rack).filter(p=>Math.hypot(p.x-BOSS.posts[0].x,p.y-BOSS.posts[0].y)>=40);g.pins=g.pins.concat(refill(g.pins,run.rack.filter(it=>!g.pins.some(p=>p.item===it))));}   // the displaced pins come back as themselves
@@ -1072,7 +1114,7 @@ function throwBall(){if(g.mode!=='aim')return;
   g.stopped=n;g.zoneAt=z;g.err=eff;g.intended=makePath(g.sx,g.ex,g.bend);
   const path=makePath(g.sx,g.ex+eff*70,g.bend);
   let clean=null;if(eff!==0){const cp=g.pins.map(q=>Object.assign({},q)),cs=newSim(cp,g.intended,1,g.bend/90);let k=0;while(!cs.done&&k++<2500)tick(cs);clean=cp.filter(q=>q.down).length;}
-  g.pend={clean,ms,run:run.n,game:run.game+1,target:run.target,frame:g.frame+1,ball:g.frames[g.frame].balls.length+1,start:Math.round(g.sx-180),aim:Math.round(g.ex-180),bend:Math.round(g.bend),needle:+n.toFixed(2),drift:Math.round(eff*70),hz:+needleHz().toFixed(2),setup:+((performance.now()-g.t0)/1000).toFixed(1),standing:g.pins.length,rack:boardText(g.pins),ten:rackText(),cash:run.cash,ball:run.ball,value:g.pins.reduce((a,p)=>a+p.v,0),hot:g.pins.filter(p=>p.k===LK()).length,moved:g.lastLine?Math.round(Math.abs(g.sx-g.lastLine[0])+Math.abs(g.ex-g.lastLine[1])+Math.abs(g.bend-g.lastLine[2])/2):'',gear:gearNames().replace(/, /g,' + '),cam:T.cam,level:Math.floor(run.game/3)+1,kind:kindName(run.game),boss:BOSS?BOSS.name:'',layout:LAYOUTS[run.layout].name,offers:g.frame===0&&g.frames[0].balls.length===0?run.offerNote||'':''};
+  g.pend={clean,ms,run:run.n,game:run.game+1,target:run.target,frame:g.frame+1,ball:g.frames[g.frame].balls.length+1,start:Math.round(g.sx-180),aim:Math.round(g.ex-180),bend:Math.round(g.bend),needle:+n.toFixed(2),drift:Math.round(eff*70),hz:+needleHz().toFixed(2),setup:+((performance.now()-g.t0)/1000).toFixed(1),standing:g.pins.length,rack:boardText(g.pins),ten:rackText(),cash:run.cash,ball:run.ball,value:g.pins.reduce((a,p)=>a+p.v,0),hot:g.pins.filter(p=>p.k===LK()).length,moved:g.lastLine?Math.round(Math.abs(g.sx-g.lastLine[0])+Math.abs(g.ex-g.lastLine[1])+Math.abs(g.bend-g.lastLine[2])/2):'',gear:gearNames().replace(/, /g,' + '),cam:T.cam,level:Math.floor(run.game/3)+1,kind:kindName(run.game),boss:BOSS?BOSS.name:'',layout:LAYOUTS[run.layout].name,open:progAll()?'all':PROG.open,offers:g.frame===0&&g.frames[0].balls.length===0?run.offerNote||'':''};
   tipEnd();tipMark('throw');g.lastLine=[g.sx,g.ex,g.bend];g.sim=newSim(g.pins,path,1,g.bend/90);g.trail=[];g.mode='roll';run.thrown=true;saveRun('thrown');g.rackBalls++;
   setBtn();hint();}
 $('throw').addEventListener('click',throwBall);
@@ -1087,10 +1129,11 @@ function chip(n){const w=n.split(' '),k=NK[w[0]],v=/^[+×]/.test(w[w.length-1])?
   return `<span class="${!k||NM[k]?'mu':k==='tip'?'ca':'pt'}">${k?`<img src="${icon(k)}" alt="${w[0]}">`:w[0]+' '}${v}</span>`;}
 function resolve(){g.live=0;const fell=g.pins.filter(p=>p.down),left=g.pins.filter(p=>!p.down),r=scoreAdv(fell,left,run.gear,{chain:g.chain||0,ball:g.frame+1,max:ballsLeftMax(),sweep:run.ball==='sweep'});
   g.chain=r.strike?(g.chain||0)+1:0;
-  if(r.cash){const c=Math.min(r.cash,3-run.tips);if(c>0){run.tips+=c;run.cash+=c;topBar();}}
+  if(r.cash){const c=Math.min(r.cash,3-run.tips);if(c>0){run.tips+=c;run.cash+=c;runTot().cash+=c;topBar();}}
   const post0=BOSS&&BOSS.tent&&BOSS.posts&&BOSS.posts[0]?Object.assign({},BOSS.posts[0]):null;   // where the tentacle stood, so its advance can be drawn
   const sofar=total()+r.score,last=g.frame>=ballsLeftMax()-1||sofar>=run.target&&run.target>0,bctx=last?null:{gear:run.gear,netUsed:g.netUsed,rush:run.ball==='rush',brake:run.ball==='brake'&&!g.brakeUsed,toll:run.ball==='toll',seed:run.ball==='seed',strike:r.strike},st=last?null:advance(left,fell,null,g.frame+1,bctx);if(bctx&&bctx.brake)g.brakeUsed=true;if(st&&st.netUsed){g.netUsed=true;r.notes.push('Net');}
   const cost=st?st.cost:0,net=r.score-cost;
+  {const T=runTot();T.pts+=net;T.pins+=fell.length;T.strikes+=r.strike?1:0;T.best=Math.max(T.best,net);T.balls++;}
   const f=g.frames[g.frame];f.balls.push(net);f.marks.push(r.strike?'X':fell.length?String(fell.length):'-');
   const head=g.sim.ball.gutter&&!fell.length?'Gutter':r.strike?'Strike!':fell.length?'':'Nothing';   // a ball that scores and then rolls off the lane isn't a gutter ball
   g.toast=r.score||cost?'x':null;toastEl.className='toast';
@@ -1152,15 +1195,39 @@ function drawTL(k,cx,cy){const x0=cx-8,y0=cy-5,R=(x,y,w,h,c)=>{k.fillStyle=c;k.f
   for(const [c,o] of [['#c9a878',1],['#d83a2a',0]]){R(o,o,9,3,c);R(3+o,3+o,3,8,c);R(10+o,o,3,11,c);R(13+o,8+o,4,3,c);}}
 $('winNext').addEventListener('click',()=>{$('win').hidden=true;showShop();tipsShop();});
 function endGame(){const t=total(),won=t>=run.target,final=run.game===TARGETS.length-1;
-  if(won&&!final){const extra=Math.min(4,g.left||0),earn=PAY[run.game%3]+extra;run.cash+=earn;run.rerolls=0;run.bought=false;topBar();tipsShopVisit();if(TOPT.rings)run.changed=[];rollOffers();
+  if(won&&BOSS)progMark('beat',lvlBoss(run.game));
+  if(won&&!final){const extra=Math.min(4,g.left||0),earn=PAY[run.game%3]+extra;run.cash+=earn;runTot().cash+=earn;run.rerolls=0;run.bought=false;topBar();tipsShopVisit();if(TOPT.rings)run.changed=[];rollOffers();
     run.pay={t,target:run.target,extra,earn,base:PAY[run.game%3],fresh:true,left:g.left||0};pending=null;sel=null;gsel=null;showWin();return;}
   $('overTitle').textContent=won?'Run complete':'Run over';$('overCash').textContent='$'+run.cash;
   $('overTrack').innerHTML=TARGETS.map((v,i)=>`<span class="${i<run.game||(won&&i===run.game)?'won':i===run.game?'lost':''}">${tgtOf(i)}</span>`).join('');
-  run.end={t,target:run.target};osel=null;ogsel=null;showOver();}
+  run.end={t,target:run.target,prog:progCommit(run,won)};osel=null;ogsel=null;oprog=null;showOver();}
 let osel=null,ogsel=null;
 function showOver(){$('over').hidden=false;clearSave();drawMap($('overMap'),i=>{osel=osel===i?null:i;ogsel=null;showOver();},osel);
   drawGear($('overGear'),k=>{ogsel=ogsel===k?null:k;osel=null;showOver();},ogsel);
-  const m=$('overMsg');m.className='strip'+(osel===null&&!ogsel?' tally big':'');m.innerHTML=osel!==null?pinInfo(osel):ogsel?gearInfo(ogsel):`<b>${run.end.t}<small> / ${run.end.target}</small></b>`;}
+  const m=$('overMsg'),pr=run.end.prog;m.className='strip'+(osel===null&&!ogsel&&!oprog?' tally big':'');
+  m.innerHTML=osel!==null?pinInfo(osel):ogsel?gearInfo(ogsel):oprog==='next'?pipInfo(pr):oprog==='more'?`<div><h3>Also new<small>${pr.fresh.length} pieces</small></h3><p>${pr.fresh.slice(3).map(pieceName).join(' · ')}</p></div>`:oprog?pieceInfo(oprog):`<b>${run.end.t}<small> / ${run.end.target}</small></b>`;
+  overProg(pr);}
+// records: this run's figure, the best beside it; a new best is lit and flashes
+function overProg(pr){const R=$('overRec'),P=$('overProg'),N=$('overNew');if(!pr){R.innerHTML='';P.hidden=true;return;}
+  R.innerHTML=[['game','Game'],['ball','Ball'],['run','Run']].map(([k,l])=>`<span class="${pr.nb[k]?'new':''}"><small>${l}</small><b>${pr.this[k]}</b><i>${pr.nb[k]?'Best':'best '+pr.was[k]}</i></span>`).join('');
+  R.setAttribute('aria-label',`Game ${pr.this.game}, best ${PROG.rec.game}. Best ball ${pr.this.ball}, best ${PROG.rec.ball}. Run total ${pr.this.run}, best ${PROG.rec.run}.`);
+  // the pieces this run opened (tap: what it does), then the next piece's pips; this run's pips are lit
+  P.hidden=progAll()&&!pr.fresh.length;const key=f=>f[0]+':'+f[1];
+  const show=pr.fresh.length>4?pr.fresh.slice(0,3):pr.fresh,more=pr.fresh.length-show.length;
+  N.innerHTML=show.map(f=>`<button type="button" class="fresh${oprog===key(f)?' on':''}" data-k="${key(f)}" aria-label="New in the shop: ${pieceName(f)}"><em>New</em>${pieceImg(f)}</button>`).join('')
+    +(more?`<button type="button" class="fresh more${oprog==='more'?' on':''}" data-k="more" aria-label="${more} more new pieces"><em>New</em><span class="ro">+${more}</span></button>`:'')
+    +(pr.need?`<button type="button" class="next${oprog==='next'?' on':''}" data-k="next" aria-label="Next piece: ${pr.have} of ${pr.need}"><span class="q">?</span><span class="pips">${Array.from({length:pr.need},(_,i)=>`<i class="${i<pr.have?(i>=pr.have-Math.min(pr.have,pr.gained)?'now':'on'):''}"></i>`).join('')}</span></button>`
+      :`<span class="done">Every piece is open</span>`);
+  N.querySelectorAll('button').forEach(b=>b.addEventListener('click',()=>{const k=b.dataset.k;oprog=oprog===k?null:k;osel=null;ogsel=null;showOver();}));}
+let oprog=null;
+const pieceName=([kind,k])=>kind==='pin'?PINS[k].name:kind==='pow'?POWERS[k].name:kind==='ball'?BALLOFFERS[k].name:kind==='gear'?GEAR[k].name:'Reroll';
+function pieceImg([kind,k]){return kind==='pin'?`<img src="${iconOf(newItem(k))}" alt="">`:kind==='pow'?pwImg(k):kind==='ball'?`<img class="gear" src="${bicon(k)}" alt="">`:kind==='gear'?`<img class="gear" src="${gicon(k)}" alt="">`:'<span class="ro">⟳</span>';}
+function pieceInfo(key){const [kind,k]=key.split(':'),tag=['Pin','Power','Ball','Gear','Shop'][['pin','pow','ball','gear','shop'].indexOf(kind)];
+  const text=kind==='pin'?PINS[k].text(1):kind==='pow'?POWERS[k].text(1):kind==='ball'?BALLOFFERS[k].text:kind==='gear'?GEAR[k].text:'New pins and powers in the shop, for a little cash.';
+  return `${kind==='pin'?pinPic(newItem(k),36):pieceImg([kind,k])}<div><h3>${short(pieceName([kind,k]))}<small>${tag}</small></h3><p>${rich(text)}</p></div>`;}
+// what this run's pips came from
+function pipInfo(pr){const NM={met:'Boss met',beat:'Boss beaten',lv:'New level',win:'Run won',pts:'Points',pins:'Pins down',strikes:'Strikes',cash:'Cash'},g=Object.keys(pr.got);
+  return `<div><h3>Next piece<small>${pr.have} of ${pr.need}</small></h3><p>${g.length?g.map(k=>`${NM[k]} <b>+${pr.got[k]}</b>`).join(' · '):'Bosses, levels and your lifetime points, pins, strikes and cash fill these.'}</p></div>`;}
 $('again').addEventListener('click',newRun);
 
 // ---------- shop and rack ----------
@@ -1202,10 +1269,11 @@ function rollPins(){const gt=gate(),pins=Object.keys(PINS).filter(k=>k!=='plain'
 function composeOffers(){run.offers=(run.pinOffers||[]).concat(run.powOffers||[],run.ballOffers||[],run.gearOffer?[run.gearOffer]:[]);}
 // a new shop: pins rolled; balls stay on the shelf for a level (two at a time, a bought one replaced) and the whole shelf restocks after each boss; one piece of gear, new each shop, not refilled
 function rollOffers(){const gt=gate();if(run.game%3===2)run.ballStock=[];
-  if(gt){run.ballOffers=[];}else if(OPT.balls){const pool=Object.keys(BALLOFFERS).filter(k=>k!==run.hook&&!run.ballStock.includes(k));while(run.ballStock.length<2&&pool.length)run.ballStock.push(pickOut(pool));
+  if(gt)run.ballStock=run.ballStock.filter(k=>gt.ball.includes(k));
+  if(OPT.balls){const pool=Object.keys(BALLOFFERS).filter(k=>k!==run.hook&&!run.ballStock.includes(k)&&(!gt||gt.ball.includes(k)));while(run.ballStock.length<2&&pool.length)run.ballStock.push(pickOut(pool));
     run.ballOffers=run.ballStock.map(k=>({kind:'ball',t:k,name:BALLOFFERS[k].name,text:BALLOFFERS[k].text,cost:BALLOFFERS[k].cost,bought:false}));}else run.ballOffers=[];
-  const gear=Object.keys(GEAR).filter(k=>!run.gear[k]&&!(OPT.balls&&k==='big'));
-  run.gearOffer=gt?null:gear.length?(k=>({kind:'gear',t:k,name:GEAR[k].name,text:GEAR[k].text,cost:GEAR[k].cost,bought:false}))(pickOut(gear)):null;
+  const gear=Object.keys(GEAR).filter(k=>!run.gear[k]&&!(OPT.balls&&k==='big')&&(!gt||gt.gear.includes(k)));
+  run.gearOffer=gear.length?(k=>({kind:'gear',t:k,name:GEAR[k].name,text:GEAR[k].text,cost:GEAR[k].cost,bought:false}))(pickOut(gear)):null;
   if(OPT.layout){const a=randLayout(),b=randLayout([a]),c=randLayout([a,b]);run.layoutOpts=[{id:a,cost:0},{id:b,cost:LAYCOST},{id:c,cost:LAYCOST}];run.nextLayout=a;run.layoutPaid=0;
     run.seen.push('next rack: '+LAYOUTS[a].name+' free; '+LAYOUTS[b].name+' $'+LAYCOST+'; '+LAYOUTS[c].name+' $'+LAYCOST);}
   run.seen.push('balls: '+(run.ballOffers.map(o=>o.name+' $'+o.cost).join('; ')||'none')+' | gear: '+(run.gearOffer?run.gearOffer.name+' $'+run.gearOffer.cost:'none'));
@@ -1424,7 +1492,7 @@ function rackDiagram(id){const n=run.rack.length,W=96,H=30,X=x=>Math.round((x-60
     +at.map((p,i)=>`<rect x="${X(p.x)-d/2-1}" y="${Y(p.y)-d/2-1}" width="${d+2}" height="${d+2}" fill="var(--paper-ink)"/><rect x="${X(p.x)-d/2}" y="${Y(p.y)-d/2}" width="${d}" height="${d}" fill="${i===0?'var(--tag)':'var(--paper)'}"/>`).join('')+'</svg>';}
 function showShop(){const box=$('shop').firstElementChild,el=$('shopList'),chip=$('shopCash'),p=run.pay;$('shop').hidden=false;   // shown first, so the canvases can measure themselves
   box.classList.toggle('placing',!!pending);box.classList.remove('nudge');box.classList.toggle('tipshop',SHOPTIP==='shop');box.classList.toggle('tippick',SHOPTIP==='pick'&&!!pending);
-  {const gt=gate();box.querySelector('.ptray').hidden=!!gt&&!gt.trays.includes('pin');$('shopReroll').hidden=!!gt&&!gt.trays.includes('reroll');}const bEl=$('shopBalls'),gEl=$('shopGearBuy'),wEl=$('shopPows');[el,bEl,gEl,wEl].forEach(e=>e.innerHTML='');
+  {const gt=gate();box.querySelector('.ptray').hidden=!!gt&&!gt.pin.length;$('shopReroll').hidden=!!gt&&!gt.reroll;}const bEl=$('shopBalls'),gEl=$('shopGearBuy'),wEl=$('shopPows');[el,bEl,gEl,wEl].forEach(e=>e.innerHTML='');
   if(chip.textContent!=='$'+run.cash){chip.textContent='$'+run.cash;chip.classList.remove('bump');void chip.offsetWidth;chip.classList.add('bump');}
   if(p&&p.fresh){p.fresh=false;chip.insertAdjacentHTML('beforeend',`<span class="fly">+$${p.earn}</span>`);}
   const have=powerCounts();
@@ -1524,7 +1592,7 @@ function showRack(){const m=$('rackMsg');$('rackCash').textContent='$'+run.cash;
   drawGear($('rackGear'),k=>{rgsel=rgsel===k?null:k;rsel=null;rpw=null;showRack();},rgsel);
   m.className='strip'+(rsel===null&&!rgsel&&!rpw?' tally':'');
   $('rackSheet').classList.toggle('reading',rsel!==null);m.innerHTML=rsel!==null?pinInfo(rsel):rgsel?gearInfo(rgsel):rpw?powInfo(rpw):'<span>Pins double each ball</span><span><i>Strike</i>×2</span>';}
-function openBuild(){rsel=null;rgsel=null;rpw=null;newAsk=false;$('rackNew').textContent='New run';tipsAsk=false;$('rackTips').textContent='Tips again';$('rackTips').classList.remove('ask');$('rackTips').hidden=TIPS.off;showRack();}
+function openBuild(){allBtn();rsel=null;rgsel=null;rpw=null;newAsk=false;$('rackNew').textContent='New run';tipsAsk=false;$('rackTips').textContent='Tips again';$('rackTips').classList.remove('ask');$('rackTips').hidden=TIPS.off;showRack();}
 $('rackBtn').addEventListener('click',openBuild);
 $('rackClose').addEventListener('click',()=>$('rackSheet').hidden=true);
 
@@ -1566,13 +1634,18 @@ function peek(q){PEEK=q;const el=$('laneInfo'),cm=CAM[T.cam],s=cm.proj(q.x,q.y),
   const below=Ybot+14+h<=st.height-4,left=Math.max(6,Math.min(st.width-w-6,X-w/2));
   el.style.left=left+'px';el.style.top=(below?Ybot+12:Ytop-12-h)+'px';const a=el.querySelector('.arw');a.className='arw '+(below?'up':'dn');a.style.left=(X-left)+'px';}
 function ladder(){const el=$('ladder');if(!el.hidden){el.hidden=true;return;}
-  el.innerHTML=[0,1,2,3].map(L=>`<span>${[0,1,2].map(j=>{const i=L*3+j;return `<b class="${i<run.game?'won':i===run.game?'cur':''}${j===2?' boss':''}">${TARGETS[i]}</b>`;}).join('')}${bossImg(run.bosses[L])}</span>`).join('');el.hidden=false;}
+  el.innerHTML=[0,1,2,3].map(L=>`<span>${[0,1,2].map(j=>{const i=L*3+j;return `<b class="${i<run.game?'won':i===run.game?'cur':''}${j===2?' boss':''}">${TARGETS[i]}</b>`;}).join('')}${bossImg(run.bosses[L])}</span>`).join('')
+    +`<div class="wall" role="img" aria-label="Bosses: ${Object.keys(BOSSES).map(k=>PROG.beat[k]?BOSSES[k].name+' beaten':PROG.met[k]?BOSSES[k].name+' met':'one not met').join(', ')}">${Object.keys(BOSSES).map(k=>{const st=PROG.beat[k]?'lit':PROG.met[k]?'met':'dark';return `<img class="${st}" src="${bossWallIcon(k,st)}" alt="">`;}).join('')}</div>`;el.hidden=false;}
+// a boss on the wall: a faint shape in the dark until met; its shape in chalk once met; its own colours once beaten
+function bossWallIcon(k,st){if(st==='lit')return bossIcon(k);const key='w'+st+k;if(GLYC[key])return GLYC[key];const t=mk(9,9),q=t.getContext('2d'),G=BOSSG[k];
+  q.fillStyle=st==='dark'?'#1d100a':'#2a160e';q.fillRect(0,0,9,9);q.fillStyle=st==='dark'?'#33201a':'#c9a878';
+  for(let y=0;y<9;y++)for(let x=0;x<9;x++)if(G[y][x]!=='.')q.fillRect(x,y,1,1);return GLYC[key]=t.toDataURL();}
 $('title').addEventListener('click',e=>{e.stopPropagation();ladder();});
 document.addEventListener('pointerdown',e=>{if(!$('ladder').hidden&&e.target.id!=='title'&&!e.target.closest('#title'))$('ladder').hidden=true;},true);
 $('title').setAttribute('role','button');
 function peekOff(){if(!PEEK)return;PEEK=null;const el=$('laneInfo');el.hidden=true;el.innerHTML='';}
 
-function logText(){const sg=v=>(v>0?'+':'')+v;let t='Temperance Lanes log. Four levels of '+NAMES.join(', ')+' (small, big, boss); ten balls a game at most, ending as soon as the target is reached ($1 per ball left, up to $4). One board per game that never resets. After each ball, pins left standing advance one row toward you and double in value (1, 2, 4, 8, 16); pins that fell come back worth 1 at the back, as far back as they fit. A pin that would advance past the red line breaks through: it costs its value and comes back at the back. A strike (every pin on the board) is worth '+ADV.STRIKEX+'x. Growth: '+ADV.GROW+'. Powers: each pin has three slots; a pin shows them as letters in brackets, e.g. 0:3=8[qqh] (q Quick growth, h Head start, k Spark, l Lantern, w Slow, d Shield, b Bomb, r Rent, t Fare). No pin grows past '+ADV.CAP+'. Rows before the line: '+(ADV.LASTK+1)+' (Short line boss: 4). Bosses, one per level, drawn each run from seven (level 1 from Rising tentacle, Pin quota, Flat rate, Cold lane; no repeats): Short line (the line one row closer), Sweep bar (after ball 5: every standing pin swept off for nothing), Bolted rack (a pin hit by another pin falls only to a very hard hit), Rising tentacle (a post that rises at the back of a middle column and advances each ball; it stops the ball), Pin quota (a ball that knocks down fewer than 3 pins scores nothing), Flat rate (multipliers count half: x2 is x1.5), Cold lane (no pin grows faster than x3). Toll ball: break-throughs cost nothing. Crowd pays +1 per other standing pin, up to +6, and only one Crowd pays a ball; all Rent together pays at most +8 a ball; at most two Sparks count on one ball. Rent and Crowd pay only on a ball that knocks pins down. Your ten pins keep their type: Slow, Spark, Shield, Runner, Anchor, Glass, Bomb, Huddle, Crown, Rent, Crowd, Fare; the board lists a type by its first three letters after the value. Rack lists your ten by starting spot 1 to 10. Ball used: the house ball, or the one you bought (Big, Small, Plastic: size and weight; Rush, Brake, Toll, Sweep, Seed: the house ball with an effect on how the board advances). Positions are px from lane centre (lane edges -120/+120). Board lists each pin as column:row=value, columns -3..3 are half a pin spacing apart (34.5 px), row 0 is the back. Hot is how many pins stood on the front row (they break through unless knocked down). Moved is how far the line changed from the previous ball (start + aim + half the bend). Timing is ms early (-) or late (+); drift is how far the ball was pushed off the drawn line. Tips lists the first-time tips that fired since the previous ball (advten-tips flags: throw, advance, redline, broke, strike, early, shop, pick, pw:<power>, onlane, fx:<power>, boss:<boss>, bossgo:<boss>; tips-again when they were reset).\n';
+function logText(){const sg=v=>(v>0?'+':'')+v;let t='Temperance Lanes log. Four levels of '+NAMES.join(', ')+' (small, big, boss); ten balls a game at most, ending as soon as the target is reached ($1 per ball left, up to $4). One board per game that never resets. After each ball, pins left standing advance one row toward you and double in value (1, 2, 4, 8, 16); pins that fell come back worth 1 at the back, as far back as they fit. A pin that would advance past the red line breaks through: it costs its value and comes back at the back. A strike (every pin on the board) is worth '+ADV.STRIKEX+'x. Growth: '+ADV.GROW+'. Powers: each pin has three slots; a pin shows them as letters in brackets, e.g. 0:3=8[qqh] (q Quick growth, h Head start, k Spark, l Lantern, w Slow, d Shield, b Bomb, r Rent, t Fare). No pin grows past '+ADV.CAP+'. Rows before the line: '+(ADV.LASTK+1)+' (Short line boss: 4). Bosses, one per level, drawn each run from seven (level 1 from Rising tentacle, Pin quota, Flat rate, Cold lane; no repeats): Short line (the line one row closer), Sweep bar (after ball 5: every standing pin swept off for nothing), Bolted rack (a pin hit by another pin falls only to a very hard hit), Rising tentacle (a post that rises at the back of a middle column and advances each ball; it stops the ball), Pin quota (a ball that knocks down fewer than 3 pins scores nothing), Flat rate (multipliers count half: x2 is x1.5), Cold lane (no pin grows faster than x3). Toll ball: break-throughs cost nothing. Crowd pays +1 per other standing pin, up to +6, and only one Crowd pays a ball; all Rent together pays at most +8 a ball; at most two Sparks count on one ball. Rent and Crowd pay only on a ball that knocks pins down. Your ten pins keep their type: Slow, Spark, Shield, Runner, Anchor, Glass, Bomb, Huddle, Crown, Rent, Crowd, Fare; the board lists a type by its first three letters after the value. Rack lists your ten by starting spot 1 to 10. Ball used: the house ball, or the one you bought (Big, Small, Plastic: size and weight; Rush, Brake, Toll, Sweep, Seed: the house ball with an effect on how the board advances). Positions are px from lane centre (lane edges -120/+120). Board lists each pin as column:row=value, columns -3..3 are half a pin spacing apart (34.5 px), row 0 is the back. Hot is how many pins stood on the front row (they break through unless knocked down). Moved is how far the line changed from the previous ball (start + aim + half the bend). Timing is ms early (-) or late (+); drift is how far the ball was pushed off the drawn line. Open is how many pieces of the shop track were open (all: the whole shop; 0: the starter shop of 5 powers and 3 pins). Tips lists the first-time tips that fired since the previous ball (advten-tips flags: throw, advance, redline, broke, strike, early, shop, pick, pw:<power>, onlane, fx:<power>, boss:<boss>, bossgo:<boss>; tips-again when they were reset).\n';
   t+='run,game,target,ball,ball_used,start,aim,bend,moved,timing_ms,drift_px,setup_seconds,board_value,hot,pins_down,value_down,clean_pins,mult,score,triggers,broke_through,cost,swept,net,result,board_before,board_after,boss,cash,your_ten,gear,shop_before_game,tips\n';
   LOG.forEach(r=>{t+=[r.run,r.game,r.target,r.frame,r.ball||'house',sg(r.start),sg(r.aim),sg(r.bend),r.moved,sg(r.ms),sg(r.drift),r.setup,r.value,r.hot,r.down,r.downValue,r.clean,r.mult,r.score,r.notes||'',r.broke,r.cost,r.swept||0,r.net,r.result,r.rack,r.after,r.boss||'',r.cash||'',r.ten||'',r.gear||'',r.offers||'',r.tips||''].join(',')+'\n';});return t;}
 function openLog(){$('logText').value=LOG.length?logText():'No throws recorded yet.';$('log').hidden=false;}
@@ -1958,9 +2031,9 @@ function loop(ts){const dt=Math.min(.05,(ts-lastT)/1000||0);lastT=ts;
 // ---------- first-time tips: a real run teaches itself, one moment at a time (docs/design/tutorial/plan.md) ----------
 // Flags live in advten-tips, apart from the run save, so New run, a lost run or a load never resets them.
 // ?tips=reset clears them on load, ?tips=off skips every tip (and shows the full shop); under jsdom (the bots) tips are off unless ?tips=on.
-// ?rings=on rings the pins changed in the last shop for the first ball of the next game; ?gate=on opens the first shops one tray at a time.
+// ?rings=on rings the pins changed in the last shop for the first ball of the next game.
 const TIPS_KEY='advten-tips',TQ=(()=>{try{return new URLSearchParams(location.search);}catch(e){return new URLSearchParams('');}})();
-const TOPT={rings:TQ.get('rings')==='on',gate:TQ.get('gate')==='on'};
+const TOPT={rings:TQ.get('rings')==='on'};
 const TIPS={seen:{},shops:0,off:false},TIPN={};let TIPLOG=[],TIP=null,tipKey='',TIPHOLD=false,SHOPTIP=null;
 (function tipsLoad(){const q=TQ.get('tips');let d=null;try{d=JSON.parse(localStorage.getItem(TIPS_KEY)||'null');}catch(e){}
   if(d&&d.seen)TIPS.seen=d.seen;if(d&&d.shops)TIPS.shops=d.shops;
@@ -2081,12 +2154,49 @@ function tipGhost(){const box=$('shop').firstElementChild,map=$('shopMap'),hits=
   const x0=sr.left+sr.width/2-br.left,y0=sr.top+sr.height/2-br.top,x1=mr.left+h.x-br.left,y1=mr.top+h.y-br.top,at=(x,y,op,off)=>Object.assign({left:x+'px',top:y+'px',opacity:op},off===undefined?{}:{offset:off});
   d.animate([at(x0,y0,0),at(x0,y0,1,.15),at(x1,y1,1,.75),at(x1,y1,0)],{duration:1500,easing:'ease-in-out',delay:300,fill:'both'}).onfinish=()=>d.remove();}
 const tipNew=o=>o.kind==='pow'&&!o.bought&&!TIPS.off&&!TIPS.seen['pw:'+o.t]?'<i class="tnew" aria-hidden="true"></i>':'';
-// --- the first shops, one tray at a time (?gate=on; counts shops ever visited, advten-tips.shops) ---
-const STARTER=['quick','head','spark','rent','slow'];
-const GATE=[null,{trays:['pow'],pow:STARTER,pin:[]},{trays:['pow','pin'],pow:STARTER.concat('lantern'),pin:['runner','anchor','crown']},
-  {trays:['pow','pin','reroll'],pow:STARTER.concat('lantern','bomb','toll'),pin:['runner','anchor','crown','glass','huddle','crowd']}];
-function gate(){if(!TOPT.gate||TIPS.off)return null;return GATE[TIPS.shops]||null;}
+// ---------- progress from run to run (advten-progress), kept apart from the run save (advten-save) and the tips (advten-tips) ----------
+// A first run sees a small starter shop; pieces open in a fixed order, two pips each. Pips: meeting a boss the first time 1, beating it the first time 1,
+// reaching a level the first time 1, the first full-run win 3; and lifetime totals, one pip at each step of 200, 600, 1200, 2000... points
+// (triangular steps), 80, 240, 480... pins knocked down, 3, 9, 18... strikes and $15, 45, 90... earned. Pieces open when a run ends; the run-over screen shows them.
+// Paced (docs/design/progress/README.md) so a first run to game 4 opens about three pieces, later runs one or two, and the whole shop is open after about fifteen runs.
+// Records: furthest game reached, best single ball, best run total. "All pieces" in the rack sheet opens the whole shop (PROG.all).
+// Under jsdom or a driven browser (the bots, the playtest agents) the whole shop is open unless ?progress=on; ?progress=off opens it anywhere.
+const PROG_KEY='advten-progress',STARTER={pin:['runner','anchor','crown'],pow:['quick','head','spark','rent','slow']};
+const TRACK=[['pow','lantern'],['pin','glass'],['ball','big'],['shop','reroll'],['gear','bell'],['pow','bomb'],['pin','huddle'],['ball','small'],
+  ['gear','net'],['pow','toll'],['ball','plastic'],['gear','hothouse'],['pin','crowd'],['pow','shield'],['gear','chain'],['ball','brake'],['gear','steady'],['gear','front'],
+  ['ball','toll'],['gear','stand'],['gear','home'],['ball','sweep'],['gear','harvest'],['gear','breath'],['gear','rebound'],['ball','rush'],['gear','wrist'],['ball','seed'],['gear','overtime']];
+const tcost=i=>2,spent=n=>{let a=0;for(let i=0;i<n;i++)a+=tcost(i);return a;};
+const PSTEP={pts:200,pins:80,strikes:3,cash:15};
+const psteps=(v,b)=>{let k=0;while(b*(k+1)*(k+2)/2<=v)k++;return k;};
+const PQ=TQ.get('progress'),PROGOFF=PQ==='off'||(PQ!=='on'&&(/jsdom/i.test(navigator.userAgent||'')||navigator.webdriver===true));
+const PROG0=()=>({v:1,met:{},beat:{},lv:{},wins:0,runs:0,tot:{pts:0,pins:0,strikes:0,cash:0},open:0,rec:{game:0,ball:0,run:0},all:false});
+let PROG=PROG0();
+(function progLoad(){try{const d=JSON.parse(localStorage.getItem(PROG_KEY)||'null');if(d&&d.v===1){PROG=Object.assign(PROG0(),d);PROG.tot=Object.assign(PROG0().tot,d.tot);PROG.rec=Object.assign(PROG0().rec,d.rec);}}catch(e){}})();
+function progSave(){try{localStorage.setItem(PROG_KEY,JSON.stringify(PROG));}catch(e){}}
+const progAll=()=>PROGOFF||!!PROG.all;
+function isOpen(kind,k){return progAll()||!!(STARTER[kind]&&STARTER[kind].includes(k))||TRACK.slice(0,PROG.open).some(([a,b])=>a===kind&&b===k);}
+// the pips a store has earned, by source
+function pipSrc(P){const n=o=>Object.keys(o||{}).length,t=P.tot||{};return{met:n(P.met),beat:n(P.beat),lv:n(P.lv),win:P.wins?3:0,
+  pts:psteps(t.pts||0,PSTEP.pts),pins:psteps(t.pins||0,PSTEP.pins),strikes:psteps(t.strikes||0,PSTEP.strikes),cash:psteps(t.cash||0,PSTEP.cash)};}
+const pipsOf=P=>Object.values(pipSrc(P)).reduce((a,b)=>a+b,0);
+// a milestone, kept the moment it happens (the boss wall lights mid-run); a run's own totals wait for its end
+function progMark(kind,k){if(PROG[kind][k])return;PROG[kind][k]=1;progSave();}
+function runTot(){return run.tot||(run.tot={pts:0,pins:0,strikes:0,cash:0,best:0,balls:0});}
+// the end of a run (lost, won, or dropped with New run): its totals and records go in, and any pieces they pay for open
+function progCommit(r,won){if(!r||r.done)return null;r.done=true;const t=r.tot||{},P=PROG,src0=r.p0||pipSrc(P);
+  for(const k of ['pts','pins','strikes','cash'])P.tot[k]+=Math.max(0,t[k]||0);P.runs++;if(won)P.wins++;
+  const reached=won?TARGETS.length:r.game+1,nb={game:reached>P.rec.game,ball:(t.best||0)>P.rec.ball,run:(t.pts||0)>P.rec.run};   // records never go below 0
+  const was=Object.assign({},P.rec);P.rec={game:Math.max(P.rec.game,reached),ball:Math.max(P.rec.ball,t.best||0),run:Math.max(P.rec.run,t.pts||0)};
+  const src=pipSrc(P),pips=pipsOf(P),fresh=[];while(P.open<TRACK.length&&spent(P.open+1)<=pips){fresh.push(TRACK[P.open]);P.open++;}
+  progSave();const got={};for(const k in src)if(src[k]>(src0[k]||0))got[k]=src[k]-(src0[k]||0);
+  return{fresh,nb,was,this:{game:reached,ball:Math.max(0,t.best||0),run:Math.max(0,t.pts||0)},got,gained:Object.values(got).reduce((a,b)=>a+b,0),have:pips-spent(P.open),need:P.open<TRACK.length?tcost(P.open):0};}
+// the shop's pools (null: everything), used by every roll and by the trays
+function gate(){if(progAll())return null;const of=(kind,keys)=>keys.filter(k=>isOpen(kind,k));
+  return{pow:of('pow',Object.keys(POWERS)),pin:of('pin',Object.keys(PINS)),ball:of('ball',Object.keys(BALLOFFERS)),gear:of('gear',Object.keys(GEAR)),reroll:isOpen('shop','reroll')};}
 function tipsShopVisit(){if(TIPS.off)return;TIPS.shops++;tipsSave();}
+// All pieces, in the rack sheet's header: opens the whole shop from the next roll on (Reroll, or the next shop); progress keeps counting underneath
+function allBtn(){const b=$('rackAll');b.parentNode.classList.toggle('two',!TIPS.off);b.setAttribute('aria-pressed',String(progAll()));b.disabled=PROGOFF;b.setAttribute('aria-label',progAll()?'All pieces open in the shop':'Open all pieces in the shop');}
+$('rackAll').addEventListener('click',()=>{if(PROGOFF)return;PROG.all=!PROG.all;progSave();allBtn();});
 
 // --- Tips again, in the Your build sheet: a second tap confirms; every moment (and the first-shop gating) plays again ---
 let tipsAsk=false;
@@ -2118,7 +2228,7 @@ let newAsk=false;
 let shopNewAsk=false;
 $('shopNew').addEventListener('click',e=>{const b=e.currentTarget;if(!shopNewAsk){shopNewAsk=true;b.textContent='Drop run?';b.classList.add('ask');return;}shopNewAsk=false;b.textContent='New run';b.classList.remove('ask');$('shop').hidden=true;newRun();});
 // ?new=1 (New run on the cover): drop the save first, then take the flag off the URL so a reload doesn't drop the next run
-if(new URLSearchParams(location.search).get('new')==='1'){clearSave();try{const u=new URL(location.href);u.searchParams.delete('new');history.replaceState(null,'',u.pathname+u.search+u.hash);}catch(e){}}
+if(new URLSearchParams(location.search).get('new')==='1'){try{const d=JSON.parse(localStorage.getItem(SAVE)||'null');if(d&&d.run&&d.run.tot&&d.run.tot.balls)progCommit(d.run,false);}catch(e){}clearSave();try{const u=new URL(location.href);u.searchParams.delete('new');history.replaceState(null,'',u.pathname+u.search+u.hash);}catch(e){}}
 $('rackNew').addEventListener('click',e=>{if(!newAsk){newAsk=true;e.currentTarget.textContent='Drop this run?';return;}newAsk=false;e.currentTarget.textContent='New run';$('rackSheet').hidden=true;newRun();});
 if(!loadRun())newRun();fit();requestAnimationFrame(loop);
 // one live tab: the newest tab to open the game takes the run; any older tab stops saving and asks to be reloaded, so two tabs can't preview a reroll or a throw
