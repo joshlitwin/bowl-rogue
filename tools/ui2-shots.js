@@ -24,6 +24,7 @@ var toShop=function(){run.bosses[0]='bolted';winNow();$('winNext').click();run.c
 const S={
   'lane':{js:`run.bosses[0]='bolted';build();winNow();$('winNext').click();run.bought=true;skipAsk=true;$('shopNext').click();play(2);quiet();`},
   'win-card':{wait:2600,js:`run.bosses[0]='bolted';play(1);winNow();`},
+  'win-card-first-early':{wait:2600,js:`TIPS.off=false;TIPS.seen={};run.bosses[0]='bolted';play(1);winNow();`},
   'win-card-boss-next':{wait:2600,js:`run.bosses[0]='sweep';run.game=1;run.cash=9;startGame();play(2);winNow();`},
   'win-card-boss-beaten':{wait:2600,js:`run.bosses[1]='sweep';run.game=5;run.cash=21;build();startGame();if(!$('intro').hidden)$('introGo').click();play(3);winNow();`},
   'shop':{js:`build();toShop();`},
@@ -127,6 +128,9 @@ const S={
   // ball switch shows both balls (fix/josh-runs-1124): plastic in hand, then the house ball in hand, in the night look
   'swap-big-rec':{js:`run.hook='big';run.ball='big';startGame();applyKit();setBtn();quiet();`},
   'swap-sweep-rec':{js:`run.hook='sweep';run.ball='sweep';startGame();applyKit();setBtn();quiet();`},
+  'ladder':{js:`run.game=4;startGame();quiet();ladder();`},
+  'shield-lane':{js:`build();run.rack[0].pw=['shield'];run.rack[6].pw=['shield'];startGame();g.pins.forEach(p=>p.v=8);quiet();`},
+  'elsewhere':{js:`lockOut();`},
   'swap-plastic-night':{js:`run.game=3;run.hook='plastic';run.ball='plastic';startGame();applyKit();setBtn();quiet();`},
   'swap-house-night':{js:`run.game=3;run.hook='rush';run.ball='house';startGame();applyKit();setBtn();quiet();`},
   'bands-sheet':{js:`quiet();const d=document.createElement('div');d.style.cssText='position:fixed;inset:0;z-index:9;background:#1d100a;display:grid;grid-template-columns:repeat(3,1fr);gap:8px 6px;align-content:center;padding:10px;color:#f3e2b8;font:700 12px/1.2 "Pixelify Sans",sans-serif;text-align:center';

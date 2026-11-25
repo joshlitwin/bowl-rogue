@@ -51,3 +51,12 @@ His log: runs 8 and 9 on the new version. Run 8 lost game 3 (Rising tentacle) 81
 - **The house ball is red in every look** (it was teal, green and purple in the later halls, so the free ball wasn't recognisable). The Rush ball's band is now dark so it shows on red.
 - **Round-2 fixes:** a scoring ball is not labelled Gutter; ball icons are drawn from the lane sprite; the swap choice is saved; two Crowns count (strike x4); Quick growth shows the pin's real rate; Head start says it also starts each game worth 2; a power tapped onto a full pin says so; Tentacle reopen and a run's first ball replay exactly (`run.rs` kept across `startGame`, set before `pickBosses`); Results log rows replace rather than duplicate.
 - **Round-2 tuning (approved by Josh):** Rent capped at +8 a ball in total; Flat rate counts multipliers half; Cold lane caps growth at x3; Bolted rack boltK 300; level-1 pool tentacle/quota/flat/cold; targets 70 85 90 / 115 135 140 / 200 250 290 / 320 400 480.
+
+## Teaching, round 2 (branch `teach/round-2`)
+- **First early win says why the game ended:** the win card adds "Target reached, so the game ends here. Each ball left pays $1, up to $4." once (tip flag `earlyend`).
+- **No more "break-through" in player text:** Toll ball, Overtime, Catch net and Last stand say "pins that cross the red line".
+- **Shield shows on the lane:** a steel arc over a pin while its shield is up; gone once spent (the crack mark stays).
+- **The twelve targets:** tap the game dots at the top of the lane for a ladder of all targets, a level a row, with that level's boss.
+- **The Toll power is now Fare** (Fare pin, "Fare +$1" in results), so it no longer shares a name with the Toll ball.
+- **One live tab:** opening the game in a second tab locks the older one ("Playing in another tab", Play here reloads) and stops it saving, so tabs can't preview a reroll or a throw. `node tools/tab-lock-test.js`.
+- Kept as discovery: pins returning at random spots, the gutter as a pass. The opening rack stays fixed (Josh: you place pins on purpose).
