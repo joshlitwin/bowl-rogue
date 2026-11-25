@@ -42,3 +42,12 @@ Game 3 100 → 90, game 6 150 → 140, game 9 250 → 235 (boss games: they were
 - Last stand + Slow or Brake parking a pin on the red line forever.
 - Dead pieces: Shield, Huddle, Crown, Harvest bell, Last stand need a real job.
 - Rerun the playtest agents against this branch.
+
+## From Josh's runs, 24 November (branch `fix/josh-runs-1124`)
+His log: runs 8 and 9 on the new version. Run 8 lost game 3 (Rising tentacle) 81/90 after a Small ball, Toll and Shield shop. Run 9 won games 1-8 and lost game 9 (Sweep bar) 135/235: with sweeps after balls 4 and 8 the board never rose above 31 and no ball multiplied, so it was a wall, not a hard moment. Sweep bar had now ended more runs than any other boss (his 235/250, 135/235; playtesters 113/150, 130/150, 118/150).
+- **Sweep bar sweeps once, after ball 5.** Scoreboard marks ball 5; the intro counts to 5.
+- **Balls no longer bounce off the gutter back into the pins.** A ball following the drawn line already dropped into the gutter; once it had hit a pin it moved freely and bounced off the side boards. Now a free ball that leaves the lane drops into the gutter too.
+- **The ball switch shows both balls:** the one in hand big with a gold ring, the other small and dim. It used to show only the ball you'd switch to, which read as the one in hand.
+- **The house ball is red in every look** (it was teal, green and purple in the later halls, so the free ball wasn't recognisable). The Rush ball's band is now dark so it shows on red.
+- **Round-2 fixes:** a scoring ball is not labelled Gutter; ball icons are drawn from the lane sprite; the swap choice is saved; two Crowns count (strike x4); Quick growth shows the pin's real rate; Head start says it also starts each game worth 2; a power tapped onto a full pin says so; Tentacle reopen and a run's first ball replay exactly (`run.rs` kept across `startGame`, set before `pickBosses`); Results log rows replace rather than duplicate.
+- **Round-2 tuning (approved by Josh):** Rent capped at +8 a ball in total; Flat rate counts multipliers half; Cold lane caps growth at x3; Bolted rack boltK 300; level-1 pool tentacle/quota/flat/cold; targets 70 85 90 / 115 135 140 / 200 250 290 / 320 400 480.
