@@ -124,6 +124,11 @@ const S={
   'poor-ball':{js:`build();toShop();run.cash=2;showShop();document.querySelector('#shop .offer.ball').click();`},
   'poor-pin':{js:`build();toShop();run.cash=1;showShop();document.querySelector('#shop .offer.pin').click();`},
   'match-sign':{js:`run.bosses[0]='quota';run.game=2;startGame();$('intro').hidden=true;quiet();`},
+  // ball switch shows both balls (fix/josh-runs-1124): plastic in hand, then the house ball in hand, in the night look
+  'swap-big-rec':{js:`run.hook='big';run.ball='big';startGame();applyKit();setBtn();quiet();`},
+  'swap-sweep-rec':{js:`run.hook='sweep';run.ball='sweep';startGame();applyKit();setBtn();quiet();`},
+  'swap-plastic-night':{js:`run.game=3;run.hook='plastic';run.ball='plastic';startGame();applyKit();setBtn();quiet();`},
+  'swap-house-night':{js:`run.game=3;run.hook='rush';run.ball='house';startGame();applyKit();setBtn();quiet();`},
   'bands-sheet':{js:`quiet();const d=document.createElement('div');d.style.cssText='position:fixed;inset:0;z-index:9;background:#1d100a;display:grid;grid-template-columns:repeat(3,1fr);gap:8px 6px;align-content:center;padding:10px;color:#f3e2b8;font:700 12px/1.2 "Pixelify Sans",sans-serif;text-align:center';
     const put=(sp,w)=>{const cv=document.createElement('canvas');cv.width=sp.w;cv.height=sp.h;cv.getContext('2d').drawImage(sp.cv,0,0);cv.style.cssText='width:'+sp.w*2+'px;height:'+sp.h*2+'px;image-rendering:pixelated;vertical-align:bottom';w.appendChild(cv);};
     Object.keys(POWERS).forEach(k=>{const w=document.createElement('div'),r=document.createElement('div');r.style.cssText='display:flex;gap:8px;justify-content:center;align-items:flex-end;margin-bottom:4px';
