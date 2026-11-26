@@ -545,7 +545,7 @@ img.bp{flex:none;width:auto;height:52px;image-rendering:pixelated}
 .wboss p{display:none;margin:0;font:400 11px/1.25 var(--body);color:var(--chalk)}
 .wboss.open span{display:none}.wboss.open p{display:block}.wboss.open img{display:none}
 /* ---- first-time tips (advten-tips): one short line over the lane, pulses on things that already exist ---- */
-.tipline{position:absolute;left:50%;top:2px;transform:translateX(-50%);max-width:92%;padding:4px 9px 5px;background:var(--ink);color:var(--chalk);border:2px solid var(--coin);border-radius:3px;box-shadow:0 3px 0 rgba(0,0,0,.5);font:400 13px/1.2 var(--display);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;pointer-events:none}
+.tipline{position:absolute;left:50%;top:2px;transform:translateX(-50%);max-width:92%;padding:4px 9px 5px;background:var(--ink);color:var(--chalk);border:2px solid var(--coin);border-radius:3px;box-shadow:0 3px 0 rgba(0,0,0,.5);font:400 13px/1.2 var(--display);width:max-content;text-align:center;pointer-events:none}
 .tipline[hidden]{display:none}
 #bossBtn.tip{animation:tipPulse .6s steps(2) 4}
 @keyframes tipPulse{50%{box-shadow:0 0 0 3px var(--coin)}}
@@ -1617,7 +1617,7 @@ function shopInfo(){const inf=$('shopInfo'),deck=$('shopDeck'),box=$('shop').fir
     else{const it=run.rack[sel],pw=pwOf(it),n=k=>pwCount(it,k);
       inf.innerHTML=`<canvas class="closeup" data-i="${sel}" aria-hidden="true"></canvas><div class="cside"><h3>${short(PINS[it.t].name)}</h3><div class="cslots">${[0,1,2].map(j=>{const k=pw[j];
         return k?`<span>${POWERS[k].name}${pw.indexOf(k)===j?` <b>${POWERS[k].s(n(k))}</b>`:''}</span>`:'<span class="free">free</span>';}).join('')}</div>${it.t!=='plain'||!pw.length?`<p>${rich(PINS[it.t].text(it.lv))}</p>`:''}</div>`;}}
-  else if(INFO==='callout'){const pic=!o?'':o.kind==='pow'?`<canvas class="bandcard" data-k="${o.t}" aria-hidden="true"></canvas>`:o.kind==='pin'?pinPic(newItem(o.t),30):`<img class="gear" src="${gicon(o.t)}" alt="">`;
+  else if(INFO==='callout'){const pic=!o?'':o.kind==='pow'?`<canvas class="bandcard" data-k="${o.t}" aria-hidden="true"></canvas>`:o.kind==='pin'?pinPic(newItem(o.t),30):`<img class="gear" src="${o.kind==='ball'?bicon(o.t):gicon(o.t)}" alt="">`;
     inf.innerHTML=(o?`${pic}<div><h3>${o.kind==='pow'?o.name:short(o.name)}<b class="pr">$${o.cost}</b></h3><p>${rich(offerText(o))}${o.kind==='pow'?` <small class="ag">${POWERS[o.t].more}</small>`:''}</p></div>`
       +(o===pick?`<button type="button" class="buy" id="shopBuy"${run.cash<o.cost?' disabled':''}>Buy</button>`:''):pinInfo(sel,24))+'<button type="button" class="x" aria-label="Close">×</button>';
     inf.querySelector('.x').addEventListener('click',()=>{pending=null;pick=null;sel=null;showShop();});}
@@ -2281,8 +2281,10 @@ function tipsShopVisit(){if(TIPS.off)return;TIPS.shops++;tipsSave();}
 // All pieces, in the rack sheet's header: opens the whole shop from the next roll on (Reroll, or the next shop); progress keeps counting underneath
 function allBtn(){const b=$('rackAll');b.parentNode.classList.toggle('two',!TIPS.off);b.setAttribute('aria-label','Lab pieces: switch them on or off');}
 // Lab pieces: the ten this lab adds, each on or off for the shop from the next roll on
+// one line each for the Lab pieces list (the full rule shows in the shop and on the pin); the list has room for one line a piece at 360x600
+const LABLINE={'pin:peg':'Only the ball knocks it down.','pin:king':'Down alone: scores the standing pins too.','pow:tap':'Last pin standing: that ball ×3.','ball:reactive':'Pins it hits fly out wide.','ball:drop':'Hit pins drop in place. Stops after four.','gear:livewood':'Pins knock each other down more.','gear:deadwood':'Pins barely knock each other down.','gear:wedges':'Three holds a game: a pin won’t advance.','gear:frontline':'Clear a front row of 2+, no strike: ×2.','gear:split':'Two pins down, a gap between: ×2.'};
 function labSheet(){const rows=[];for(const [kind,ks] of Object.entries(LAB))for(const k of ks){const on=!LABOFF.has(kind+':'+k),nm=kind==='pin'?PINS[k].name:kind==='pow'?POWERS[k].name:kind==='ball'?BALLOFFERS[k].name:GEAR[k].name,tx=kind==='pin'?PINS[k].text(1):kind==='pow'?POWERS[k].text(1):kind==='ball'?BALLOFFERS[k].text:GEAR[k].text;
-    rows.push(`<button type="button" role="switch" aria-checked="${on}" data-k="${kind}:${k}" class="${on?'on':''}"><span class="pic">${pieceImg([kind,k])}</span><span class="tx"><b>${nm}</b><small>${tx}</small></span><i></i></button>`);}
+    rows.push(`<button type="button" role="switch" aria-checked="${on}" data-k="${kind}:${k}" class="${on?'on':''}"><span class="pic">${pieceImg([kind,k])}</span><span class="tx"><b>${nm}</b><small>${LABLINE[kind+':'+k]||tx}</small></span><i></i></button>`);}
   $('labList').innerHTML=rows.join('');$('labList').querySelectorAll('button').forEach(b=>b.addEventListener('click',()=>{const k=b.dataset.k;if(LABOFF.has(k))LABOFF.delete(k);else LABOFF.add(k);try{localStorage.setItem('piecelab-off',JSON.stringify([...LABOFF]));}catch(e){}labSheet();}));
   $('labSheet').hidden=false;}
 $('labDone').addEventListener('click',()=>{$('labSheet').hidden=true;});
