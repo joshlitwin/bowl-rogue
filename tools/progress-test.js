@@ -102,5 +102,11 @@ const P=x=>JSON.parse(x['advten-progress']||'null');
     const keys=s=>{const d=JSON.parse(s);return Object.keys(d).sort().join()+' | run: '+Object.keys(d.run).sort().join()+' | g: '+Object.keys(d.g).sort().join();};
     ok('the run save has the same fields with progress on and off',keys(F.ev("localStorage.getItem('advten-save')"))===keys(G2.ev("localStorage.getItem('advten-save')")));}
 
+  // ---- the log: an Open column, newest run first ----
+  {const L=open('?progress=on');await wait(200);L.ev(KIT);L.ev('play(2);newRun();play(3)');
+    const t=L.ev('logText()').split('\n'),h=t.findIndex(x=>x.startsWith('run,game')),cols=t[h].split(','),rows=t.slice(h+1).filter(Boolean).map(x=>x.split(','));
+    const oi=cols.indexOf('open');
+    ok('log: Open column filled on every row',oi>0&&rows.every(r=>r[oi]==='0'),cols.length+' cols, open at '+oi);
+    ok('log: newest run first, balls in order within a run',rows.length===5&&rows[0][0]==='2'&&rows[3][0]==='1'&&rows[0][3]==='1'&&rows[2][3]==='3',rows.map(r=>r[0]+'.'+r[3]).join(' '));}
   ok('no page errors',errs.length===0,errs[0]||'');
   console.log(fails?fails+' failed':'all passed');process.exit(fails?1:0);})();
