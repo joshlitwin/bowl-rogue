@@ -345,6 +345,7 @@ i.pw.big{flex:none;width:22px;height:11px;border-radius:3px}
 #shop .strip{height:48px}
 #shop .deck{min-height:0;padding:3px 28px 11px}
 #shop .row button.main{flex:1}
+#rackSheet .row button{flex:1 1 auto;padding:11px 6px}#rackGame{font-size:13px;line-height:1;padding:4px 6px}
 #shopNew{flex:none;color:var(--dim)}
 #shopNew.ask{border-color:var(--accent);color:var(--chalk)}
 .tray .offer img{align-self:center}
@@ -673,7 +674,7 @@ img.bp{flex:none;width:auto;height:52px;image-rendering:pixelated}
   <div class="bgrid"><div id="rackGrid"></div><div class="shelf" id="rackGear"></div></div>
   <div class="btot" id="rackPows"></div>
   <div class="strip" id="rackMsg" aria-live="polite"></div>
-  <div class="row"><button id="rackLog" type="button">Log</button><button id="rackNew" type="button">New run</button><button class="main" id="rackClose" type="button">Done</button></div>
+  <div class="row"><button id="rackLog" type="button">Log</button><button id="rackNew" type="button">New run</button><button id="rackGame" type="button">Main<br>game</button><button class="main" id="rackClose" type="button">Done</button></div>
 </div></div>
 <div class="sheet" id="labSheet" hidden><div class="box">
   <div class="shead"><h2>Lab pieces</h2></div>
@@ -1731,7 +1732,7 @@ function logText(){const sg=v=>(v>0?'+':'')+v;let t='Temperance Lanes Pieces Lab
   const runs=[];LOG.forEach(r=>{const l=runs.length&&runs[runs.length-1];if(l&&l[0].run===r.run)l.push(r);else runs.push([r]);});
   runs.reverse().flat().forEach(r=>{t+=[r.run,r.game,r.target,r.frame,r.ball||'house',sg(r.start),sg(r.aim),sg(r.bend),r.moved,sg(r.ms),sg(r.drift),r.setup,r.value,r.hot,r.down,r.downValue,r.clean,r.mult,r.score,r.notes||'',r.broke,r.cost,r.swept||0,r.net,r.result,r.rack,r.after,r.boss||'',r.cash||'',r.ten||'',r.gear||'',r.offers||'',r.open??'',r.tips||''].join(',')+'\n';});return t;}
 function openLog(){$('logText').value=LOG.length?logText():'No throws recorded yet.';$('log').hidden=false;}
-$('rackLog').addEventListener('click',openLog);$('overLog').addEventListener('click',openLog);
+$('rackLog').addEventListener('click',openLog);$('rackGame').addEventListener('click',()=>{location.href='../advancing-ten-pin/';});$('overLog').addEventListener('click',openLog);
 $('logClose').addEventListener('click',()=>$('log').hidden=true);
 $('logClear').addEventListener('click',()=>{LOG=[];saveLog();openLog();});
 $('logCopy').addEventListener('click',async e=>{const b=e.currentTarget,ta=$('logText');try{await navigator.clipboard.writeText(ta.value);b.textContent='Copied';}catch(_){ta.focus();ta.select();b.textContent='Selected: copy it by hand';}setTimeout(()=>b.textContent='Copy log',2200);});
