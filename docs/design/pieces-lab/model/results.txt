@@ -1,0 +1,72 @@
+games 30 lines 40 sig 60 game index 3 page labs/pieces-lab/index.html 
+kit                                mean  sd  swing  p10  p90  strikes  breakcost  same-aim  kept  triggers
+strike: base                        342   51   15%   288  429      3.9        1.9       12%    94%  
+harvest: base                       409   65   16%   330  495      1.0       39.5       15%   100%  
+hold: base                          307   58   19%   241  424      2.3        3.6       11%    98%  
+strike: Ironwood headpin            352   44   13%   297  429      4.2        1.3       12%    94%  
+strike: Kickback x2 on 1-3          365   58   16%   293  462      4.6        1.4       12%    94%  
+strike: Live wood                   408   66   16%   337  503      5.8        1.1       12%    94%  
+strike: Reactive ball               425   79   19%   348  551      6.1        0.1       16%    92%  
+harvest: Live wood                  402   92   23%   276  516      1.4       38.7       16%    98%  
+harvest: Dead wood                  369   79   21%   242  456      0.2       56.5       15%   101%  
+harvest: Dry deck (slide only)      352   90   26%   229  458      0.4       57.9        9%    98%  
+harvest: Pegged pin x2              368   71   19%   283  488      0.2       48.1       10%    99%  
+harvest: Felt base on quick pins    379   90   24%   266  521      0.7       49.3       11%    98%  
+harvest: Drop ball                  388   67   17%   312  494      0.0       83.1        6%   100%  
+harvest: Gap pin                    352   73   21%   272  492      0.7       55.4       13%    99%  
+strike: Dead wood                   249   27   11%   219  290      0.7        4.8       12%    94%  
+hold: Dead wood                     333   27    8%   297  377      0.4        5.0        7%   100%  
+hold: Pegged pin x2                 333   29    9%   297  379      0.1        5.5        8%    99%  
+hold: Live wood                     311   46   15%   253  364      3.3        0.8       10%    96%  
+games 30 lines 40 sig 60 game index 3 page labs/pieces-lab/index.html 
+kit                                mean  sd  swing  p10  p90  strikes  breakcost  same-aim  kept  triggers
+harvest: Chock (3 holds)            462   80   17%   387  569      1.2       32.0       10%   100%  acts/game 3.0 
+hold: Chock (3 holds)               327   50   15%   273  411      2.8        1.0       10%    97%  acts/game 1.3 
+strike: Re-spot (2 a game)          361   53   15%   300  447      4.7        0.9       12%    94%  acts/game 1.8 
+harvest: Re-spot (2 a game)         405   64   16%   338  494      1.2       41.9       11%    98%  acts/game 1.5 
+strike: Pinsetter's mark            526   91   17%   411  640      8.2        0.3       12%    94%  
+harvest: Pinsetter's mark           445   83   19%   334  569      1.2       29.7       15%    98%  
+harvest: Deadwood power on 3        398   75   19%   333  513      0.5       50.3       13%   101%  
+hold: Kingpin                       333   52   16%   267  426      2.3        2.1        9%    96%  Kingpin 0.5/game
+harvest: Kingpin                    420  108   26%   290  558      1.0       50.3       11%    98%  Kingpin 0.7/game
+harvest: Clean pick on quick pins   420   91   22%   321  558      0.9       45.0       12%    98%  Clean pick 0.9/game
+strike: Tap on headpin              347   54   16%   286  440      3.7        1.9       11%    95%  Tap 0.5/game
+harvest: Tap on 2 pins              464  130   28%   336  683      0.6       43.5       12%    99%  Tap 1.3/game
+harvest: Front line                 521  119   23%   378  656      0.8       26.3       15%   100%  Front line 1.7/game
+strike: Front line                  354   60   17%   293  439      4.2        1.4       13%    94%  
+harvest: Called shot                648  151   23%   420  841      0.6       51.3       17%    94%  Called shot 5.8/game
+strike: Called shot                 364   60   16%   290  449      4.4        1.3       14%    93%  Called shot 0.1/game
+harvest: Seven-ten                  464   89   19%   348  558      0.8       42.5       12%   101%  Seven-ten 1.6/game
+harvest: Split pick                 512   98   19%   411  618      0.8       46.4       13%    99%  Split pick 2.6/game
+strike: Carry pin x2                427   50   12%   351  494      4.0        2.5       13%    94%  Carry 9.4/game
+harvest: Down the board             423   98   23%   312  582      1.0       54.5       12%    97%  Down the board 1.6/game
+harvest: Picket fence               392   81   21%   313  502      0.9       46.8       13%   100%  Picket fence 0.1/game
+harvest: Late frame pin x2          699  120   17%   537  868      1.1       37.5       11%    96%  Late frame 4.0/game
+games 30 lines 40 sig 60 game index 3 page labs/pieces-lab/index.html 
+kit                                mean  sd  swing  p10  p90  strikes  breakcost  same-aim  kept  triggers
+harvest: Front line, 3 front pins   380  104   27%   261  520      1.1       47.5       11%    98%  Front line 0.0/game
+harvest: Split pick x2              453   79   17%   364  553      1.1       43.0       15%    96%  Split pick 1.8/game
+harvest: Called shot x2, 2-4        517  106   21%   414  651      1.2       49.8       13%    96%  Called shot 4.5/game
+harvest: Called shot x2, 3-5        538  110   20%   388  697      0.7       37.9       16%    96%  Called shot 4.9/game
+strike: Reactive ball 15deg         384   75   20%   298  482      5.2        0.7       11%    95%  
+harvest: Reactive ball 25deg        415   76   18%   333  497      0.8       30.9       14%    98%  
+harvest: Tap x2 on 2 pins           431   72   17%   338  552      0.6       33.0       13%   100%  Tap 0.8/game
+hold: Kingpin cap 64                336   57   17%   278  424      2.5        5.1       11%    98%  Kingpin 0.5/game
+games 30 lines 40 sig 60 game index 3 page labs/pieces-lab/index.html 
+kit                                mean  sd  swing  p10  p90  strikes  breakcost  same-aim  kept  triggers
+hold: Kingpin + Small ball          358   64   18%   279  446      2.2        1.7       11%    95%  Kingpin 0.6/game
+hold: Chock + Dead wood             354   34   10%   310  404      0.4        4.0        5%    99%  acts/game 2.2 
+strike: Live wood + Reactive        452   86   19%   364  640      7.0        0.0       14%    92%  
+hold: Front line                    302   38   13%   241  346      2.8        1.5       10%    97%  Front line 0.1/game
+strike: Split pick                  351   53   15%   302  420      4.0        1.4       12%    95%  
+hold: Split pick                    435  116   27%   282  593      1.9       10.0       13%    95%  Split pick 2.5/game
+strike: Kingpin                     351   37   11%   301  399      4.1        1.0       13%    93%  
+hold: Drop ball                     335   35   11%   296  380      0.0        8.8        9%    98%  
+games 30 lines 40 sig 60 game index 3 page labs/pieces-lab/index.html 
+kit                                mean  sd  swing  p10  p90  strikes  breakcost  same-aim  kept  triggers
+harvest: base                       404   83   21%   314  522      1.0       41.6       13%   100%  
+harvest: Drop ball                  193   90   46%    68  303      0.0      156.8        8%    99%  
+games 30 lines 40 sig 60 game index 3 page labs/pieces-lab/index.html 
+kit                                mean  sd  swing  p10  p90  strikes  breakcost  same-aim  kept  triggers
+hold: base                          324   53   16%   282  398      2.0        2.5        7%    98%  
+hold: Drop ball                     376   36   10%   338  416      0.0        9.6        5%    98%  
