@@ -1196,6 +1196,7 @@ function drawTL(k,cx,cy){const x0=cx-8,y0=cy-5,R=(x,y,w,h,c)=>{k.fillStyle=c;k.f
   for(const [c,o] of [['#c9a878',1],['#d83a2a',0]]){R(o,o,9,3,c);R(3+o,3+o,3,8,c);R(10+o,o,3,11,c);R(13+o,8+o,4,3,c);}}
 $('winNext').addEventListener('click',()=>{$('win').hidden=true;showShop();tipsShop();});
 function endGame(){const t=total(),won=t>=run.target,final=run.game===TARGETS.length-1;
+  for(const k of buildKeys()){pstat(k,'g');if(won)pstat(k,'w');}progSave();
   if(won&&BOSS)progMark('beat',lvlBoss(run.game));
   if(won&&!final){const extra=Math.min(4,g.left||0),earn=PAY[run.game%3]+extra;run.cash+=earn;runTot().cash+=earn;run.rerolls=0;run.bought=false;topBar();tipsShopVisit();if(TOPT.rings)run.changed=[];rollOffers();
     run.pay={t,target:run.target,extra,earn,base:PAY[run.game%3],fresh:true,left:g.left||0};pending=null;sel=null;gsel=null;showWin();return;}
@@ -1266,7 +1267,7 @@ const pickOut=a=>a.splice(Math.floor(rng()*a.length),1)[0];
 // pins: three at random; the only thing Reroll changes
 function rollPins(){const gt=gate(),pins=Object.keys(PINS).filter(k=>k!=='plain'&&!PINS[k].gone&&(!gt||gt.pin.includes(k)));run.pinOffers=[0,1,2].map(()=>{const t=pickOut(pins);return t&&{kind:'pin',t,name:PINS[t].name,text:PINS[t].text(1),cost:PINS[t].cost,bought:false};}).filter(Boolean);
   const pws=Object.keys(POWERS).filter(k=>!gt||gt.pow.includes(k));run.powOffers=[0,1,2].map(()=>{const t=pickOut(pws);return{kind:'pow',t,name:POWERS[t].name,text:POWERS[t].text(1),cost:POWERS[t].cost,bought:false};});
-  run.seen.push('pins: '+run.pinOffers.map(o=>o.name+' $'+o.cost).join('; ')+' | powers: '+run.powOffers.map(o=>o.name+' $'+o.cost).join('; '));composeOffers();}
+  for(const o of run.pinOffers.concat(run.powOffers))pstat(pkey(o.kind,o.t),'o');progSave();run.seen.push('pins: '+run.pinOffers.map(o=>o.name+' $'+o.cost).join('; ')+' | powers: '+run.powOffers.map(o=>o.name+' $'+o.cost).join('; '));composeOffers();}
 function composeOffers(){run.offers=(run.pinOffers||[]).concat(run.powOffers||[],run.ballOffers||[],run.gearOffer?[run.gearOffer]:[]);}
 // a new shop: pins rolled; balls stay on the shelf for a level (two at a time, a bought one replaced) and the whole shelf restocks after each boss; one piece of gear, new each shop, not refilled
 function rollOffers(){const gt=gate();if(run.game%3===2)run.ballStock=[];
@@ -1277,6 +1278,7 @@ function rollOffers(){const gt=gate();if(run.game%3===2)run.ballStock=[];
   run.gearOffer=gear.length?(k=>({kind:'gear',t:k,name:GEAR[k].name,text:GEAR[k].text,cost:GEAR[k].cost,bought:false}))(pickOut(gear)):null;
   if(OPT.layout){const a=randLayout(),b=randLayout([a]),c=randLayout([a,b]);run.layoutOpts=[{id:a,cost:0},{id:b,cost:LAYCOST},{id:c,cost:LAYCOST}];run.nextLayout=a;run.layoutPaid=0;
     run.seen.push('next rack: '+LAYOUTS[a].name+' free; '+LAYOUTS[b].name+' $'+LAYCOST+'; '+LAYOUTS[c].name+' $'+LAYCOST);}
+  for(const o of run.ballOffers.concat(run.gearOffer?[run.gearOffer]:[]))pstat(pkey(o.kind,o.t),'o');
   run.seen.push('balls: '+(run.ballOffers.map(o=>o.name+' $'+o.cost).join('; ')||'none')+' | gear: '+(run.gearOffer?run.gearOffer.name+' $'+run.gearOffer.cost:'none'));
   rollPins();}
 // ---------- big pins for the shop, drawn in code: a real pin's turned profile, lit from front-left-above, seen a little from above ----------
@@ -1479,7 +1481,7 @@ const pwText2=it=>[...new Set(pwOf(it))].map(k=>`<b>${POWERS[k].name}${pwCount(i
 // an offer's rule, read from the rules now (an offer saved in an older shop keeps its card, not its old wording)
 const offerText=o=>o.kind==='pow'&&POWERS[o.t]?POWERS[o.t].text(1):o.kind==='pin'&&PINS[o.t]?PINS[o.t].text(1):o.kind==='ball'&&BALLOFFERS[o.t]?BALLOFFERS[o.t].text+' Yours for the run: swap it with the house ball on the lane. Buying another replaces it.':o.kind==='gear'&&GEAR[o.t]?GEAR[o.t].text:o.text;
 function gearInfo(k){return `<img class="gear" src="${gicon(k)}" alt=""><div><h3>${GEAR[k].name}<small>Gear</small></h3><p>${rich(GEAR[k].text)}</p></div>`;}
-function buy(o){if(run.cash<o.cost)return;run.cash-=o.cost;run.bought=true;
+function buy(o){if(run.cash<o.cost)return;run.cash-=o.cost;run.bought=true;if(o.kind==='gear'||o.kind==='ball'){pstat(pkey(o.kind,o.t),'b');progSave();}
   if(o.kind==='gear'){run.gear[o.t]=true;o.bought=true;applyKit();}
   else if(o.kind==='ball'){run.hook=o.t;run.ball=o.t;o.bought=true;run.ballStock=run.ballStock.filter(k=>k!==o.t);applyKit();swapBtn();}
   else if(o.kind==='spot'){run.rack.push(newItem('plain'));strip();}
@@ -1569,8 +1571,8 @@ function placeInfo(){const inf=$('shopInfo'),map=$('shopMap');if(inf.hidden){if(
   paintInfoArt(inf);}
 function shopTap(i){gsel=null;pick=null;bsel=false;
   if(pending&&pending.kind==='pow'){const o=pending,it=run.rack[i];if(pwOf(it).length>=3){sel=i;FULL=i;pending=null;showShop();return;}   // full: show its build instead
-    run.cash-=o.cost;it.pw=pwOf(it).concat(o.t);o.bought=true;run.bought=true;tipsChanged(i);SHOPTIP=null;run.seen.push('bought '+o.name+' $'+o.cost+' on '+SLOTN[i]);pending=null;sel=i;topBar();strip();showShop();return;}
-  if(pending){const o=pending,it=run.rack[i];run.cash-=o.cost;run.rack[i]=Object.assign(newItem(o.t),{pw:pwOf(it)});o.bought=true;run.bought=true;tipsChanged(i);run.seen.push('bought '+o.name+' $'+o.cost+' at '+SLOTN[i]);pending=null;sel=null;topBar();showShop();return;}
+    run.cash-=o.cost;it.pw=pwOf(it).concat(o.t);o.bought=true;run.bought=true;pstat(pkey('pow',o.t),'b');progSave();tipsChanged(i);SHOPTIP=null;run.seen.push('bought '+o.name+' $'+o.cost+' on '+SLOTN[i]);pending=null;sel=i;topBar();strip();showShop();return;}
+  if(pending){const o=pending,it=run.rack[i];run.cash-=o.cost;run.rack[i]=Object.assign(newItem(o.t),{pw:pwOf(it)});o.bought=true;run.bought=true;pstat(pkey('pin',o.t),'b');progSave();tipsChanged(i);run.seen.push('bought '+o.name+' $'+o.cost+' at '+SLOTN[i]);pending=null;sel=null;topBar();showShop();return;}
   if(sel===null)sel=i;else if(sel===i)sel=null;else{const a=run.rack[sel];run.rack[sel]=run.rack[i];run.rack[i]=a;sel=null;}
   showShop();}
 $('shopReroll').addEventListener('click',()=>{const rc=2+run.rerolls;if(run.cash<rc)return;run.cash-=rc;run.rerolls++;pending=null;pick=null;topBar();rollPins();showShop();});
@@ -1650,7 +1652,10 @@ function logText(){const sg=v=>(v>0?'+':'')+v;let t='Temperance Lanes log. Four 
   t+='run,game,target,ball,ball_used,start,aim,bend,moved,timing_ms,drift_px,setup_seconds,board_value,hot,pins_down,value_down,clean_pins,mult,score,triggers,broke_through,cost,swept,net,result,board_before,board_after,boss,cash,your_ten,gear,shop_before_game,open,tips\n';
   // newest run first (balls in order within a run), so a paste cut short keeps the latest runs
   const runs=[];LOG.forEach(r=>{const l=runs.length&&runs[runs.length-1];if(l&&l[0].run===r.run)l.push(r);else runs.push([r]);});
-  runs.reverse().flat().forEach(r=>{t+=[r.run,r.game,r.target,r.frame,r.ball||'house',sg(r.start),sg(r.aim),sg(r.bend),r.moved,sg(r.ms),sg(r.drift),r.setup,r.value,r.hot,r.down,r.downValue,r.clean,r.mult,r.score,r.notes||'',r.broke,r.cost,r.swept||0,r.net,r.result,r.rack,r.after,r.boss||'',r.cash||'',r.ten||'',r.gear||'',r.offers||'',r.open??'',r.tips||''].join(',')+'\n';});return t;}
+  runs.reverse().flat().forEach(r=>{t+=[r.run,r.game,r.target,r.frame,r.ball||'house',sg(r.start),sg(r.aim),sg(r.bend),r.moved,sg(r.ms),sg(r.drift),r.setup,r.value,r.hot,r.down,r.downValue,r.clean,r.mult,r.score,r.notes||'',r.broke,r.cost,r.swept||0,r.net,r.result,r.rack,r.after,r.boss||'',r.cash||'',r.ten||'',r.gear||'',r.offers||'',r.open??'',r.tips||''].join(',')+'\n';});
+  const ps=PROG.ps||{},keys=Object.keys(ps).sort((a,b)=>ps[b].b-ps[a].b||ps[b].g-ps[a].g||ps[b].o-ps[a].o);
+  if(keys.length){t+='\nPieces across all runs since 26 November. offered: shops it was offered in (rerolls count); bought: times bought; games: games played with it in your build; won: those games won.\npiece,kind,offered,bought,games,won\n';keys.forEach(k=>{const[kind,id]=k.split(':'),x=ps[k];t+=[pieceName([kind,id]),kind,x.o,x.b,x.g,x.w].join(',')+'\n';});}
+  return t;}
 function openLog(){$('logText').value=LOG.length?logText():'No throws recorded yet.';$('log').hidden=false;}
 $('rackLog').addEventListener('click',openLog);$('rackLab').addEventListener('click',()=>{location.href='../pieces-lab/';});$('overLog').addEventListener('click',openLog);
 $('logClose').addEventListener('click',()=>$('log').hidden=true);
@@ -2172,10 +2177,14 @@ const tcost=i=>2,spent=n=>{let a=0;for(let i=0;i<n;i++)a+=tcost(i);return a;};
 const PSTEP={pts:200,pins:80,strikes:3,cash:15};
 const psteps=(v,b)=>{let k=0;while(b*(k+1)*(k+2)/2<=v)k++;return k;};
 const PQ=TQ.get('progress'),PROGOFF=PQ==='off'||(PQ!=='on'&&(/jsdom/i.test(navigator.userAgent||'')||navigator.webdriver===true));
-const PROG0=()=>({v:1,met:{},beat:{},lv:{},wins:0,runs:0,tot:{pts:0,pins:0,strikes:0,cash:0},open:0,rec:{game:0,ball:0,run:0},all:false});
+const PROG0=()=>({v:1,met:{},beat:{},lv:{},wins:0,runs:0,tot:{pts:0,pins:0,strikes:0,cash:0},open:0,rec:{game:0,ball:0,run:0},all:false,ps:{}});
 let PROG=PROG0();
 (function progLoad(){try{const d=JSON.parse(localStorage.getItem(PROG_KEY)||'null');if(d&&d.v===1){PROG=Object.assign(PROG0(),d);PROG.tot=Object.assign(PROG0().tot,d.tot);PROG.rec=Object.assign(PROG0().rec,d.rec);}}catch(e){}})();
 function progSave(){try{localStorage.setItem(PROG_KEY,JSON.stringify(PROG));}catch(e){}}
+// pieces, counted across runs for balancing (shown only in the log): shops each was offered in, times bought, games it was in your build, and how many of those were won
+function pkey(kind,t){return kind+':'+t;}
+function pstat(key,f){const s=PROG.ps||(PROG.ps={}),o=s[key]||(s[key]={o:0,b:0,g:0,w:0});o[f]++;}
+function buildKeys(){const k=new Set();for(const it of run.rack){if(it.t!=='plain')k.add(pkey('pin',it.t));for(const p of pwOf(it))k.add(pkey('pow',p));}for(const x of Object.keys(run.gear||{}))if(run.gear[x])k.add(pkey('gear',x));if(run.hook)k.add(pkey('ball',run.hook));return[...k];}
 const progAll=()=>PROGOFF||!!PROG.all;
 function isOpen(kind,k){return progAll()||!!(STARTER[kind]&&STARTER[kind].includes(k))||TRACK.slice(0,PROG.open).some(([a,b])=>a===kind&&b===k);}
 // the pips a store has earned, by source
