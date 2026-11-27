@@ -48,4 +48,34 @@ const pin=(c,k,v,t,pw)=>`mkPin(${c},${k},${v},{t:'${t||'plain'}',lv:1,pw:${JSON.
   ok('a pin flying into a Pegged pin leaves it standing',ev('!sim.pins[1].down'));
   ev("run.ball='drop';var dp=boardStart(run.rack);var ds=newSim(dp,makePath(180,180,0),1,0);n=0;while(!ds.done&&n++<3000)tick(ds);run.ball='house'");
   ok('Drop ball: a straight ball drops the pins in its path, four at most, none felled by another pin',ev("dp.filter(p=>p.down).length>=2&&dp.filter(p=>p.down).length<=4&&dp.filter(p=>p.down).every(p=>p.by==='ball')"),ev("dp.filter(p=>p.down).length"));
+  // per-piece numbers: offered in a shop, bought, games with it in the build and games won; listed at the end of the log
+  {const e=open();await wait(250);e("PROG.ps={};run.game=0;run.cash=99;rollOffers()");
+    const o=JSON.parse(e("JSON.stringify(run.pinOffers[0])"));ok('a shop counts its offers',e(`PROG.ps['pin:${o.t}'].o===1&&PROG.ps['pow:'+run.powOffers[0].t].o>=1`));
+    e(`pending=run.pinOffers[0];shopTap(3);pending=run.powOffers[0];shopTap(3)`);ok('buying a pin and a power counts both',e(`PROG.ps['pin:${o.t}'].b===1&&PROG.ps['pow:'+run.powOffers[0].t].b===1`));
+    e("$('shop').hidden=true;run.game=1;startGame();if(!$('intro').hidden)$('introGo').click();g.frames[0].balls=[999];endGame()");
+    ok('a won game counts for every piece in the build',e(`PROG.ps['pin:${o.t}'].g===1&&PROG.ps['pin:${o.t}'].w===1`));
+    e("LOG.push({run:1,game:2,target:85,frame:1,ball:1,net:0});");ok('the log ends with the pieces table',e("/piece,kind,offered,bought,games,won,sold\\n/.test(logText())&&(x=>logText().includes(pieceName(['pin','"+o.t+"'])+',pin,'+[x.o,x.b,x.g,x.w,x.s||0].join(',')))(PROG.ps['pin:"+o.t+"'])"));
+    ok('kept in the progress key',e("JSON.parse(localStorage.getItem('piecelab-progress')).ps['pin:"+o.t+"'].w===1"));}
+  // moving a power to another pin ($1, then $2...) and selling one back for half its price
+  {const e=open();await wait(250);e("run.game=0;rollOffers();run.cash=20;run.rack[2].pw=['spark','quick'];run.rack[4].pw=['rent','rent','rent'];showShop();shopTap(2)");
+    ok('a tapped pin with powers shows them as bands',e("$('shopInfo').querySelectorAll('.pwact .bd').length===2&&!$('pwMove')"));
+    e("$('shopInfo').querySelector('.pwact .bd[data-j=\"0\"]').click()");ok('picking a band offers Move $1 and Sell +$3',e("/\\$1/.test($('pwMove').textContent)&&/\\+\\$3/.test($('pwSell').textContent)"));
+    e("$('pwMove').click()");ok('Move asks where, ringing pins with room',e("pending&&pending.kind==='move'&&$('shopMap').classList.contains('place')"));
+    e("shopTap(4)");ok('a full pin turns the move down and nothing changes',e("!pending&&run.cash===20&&pwOf(run.rack[2]).join()==='spark,quick'"));
+    e("shopTap(4);shopTap(2);$('shopInfo').querySelector('.pwact .bd[data-j=\"0\"]').click();$('pwMove').click();shopTap(7)");
+    ok('the power moves and costs $1',e("pwOf(run.rack[2]).join()==='quick'&&pwOf(run.rack[7]).join()==='spark'&&run.cash===19&&run.moves===1"));
+    e("shopTap(7);shopTap(2);$('shopInfo').querySelector('.pwact .bd[data-j=\"0\"]').click()");ok('the next move costs $2',e("/\\$2/.test($('pwMove').textContent)"));
+    e("$('pwSell').click()");ok('selling Quick growth pays $2 and frees the slot',e("pwOf(run.rack[2]).length===0&&run.cash===21&&PROG.ps['pow:quick'].s>=1"));
+    ok('the shop log notes both',e("run.seen.some(x=>/^moved Spark from 3 pin to 8 pin \\$1/.test(x))&&run.seen.some(x=>/^sold Quick growth/.test(x))"),e("JSON.stringify(run.seen.slice(-2))"));}
+  // the next-ball preview matches what a missed ball really does, and leaves the boss's tentacle where it was
+  {const e=open();await wait(250);e("run.rack[1]=newItem('runner');run.rack[5]=newItem('anchor');run.bosses=['tentacle','sweep','short','bolted'];run.game=2;startGame();if(!$('intro').hidden)$('introGo').click();$('shop').hidden=true;");
+    e("var pv=0;for(let i=0;i<3;i++){g.sx=180;g.ex=180;g.bx=180;g.bend=0;g.ready=true;g.phase=.25;throwBall();let j=0;while(!g.sim.done&&j++<3000)tick(g.sim);resolve();let s=0;while(g.mode==='step'&&s++<10)stepAnim(1);}");
+    const tk=e("JSON.stringify(BOSS.tent)");const P=JSON.parse(e("JSON.stringify((x=>({kept:x.kept.map(p=>p.c+':'+p.k+'='+p.v).sort(),broke:x.broke.map(q=>q.cost)}))(preview()))"));
+    ok('the preview leaves the tentacle alone',e("JSON.stringify(BOSS.tent)")===tk);
+    e("$('next').click();draw()");ok('the button shows it is on, and the lane draws',e("$('next').getAttribute('aria-pressed')==='true'"));
+    e("g.sx=g.ex=62;g.bx=62;g.bend=0;g.ready=true;g.phase=.25;throwBall();let j=0;while(!g.sim.done&&j++<3000)tick(g.sim);g.pins.forEach(p=>{p.down=false;p.x=colX(p.c);p.y=pinY(p);p.vx=p.vy=0;});var fellN=g.pins.filter(p=>p.down).length;resolve();let s=0;while(g.mode==='step'&&s++<10)stepAnim(1);");
+    const after=JSON.parse(e("JSON.stringify(g.pins.filter(p=>!p.fresh&&!p.broke).map(p=>p.c+':'+p.k+'='+p.v).sort())"));
+    ok('after a ball that leaves every pin standing, the board is what the preview showed',e('fellN')===0&&JSON.stringify(after)===JSON.stringify(P.kept),JSON.stringify(P)+' vs '+JSON.stringify(after));
+    ok('a throw turns the preview off',e("NEXT===false&&$('next').getAttribute('aria-pressed')==='false'"));
+    ok('the log marks that ball as previewed',e("LOG[LOG.length-1].next===1&&/,next\\n/.test(logText())"));}
   ok('no page errors',errs.length===0,errs[0]||'');console.log(fails?fails+' failed':'all passed');process.exit(fails?1:0);})();

@@ -30,6 +30,11 @@ const S={
   'hold-readout':{js:`run.gear.wedges=true;startGame();if(!$('intro').hidden)$('introGo').click();quiet();good(2);quiet();peek(g.pins.filter(p=>!p.down).sort((a,b)=>b.k-a.k)[0]);`},
   'held-wedge':{js:`run.gear.wedges=true;startGame();if(!$('intro').hidden)$('introGo').click();quiet();good(2);quiet();const q=g.pins.filter(p=>!p.down).sort((a,b)=>b.k-a.k)[0];peek(q);$('laneInfo').querySelector('button.hold').click();`},
   'results-log':{js:`good(3);quiet();openLog();`},
+  'shop-power-pick':{js:`winGame();$('winNext').click();run.cash=12;run.rack[4].pw=['spark','quick','rent'];showShop();shopTap(4);$('shopInfo').querySelector('.pwact .bd[data-j="1"]').click();`},
+  'shop-power-move':{js:`winGame();$('winNext').click();run.cash=12;run.rack[4].pw=['spark','quick'];showShop();shopTap(4);$('shopInfo').querySelector('.pwact .bd[data-j="0"]').click();$('pwMove').click();`},
+  'mid-board':{js:`for(let i=0;i<4;i++)good(1,2);quiet();`},
+  'next-ball':{js:`for(let i=0;i<4;i++)good(1,2);quiet();NEXT=true;nextBtn();`},
+  'next-ball-runner':{js:`run.rack[1]=newItem('runner');run.rack[5]=newItem('anchor');run.rack[2].pw=['quick'];startGame();if(!$('intro').hidden)$('introGo').click();for(let i=0;i<3;i++)good(1,2);quiet();NEXT=true;nextBtn();`},
 };
 const names=process.argv.slice(2).length?process.argv.slice(2):Object.keys(S);
 (async()=>{const css=fontCss();
