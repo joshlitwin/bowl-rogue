@@ -67,15 +67,34 @@ const pin=(c,k,v,t,pw)=>`mkPin(${c},${k},${v},{t:'${t||'plain'}',lv:1,pw:${JSON.
     e("shopTap(7);shopTap(2);$('shopInfo').querySelector('.pwact .bd[data-j=\"0\"]').click()");ok('the next move costs $2',e("/\\$2/.test($('pwMove').textContent)"));
     e("$('pwSell').click()");ok('selling Quick growth pays $2 and frees the slot',e("pwOf(run.rack[2]).length===0&&run.cash===21&&PROG.ps['pow:quick'].s>=1"));
     ok('the shop log notes both',e("run.seen.some(x=>/^moved Spark from 3 pin to 8 pin \\$1/.test(x))&&run.seen.some(x=>/^sold Quick growth/.test(x))"),e("JSON.stringify(run.seen.slice(-2))"));}
+  // game conditions: one per small and big game after the first, drawn when the shop before it opens, shown there and on the lane
+  {const e=open();await wait(250);
+    ok('no condition in the first game or a boss game',e("condFor(0)===null&&condFor(2)===null&&condFor(5)===null"));
+    ok('every other game has one, drawn once, never the same twice running',e("(()=>{for(let t=0;t<30;t++){run.conds={};const a=[1,3,4,6,7,9,10].map(condFor);if(a.some(k=>!CONDS[k]))return false;if(condFor(1)!==a[0])return false;if(a[1]===a[2]||a[3]===a[4]||a[5]===a[6])return false;}return true;})()"));
+    e("run.game=0;rollOffers();showShop()");const k1=e("condFor(1)");
+    ok('the shop shows the next game\'s condition',e(`!!$('shopCond')&&$('shopCond').getAttribute('aria-label').includes(CONDS['${k1}'].name)`));
+    e("$('shopCond').click()");ok('tapping it shows its rule',e(`$('shopMsg').textContent.includes(CONDS['${k1}'].rule)`));
+    e("$('shop').hidden=true;run.game=1;startGame();if(!$('intro').hidden)$('introGo').click();");
+    ok('the game starts with it, on the top bar and in the save',e(`run.cond==='${k1}'&&!$('condBtn').hidden&&JSON.parse(localStorage.getItem(SAVE)).run.cond==='${k1}'`));
+    e("var P=(c,k,v)=>Object.assign(mkPin(c,k,v,{t:'plain',lv:1}),{})");
+    ok('Strike night: a strike is ×3',e("(()=>{run.cond='strike';const a=scoreAdv([P(0,0,1),P(1,0,1)],[],{},{ball:1,max:10}).m;run.cond='late';const b=scoreAdv([P(0,0,1),P(1,0,1)],[],{},{ball:1,max:10}).m;return a===3&&b===2;})()"));
+    ok('Late harvest: balls 8 to 10 double',e("(()=>{run.cond='late';const a=scoreAdv([P(0,0,4)],[P(1,1,2)],{},{ball:7,max:10}).score,b=scoreAdv([P(0,0,4)],[P(1,1,2)],{},{ball:8,max:10}).score;return a===4&&b===8;})()"));
+    ok('Soft line: a break-through costs half',e(`(()=>{run.cond='soft';const a=advance([P(0,LK(),16)],[],()=>.5,3,{gear:{}}).cost;run.cond='strike';const b=advance([P(0,LK(),16)],[],()=>.5,3,{gear:{}}).cost;return a===8&&b===16;})()`));
+    ok('Fresh wood: pins come back worth 2',e(`(()=>{run.cond='fresh';const st=advance([P(0,1,4)],[P(1,1,4)],()=>.5,3,{gear:{}});return st.fresh.length===1&&st.fresh[0].v===2;})()`));
+    ok('Warm start: ×3 for three balls, then ×2',e(`(()=>{run.cond='warm';const a=advance([P(0,1,2)],[],()=>.5,3,{gear:{}}).kept[0].v,b=advance([P(0,1,2)],[],()=>.5,4,{gear:{}}).kept[0].v;return a===6&&b===4;})()`));
+    e(`run.cond='${k1}'`);ok('the log names it',e("(()=>{LOG.push({run:1,game:2,target:85,frame:1,ball:1,net:0,cond:CONDS[run.cond].name});return /,condition\\n/.test(logText())&&logText().includes(','+CONDS[run.cond].name+'\\n');})()"));}
   // the next-ball preview matches what a missed ball really does, and leaves the boss's tentacle where it was
   {const e=open();await wait(250);e("run.rack[1]=newItem('runner');run.rack[5]=newItem('anchor');run.bosses=['tentacle','sweep','short','bolted'];run.game=2;startGame();if(!$('intro').hidden)$('introGo').click();$('shop').hidden=true;");
     e("var pv=0;for(let i=0;i<3;i++){g.sx=180;g.ex=180;g.bx=180;g.bend=0;g.ready=true;g.phase=.25;throwBall();let j=0;while(!g.sim.done&&j++<3000)tick(g.sim);resolve();let s=0;while(g.mode==='step'&&s++<10)stepAnim(1);}");
     const tk=e("JSON.stringify(BOSS.tent)");const P=JSON.parse(e("JSON.stringify((x=>({kept:x.kept.map(p=>p.c+':'+p.k+'='+p.v).sort(),broke:x.broke.map(q=>q.cost)}))(preview()))"));
     ok('the preview leaves the tentacle alone',e("JSON.stringify(BOSS.tent)")===tk);
-    e("$('next').click();draw()");ok('the button shows it is on, and the lane draws',e("$('next').getAttribute('aria-pressed')==='true'"));
+    e("$('next').dispatchEvent(new MouseEvent('click',{bubbles:true}))");ok('a tap does not turn it on',e("!nextOn()&&$('next').getAttribute('aria-pressed')==='false'"));
+    e("const P=(t)=>$('next').dispatchEvent(Object.assign(new MouseEvent(t,{bubbles:true}),{pointerId:1}));P('pointerdown');draw()");ok('holding shows it, and the lane draws',e("nextOn()&&$('next').getAttribute('aria-pressed')==='true'"));
+    e("$('next').dispatchEvent(Object.assign(new MouseEvent('pointerup',{bubbles:true}),{pointerId:1}))");ok('letting go hides it',e("!nextOn()&&$('next').getAttribute('aria-pressed')==='false'"));
+    e("$('next').dispatchEvent(Object.assign(new MouseEvent('pointerdown',{bubbles:true}),{pointerId:1}))");
     e("g.sx=g.ex=62;g.bx=62;g.bend=0;g.ready=true;g.phase=.25;throwBall();let j=0;while(!g.sim.done&&j++<3000)tick(g.sim);g.pins.forEach(p=>{p.down=false;p.x=colX(p.c);p.y=pinY(p);p.vx=p.vy=0;});var fellN=g.pins.filter(p=>p.down).length;resolve();let s=0;while(g.mode==='step'&&s++<10)stepAnim(1);");
     const after=JSON.parse(e("JSON.stringify(g.pins.filter(p=>!p.fresh&&!p.broke).map(p=>p.c+':'+p.k+'='+p.v).sort())"));
     ok('after a ball that leaves every pin standing, the board is what the preview showed',e('fellN')===0&&JSON.stringify(after)===JSON.stringify(P.kept),JSON.stringify(P)+' vs '+JSON.stringify(after));
-    ok('a throw turns the preview off',e("NEXT===false&&$('next').getAttribute('aria-pressed')==='false'"));
-    ok('the log marks that ball as previewed',e("LOG[LOG.length-1].next===1&&/,next\\n/.test(logText())"));}
+    ok('a throw ends a hold',e("NHOLD===false&&$('next').getAttribute('aria-pressed')==='false'"));
+    ok('the log marks that ball as previewed',e("LOG[LOG.length-1].next===1&&/,next,condition\\n/.test(logText())"));}
   ok('no page errors',errs.length===0,errs[0]||'');console.log(fails?fails+' failed':'all passed');process.exit(fails?1:0);})();

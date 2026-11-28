@@ -13,7 +13,7 @@ Slay the Spire's designers balanced the game on two numbers per card: how often 
 These are kept in the progress key (`piecelab-progress`, `advten-progress`), never in the run save, and listed under the ball rows at the end of the Results log copy. They count from 26 November. Rules, numbers and the throw are unchanged.
 
 ## Next ball (lab)
-Slay the Spire shows what each enemy will do next turn. Players name that as the main reason a loss feels fair. A new button beside THROW shows the next ball if this one misses every pin. Hold it to look, or tap it to keep it on until you throw. The lane then shows:
+Slay the Spire shows what each enemy will do next turn. Players name that as the main reason a loss feels fair. A new button beside THROW shows the next ball if this one misses every pin, only while you hold it (27 November: tapping it no longer keeps it on). The lane then shows:
 - each standing pin where it will stand next ball, with what it will be worth
 - the pins where they stand now, faint
 - any pin that would cross the red line, past the line, with its cost in red
