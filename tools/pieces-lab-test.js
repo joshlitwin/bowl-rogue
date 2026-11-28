@@ -54,7 +54,7 @@ const pin=(c,k,v,t,pw)=>`mkPin(${c},${k},${v},{t:'${t||'plain'}',lv:1,pw:${JSON.
     e(`pending=run.pinOffers[0];shopTap(3);pending=run.powOffers[0];shopTap(3)`);ok('buying a pin and a power counts both',e(`PROG.ps['pin:${o.t}'].b===1&&PROG.ps['pow:'+run.powOffers[0].t].b===1`));
     e("$('shop').hidden=true;run.game=1;startGame();if(!$('intro').hidden)$('introGo').click();g.frames[0].balls=[999];endGame()");
     ok('a won game counts for every piece in the build',e(`PROG.ps['pin:${o.t}'].g===1&&PROG.ps['pin:${o.t}'].w===1`));
-    e("LOG.push({run:1,game:2,target:85,frame:1,ball:1,net:0});");ok('the log ends with the pieces table',e("/piece,kind,offered,bought,games,won,sold\\n/.test(logText())&&(x=>logText().includes(pieceName(['pin','"+o.t+"'])+',pin,'+[x.o,x.b,x.g,x.w,x.s||0].join(',')))(PROG.ps['pin:"+o.t+"'])"));
+    e("LOG.push({run:1,game:2,target:85,frame:1,ball:1,net:0});");ok('the log ends with the pieces table',e("/piece,kind,offered,bought,games,won,sold,in_case,prize\\n/.test(logText())&&(x=>logText().includes(pieceName(['pin','"+o.t+"'])+',pin,'+[x.o,x.b,x.g,x.w,x.s||0,x.z||0,x.p||0].join(',')))(PROG.ps['pin:"+o.t+"'])"));
     ok('kept in the progress key',e("JSON.parse(localStorage.getItem('piecelab-progress')).ps['pin:"+o.t+"'].w===1"));}
   // moving a power to another pin ($1, then $2...) and selling one back for half its price
   {const e=open();await wait(250);e("run.game=0;rollOffers();run.cash=20;run.rack[2].pw=['spark','quick'];run.rack[4].pw=['rent','rent','rent'];showShop();shopTap(2)");
@@ -83,6 +83,24 @@ const pin=(c,k,v,t,pw)=>`mkPin(${c},${k},${v},{t:'${t||'plain'}',lv:1,pw:${JSON.
     ok('Fresh wood: pins come back worth 2',e(`(()=>{run.cond='fresh';const st=advance([P(0,1,4)],[P(1,1,4)],()=>.5,3,{gear:{}});return st.fresh.length===1&&st.fresh[0].v===2;})()`));
     ok('Warm start: ×3 for three balls, then ×2',e(`(()=>{run.cond='warm';const a=advance([P(0,1,2)],[],()=>.5,3,{gear:{}}).kept[0].v,b=advance([P(0,1,2)],[],()=>.5,4,{gear:{}}).kept[0].v;return a===6&&b===4;})()`));
     e(`run.cond='${k1}'`);ok('the log names it',e("(()=>{LOG.push({run:1,game:2,target:85,frame:1,ball:1,net:0,cond:CONDS[run.cond].name});return /,condition\\n/.test(logText())&&logText().includes(','+CONDS[run.cond].name+'\\n');})()"));}
+  // the prize counter: after a boss you beat, five prizes in a claw machine; the claw never drops one; one shake per case
+  {const e=open();await wait(250);const run2=(n)=>e(`for(let i=0;i<${n};i++)clawStep(.016)`);
+    e("run.game=1;run.cond=null;startGame();if(!$('intro').hidden)$('introGo').click();g.frames.forEach(f=>f.balls=[]);run.target=1;g.frames[0].balls=[99];endGame()");
+    ok('no prize counter after a game that is not a boss',e("!run.claw"));
+    e("$('win').hidden=true;$('shop').hidden=true;run.game=2;startGame();if(!$('intro').hidden)$('introGo').click();run.target=1;g.frames[0].balls=[99];endGame();$('winNext').click();cancelAnimationFrame(clawRAF);clawRAF=0");
+    ok('beating a boss opens it with two pins, two powers and a ball or gear',e("!$('claw').hidden&&$('shop').hidden&&run.claw.prizes.length===5&&run.claw.prizes.filter(p=>p.kind==='pin').length===2&&run.claw.prizes.filter(p=>p.kind==='pow').length===2&&run.claw.prizes.filter(p=>p.kind==='ball'||p.kind==='gear').length===1"));
+    run2(300);ok('the prizes land, and Grab waits for a pick',e("CL.mode==='idle'&&$('clawGo').disabled"));
+    const before=e("JSON.stringify(run.claw.prizes)");e("$('clawShake').click()");run2(400);
+    ok('Shake swaps the five once, then is spent',e(`JSON.stringify(run.claw.prizes)!==${JSON.stringify(before)}&&run.claw.shook&&$('clawShake').disabled&&CL.mode==='idle'&&CL.items.length===5`));
+    e("run.claw.prizes[1]={kind:'pow',t:'spark'};CL.items=clawSet(run.claw.prizes,false);clawPick(1)");ok('picking shows its rule and enables Grab',e("$('clawMsg').textContent.includes('Spark')&&!$('clawGo').disabled"));
+    e("$('clawGo').click()");run2(600);ok('the claw always brings it to the chute',e("run.claw.took&&run.claw.took.t==='spark'&&CL.mode==='got'&&!$('clawDeck').hidden&&$('clawGo').disabled"));
+    e("saveRun('claw');loadRun()");ok('a reload comes back to the counter with the prize in hand',e("!$('claw').hidden&&run.claw.took.t==='spark'&&!run.claw.placed&&!$('clawDeck').hidden"));
+    e("clawPlace(6)");ok('a power goes on the pin you pick, then Shop',e("pwOf(run.rack[6]).includes('spark')&&!$('clawGo').disabled&&/Shop/.test($('clawGo').textContent)"));
+    e("$('clawGo').click()");ok('Shop opens and the case is done',e("$('claw').hidden&&!$('shop').hidden&&run.claw.done"));
+    ok('the shop line names the case, the shake and the prize',e("run.seen.some(x=>/^prize counter: /.test(x))&&run.seen.some(x=>/^shook the case: /.test(x))&&run.seen.some(x=>/^won Spark at the prize counter, on 7 pin/.test(x))"),e("JSON.stringify(run.seen.slice(-4))"));
+    ok('the pieces table counts cases and prizes',e("PROG.ps['pow:spark'].p>=1&&Object.values(PROG.ps).reduce((a,x)=>a+(x.z||0),0)>=10"));}
+  {const e=open();await wait(250);e("run.game=2;rollOffers();run.claw={prizes:[{kind:'gear',t:Object.keys(GEAR).find(k=>!run.gear[k]&&k!=='big')},{kind:'pin',t:'crown'},{kind:'pin',t:'anchor'},{kind:'pow',t:'rent'},{kind:'pow',t:'quick'}],shook:false,took:null,placed:false,done:false};showClaw();cancelAnimationFrame(clawRAF);clawRAF=0;for(let i=0;i<300;i++)clawStep(.016);clawPick(0);clawGrab();for(let i=0;i<600;i++)clawStep(.016)");
+    ok('gear is yours at once, straight to Shop',e("run.gear[run.claw.took.t]===true&&run.claw.placed&&$('clawDeck').hidden&&!$('clawGo').disabled"));}
   // the next-ball preview matches what a missed ball really does, and leaves the boss's tentacle where it was
   {const e=open();await wait(250);e("run.rack[1]=newItem('runner');run.rack[5]=newItem('anchor');run.bosses=['tentacle','sweep','short','bolted'];run.game=2;startGame();if(!$('intro').hidden)$('introGo').click();$('shop').hidden=true;");
     e("var pv=0;for(let i=0;i<3;i++){g.sx=180;g.ex=180;g.bx=180;g.bend=0;g.ready=true;g.phase=.25;throwBall();let j=0;while(!g.sim.done&&j++<3000)tick(g.sim);resolve();let s=0;while(g.mode==='step'&&s++<10)stepAnim(1);}");

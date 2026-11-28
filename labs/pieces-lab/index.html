@@ -525,6 +525,12 @@ img.bp{flex:none;width:auto;height:52px;image-rendering:pixelated}
 .deck.split .rackmap{border-left:0}
 /* win card: the back-wall panel (your score, the hall's disc, the target), the pay as coins dropping into the cash, the run as twelve pips in four levels, then the next game and the level's boss */
 #win .box{justify-content:center;gap:12px}
+#claw .box{justify-content:center;gap:10px}
+#claw .clawcase{display:block;width:auto;height:min(390px,52vh);max-width:100%;margin:0 auto;aspect-ratio:132/150;image-rendering:pixelated;border-radius:6px;touch-action:manipulation}
+#claw .clawcase[hidden],#claw .deck[hidden]{display:none}
+#claw .deck{height:240px}
+#claw #clawMsg{height:auto;min-height:54px;flex:none}
+#claw #clawShake:disabled,#claw #clawGo:disabled{opacity:.4}
 .wpanel{display:block;align-self:center;image-rendering:pixelated;border-radius:2px}
 .wpay{display:flex;align-items:flex-start;justify-content:center;gap:8px;min-height:40px}
 .wpay .grp{display:flex;flex-direction:column;align-items:center;gap:5px}
@@ -661,6 +667,13 @@ img.bp{flex:none;width:auto;height:52px;image-rendering:pixelated}
   <div class="wtrack" id="winTrack" role="img"></div>
   <div class="wnext" id="winAhead"></div>
   <div class="row"><button class="main" id="winNext" type="button">Shop<i class="tri r"></i></button></div>
+</div></div>
+<div class="sheet" id="claw" hidden><div class="box">
+  <div class="shead"><h2>Prize counter</h2></div>
+  <canvas class="clawcase" id="clawCase" role="img" aria-label="A claw machine with five prizes, seen from the front"></canvas>
+  <div class="deck" id="clawDeck" hidden><div class="rackmap" id="clawMap"></div></div>
+  <div class="strip" id="clawMsg" aria-live="polite"></div>
+  <div class="row"><button id="clawShake" type="button">Shake</button><button class="main" id="clawGo" type="button" disabled>Grab</button></div>
 </div></div>
 <div class="sheet" id="over" hidden><div class="box">
   <div class="shead"><h2 id="overTitle"></h2><b class="chip" id="overCash"></b></div>
@@ -1313,10 +1326,136 @@ function showWin(){const p=run.pay,bo=BOSS,n=run.game+1,nb=bossOf(n),nk=lvlBoss(
 // the hall's monogram: TL in red on the cream disc (the back wall, the win card)
 function drawTL(k,cx,cy){const x0=cx-8,y0=cy-5,R=(x,y,w,h,c)=>{k.fillStyle=c;k.fillRect(x0+x,y0+y,w,h);};
   for(const [c,o] of [['#c9a878',1],['#d83a2a',0]]){R(o,o,9,3,c);R(3+o,3+o,3,8,c);R(10+o,o,3,11,c);R(13+o,8+o,4,3,c);}}
-$('winNext').addEventListener('click',()=>{$('win').hidden=true;showShop();tipsShop();});
+$('winNext').addEventListener('click',()=>{$('win').hidden=true;if(run.claw&&!run.claw.done){showClaw();return;}showShop();tipsShop();});
+// ---------- prize counter: after each boss you beat, a claw machine holds five prizes (two pins, two powers, a ball or gear), drawn from the open shop
+// with the dearer pieces likelier. Tap one and the claw fetches it: it never drops a prize. One shake per case tumbles in five new ones.
+// A pin or power then goes on a pin you pick; a ball or gear is yours at once. Saved in run.claw, so a reload comes back here.
+const CW=132,CH2=150,CXC=60,FYF=90,FYB=66,CASEH=58,CHUTE=[13,31],CHOME=22;
+const zs=z=>1-.28*z,zy=z=>FYF-(FYF-FYB)*z,zx=(x,z)=>CXC+(x-CXC)*zs(z);   // scale, floor line and x at depth z
+const CSLOTS=[[42,.12],[66,.06],[92,.14],[54,.72],[80,.78]];
+let CL=null,clawRAF=0;
+function prizeOf(kind,t){const B={pin:PINS,pow:POWERS,ball:BALLOFFERS,gear:GEAR}[kind][t];return{kind,t,name:B.name,text:typeof B.text==='function'?B.text(1):B.text,cost:B.cost};}
+function rollPrizes(){const gt=gate(),w=k=>Math.pow(k,1.6),pick=(pool,cost,n)=>{const out=[];pool=pool.slice();while(out.length<n&&pool.length){const tot=pool.reduce((a,k)=>a+w(cost(k)),0);let r=rng()*tot,i=0;for(;i<pool.length-1;i++){r-=w(cost(pool[i]));if(r<=0)break;}out.push(pool.splice(i,1)[0]);}return out;};
+  const pins=Object.keys(PINS).filter(k=>k!=='plain'&&!PINS[k].gone&&(!gt||gt.pin.includes(k))&&labOn('pin',k)),pws=Object.keys(POWERS).filter(k=>(!gt||gt.pow.includes(k))&&labOn('pow',k)),
+    balls=OPT.balls?Object.keys(BALLOFFERS).filter(k=>k!==run.hook&&(!gt||gt.ball.includes(k))&&labOn('ball',k)):[],gear=Object.keys(GEAR).filter(k=>!run.gear[k]&&!(OPT.balls&&k==='big')&&(!gt||gt.gear.includes(k))&&labOn('gear',k));
+  const last=rng()<.5&&balls.length||!gear.length?pick(balls,k=>BALLOFFERS[k].cost,1).map(t=>['ball',t]):pick(gear,k=>GEAR[k].cost,1).map(t=>['gear',t]);
+  const list=pick(pins,k=>PINS[k].cost,2).map(t=>['pin',t]).concat(pick(pws,k=>POWERS[k].cost,2).map(t=>['pow',t]),last);
+  for(let i=list.length-1;i>0;i--){const j=Math.floor(rng()*(i+1));[list[i],list[j]]=[list[j],list[i]];}
+  return list.map(([kind,t])=>({kind,t}));}
+function prizeArt(p){const key='z'+p.kind+p.t;if(ICON[key]&&typeof ICON[key]!=='string')return ICON[key];let cv;
+  if(p.kind==='pin')cv=bigPin(24,p.t,[]).cv;else if(p.kind==='pow')cv=bandCanvas(p.t);
+  else if(p.kind==='gear'){const g0=sprite(GLYPH[p.t],{'#':'#2a160e',r:'#d83a2a',w:'#fff8e8',y:'#e8a020',g:'#3f8f6a',v:'#9a6ad8',d:'#7a1a10'});cv=mk(g0.width*2,g0.height*2);const q=cv.getContext('2d');q.imageSmoothingEnabled=false;q.drawImage(g0,0,0,cv.width,cv.height);}
+  else{const o=buildTheme(THEME.rec),BI=BALLS[p.t]||BALLS.house,B=o.ballsBy[BI.spr||p.t]||o.ballsBy.house,r=8;cv=mk(2*r+1,2*r+1);const q=cv.getContext('2d');q.drawImage(B[r],0,0);if(BI.band){q.fillStyle=BI.band;q.fillRect(1,r-1,2*r-1,2);}}
+  return ICON[key]=cv;}
+function clawSet(list,drop){const sl=CSLOTS.slice();for(let i=sl.length-1;i>0;i--){const j=Math.floor(rng()*(i+1));[sl[i],sl[j]]=[sl[j],sl[i]];}
+  return list.map((p,i)=>{const a=prizeArt(p),sc=Math.min(1.25,24/Math.max(a.width,a.height)),[x,z]=sl[i%sl.length];
+    return{p,art:a,w:Math.round(a.width*sc),h:Math.round(a.height*sc),x:x+Math.round((rng()-.5)*4),z:z+(rng()-.5)*.06,y:drop?60+i*16+rng()*10:0,vy:0,rest:!drop};});}
+function showClaw(){const C=run.claw;$('claw').hidden=false;$('clawCase').hidden=false;$('clawDeck').hidden=true;
+  CL={items:clawSet(C.prizes,!C.seenFall),mode:C.took?'got':'fall',claw:{x:CHOME,z:0,drop:0,open:1},sel:null,t:0,shake:0,phase:null,carry:null,last:0,door:C.took?{art:prizeArt(C.took),w:Math.round(prizeArt(C.took).width*Math.min(1.25,24/Math.max(prizeArt(C.took).width,prizeArt(C.took).height))),h:Math.round(prizeArt(C.took).height*Math.min(1.25,24/Math.max(prizeArt(C.took).width,prizeArt(C.took).height)))}:null};
+  if(!C.seenFall){C.seenFall=true;for(const p of C.prizes)pstat(pkey(p.kind,p.t),'z');progSave();run.seen.push('prize counter: '+C.prizes.map(p=>prizeOf(p.kind,p.t).name).join('; '));}
+  if(C.took)clawGot(true);else clawUI();saveRun('claw');if(!clawRAF)clawRAF=requestAnimationFrame(clawLoop);}
+function clawUI(){const C=run.claw,m=$('clawMsg'),b=$('clawGo'),sh=$('clawShake');sh.hidden=!!C.took;sh.disabled=C.shook||CL.mode!=='idle';
+  if(C.took){const o=prizeOf(C.took.kind,C.took.t),place=(C.took.kind==='pin'||C.took.kind==='pow')&&!C.placed;b.innerHTML=place?'Pick a pin':'Shop<i class="tri r"></i>';b.disabled=place&&clawCanPlace();
+    m.innerHTML=prizeInfo(o);return;}
+  b.textContent='Grab';b.disabled=CL.sel===null||CL.mode!=='idle';m.innerHTML=CL.sel!==null?prizeInfo(prizeOf(CL.items[CL.sel].p.kind,CL.items[CL.sel].p.t)):'<div><h3>Pick a prize.</h3></div>';}
+function prizeInfo(o){const pic=o.kind==='pin'?`<canvas class="bigpin" data-k="${o.t}"></canvas>`:o.kind==='pow'?`<img class="bd" src="${bandSrc(o.t)}" alt="">`:`<img class="gear" src="${o.kind==='ball'?bicon(o.t):gicon(o.t)}" alt="">`;
+  return `${o.kind==='pin'?`<img class="gear" src="${prizeArt(o).toDataURL()}" alt="">`:pic}<div><h3>${o.name}</h3><p>${o.text}</p></div>`;}
+function clawCanPlace(){const C=run.claw;return C.took.kind==='pin'||run.rack.some(it=>pwOf(it).length<3);}
+function clawTap(e){if(!CL||CL.mode!=='idle'||run.claw.took)return;const r=$('clawCase').getBoundingClientRect(),x=(e.clientX-r.left)/r.width*CW,y=(e.clientY-r.top)/r.height*CH2;
+  let best=null,bd=13;CL.items.forEach((it,i)=>{if(it.out)return;const k=zs(it.z),d=Math.hypot(x-zx(it.x,it.z),(y-(zy(it.z)-it.h*k/2))*.7);if(d<bd){bd=d;best=i;}});
+  CL.sel=best===CL.sel?null:best;clawUI();}
+function clawPick(i){if(!CL||CL.mode!=='idle'||run.claw.took)return;CL.sel=i;clawUI();}
+function clawGrab(){if(!CL||CL.mode!=='idle'||CL.sel===null)return;CL.mode='grab';CL.phase='move';CL.target=CL.items[CL.sel];clawUI();}
+function clawShakeIt(){const C=run.claw;if(!CL||C.shook||CL.mode!=='idle'||C.took)return;C.shook=true;CL.mode='shake';CL.shake=.5;CL.sel=null;
+  for(const it of CL.items){it.rest=false;it.out=true;}
+  C.prizes=rollPrizes();for(const p of C.prizes)pstat(pkey(p.kind,p.t),'z');progSave();run.seen.push('shook the case: '+C.prizes.map(p=>prizeOf(p.kind,p.t).name).join('; '));
+  CL.next=clawSet(C.prizes,true);saveRun('claw');clawUI();}
+function clawGot(again){const C=run.claw;CL.mode='got';if(!again){const p=C.took,o=prizeOf(p.kind,p.t);pstat(pkey(p.kind,p.t),'p');progSave();
+    if(p.kind==='gear'){run.gear[p.t]=true;if(p.t==='livewood')delete run.gear.deadwood;if(p.t==='deadwood')delete run.gear.livewood;applyKit();C.placed=true;run.seen.push('won '+o.name+' at the prize counter');}
+    else if(p.kind==='ball'){run.hook=p.t;run.ball=p.t;run.ballStock=(run.ballStock||[]).filter(k=>k!==p.t);applyKit();swapBtn();C.placed=true;run.seen.push('won '+o.name+' at the prize counter');}
+    saveRun('claw');}
+  if((C.took.kind==='pin'||C.took.kind==='pow')&&!C.placed){$('clawCase').hidden=true;$('clawDeck').hidden=false;clawMap();}
+  clawUI();topBar();}
+function clawMap(){const C=run.claw,o=C.placed?null:prizeOf(C.took.kind,C.took.t);drawMap($('clawMap'),C.placed?null:i=>clawPlace(i),C.placed?C.placedAt:null,o);}
+function clawPlace(i){const C=run.claw,p=C.took,it=run.rack[i];if(C.placed)return;
+  if(p.kind==='pow'){if(pwOf(it).length>=3)return;it.pw=pwOf(it).concat(p.t);}else run.rack[i]=Object.assign(newItem(p.t),{pw:pwOf(it)});
+  C.placed=true;C.placedAt=i;tipsChanged(i);run.seen.push('won '+prizeOf(p.kind,p.t).name+' at the prize counter, '+(p.kind==='pow'?'on ':'at ')+SLOTN[i]);saveRun('claw');clawMap();clawUI();strip();}
+function clawDone(){const C=run.claw;C.done=true;$('claw').hidden=true;CL=null;showShop();tipsShop();}
+function clawStep(dt){if(!CL)return;CL.t+=dt;const C=run.claw,k=CL.claw,G=520;k.vx=0;k.vz=0;
+  const fall=it=>{if(it.rest)return;it.vy+=G*dt;it.y-=it.vy*dt;if(!it.out&&it.y<=0){it.y=0;if(it.vy>60)it.vy=-it.vy*.32;else{it.vy=0;it.rest=true;}}};
+  const go=(key,to,sp)=>{const d=to-k[key],st=Math.sign(d)*Math.min(sp,Math.abs(d));k[key]+=st;if(key==='x')k.vx=Math.sign(d);if(key==='z')k.vz=Math.sign(d);return k[key]===to;};
+  if(CL.mode==='fall'){CL.items.forEach(fall);if(CL.items.every(it=>it.rest)){CL.mode='idle';clawUI();}}
+  else if(CL.mode==='shake'){CL.shake=Math.max(0,CL.shake-dt);CL.items.forEach(it=>{it.y+=200*dt;});if(CL.items.every(it=>it.y>90)){CL.items=CL.next;CL.next=null;CL.mode='fall';}}
+  else if(CL.mode==='grab'){const it=CL.target,sp=60*dt;
+    if(CL.phase==='move'){if(go('x',it.x,sp))CL.phase='deep';}
+    else if(CL.phase==='deep'){if(go('z',it.z,sp/60))CL.phase='down';}
+    else if(CL.phase==='down'){if(go('drop',CASEH-it.h-3,sp*.9)){CL.phase='close';CL.pt=0;}}
+    else if(CL.phase==='close'){CL.pt+=dt;k.open=Math.max(0,1-CL.pt/.25);if(CL.pt>=.35){CL.phase='up';CL.carry=it;}}
+    else if(CL.phase==='up'){if(go('drop',0,sp*.8))CL.phase='back';}
+    else if(CL.phase==='back'){if(go('z',0,sp/60))CL.phase='carry';}
+    else if(CL.phase==='carry'){if(go('x',CHOME,sp*.8)){CL.phase='drop';CL.pt=0;}}
+    else if(CL.phase==='drop'){CL.pt+=dt;k.open=Math.min(1,CL.pt/.15);if(CL.carry&&CL.pt>.12){const it2=CL.carry;CL.carry=null;it2.out=true;it2.rest=false;it2.vy=20;it2.x=CHOME;it2.z=0;}
+      CL.items.forEach(x=>{if(x.out)fall(x);});if(it.out&&it.y<-38&&!it.door){it.door=true;}if(CL.pt>.9){CL.items=CL.items.filter(x=>x!==it);CL.door=it;C.took={kind:it.p.kind,t:it.p.t};clawGot(false);}}
+    if(CL.carry){CL.carry.x=k.x+Math.round(Math.sin(CL.t*14)*.8);CL.carry.z=k.z;CL.carry.y=CASEH-k.drop-CL.carry.h-3;}}}
+function clawDraw(){const cv=$('clawCase');if(!CL||cv.hidden)return;if(cv.width!==CW||cv.height!==CH2){cv.width=CW;cv.height=CH2;}const q=cv.getContext('2d');q.imageSmoothingEnabled=false;q.clearRect(0,0,CW,CH2);
+  const jx=CL.shake>0?Math.round(Math.sin(CL.t*70)*2):0,poly=(c,pts)=>{q.fillStyle=c;q.beginPath();pts.forEach(([x,y],i)=>i?q.lineTo(x,y):q.moveTo(x,y));q.closePath();q.fill();},R=(c,x,y,w,h)=>{q.fillStyle=c;q.fillRect(x,y,w,h);};
+  const L=10,Rt=110,SD=14,SK=5;   // the front face runs L..Rt; the right side is SD wide and rises SK toward the back
+  q.save();q.translate(jx,0);
+  // the cabinet: side, top, marquee
+  poly('#7a1c12',[[Rt,4],[Rt+SD,4-SK+1],[Rt+SD,CH2-6-SK],[Rt,CH2-6]]);
+  poly('#e8a020',[[L,4],[Rt,4],[Rt+SD,4-SK+1],[L+SD,4-SK+1]]);
+  R('#b8321f',L,4,Rt-L,CH2-10);
+  R('#d83a2a',L+2,6,Rt-L-4,14);for(let i=0;i<9;i++){R((Math.floor(CL.t*3)+i)%3===0?'#ffd866':'#7a1a10',L+5+i*11,8,2,2);R((Math.floor(CL.t*3)+i)%3===1?'#ffd866':'#7a1a10',L+5+i*11,16,2,2);}
+  txt(q,'PRIZES',CXC-12,10,'#fff8e8');
+  // inside the case: back wall, floor, side walls, then the chute box at the front left
+  const top=zy(0)-CASEH,btop=zy(1)-CASEH*zs(1),bl=zx(L+4,1),br=zx(Rt-4,1);
+  R('#0e161c',L+3,22,Rt-L-6,FYF-22);
+  R('#16222c',bl,btop,br-bl,FYB-btop);for(let i=0;i<4;i++)R('rgba(255,255,255,.04)',bl+6+i*16,btop,1,FYB-btop);
+  poly('#3a2416',[[L+3,FYF],[Rt-3,FYF],[br,FYB],[bl,FYB]]);for(let i=1;i<4;i++){const z=i/4;R('#43291a',zx(L+4,z),Math.round(zy(z)),zx(Rt-4,z)-zx(L+4,z),1);}
+  poly('#121c24',[[L+3,22],[bl,btop],[bl,FYB],[L+3,FYF]]);poly('#1a2630',[[Rt-3,22],[br,btop],[br,FYB],[Rt-3,FYF]]);
+  // the rail the claw rides, front to back, and the carriage
+  const k=CL.claw,kz=k.z,kx=zx(k.x,kz),ks=zs(kz),ry=zy(kz)-CASEH*ks;
+  R('#6b4a2a',zx(L+4,kz),Math.round(ry)-1,zx(Rt-4,kz)-zx(L+4,kz),2);R('#4a3020',L+3,22,Rt-L-6,2);
+  // prizes, back to front, with the claw drawn at its own depth among them
+  const draw=it=>{const s2=zs(it.z),w=Math.max(1,Math.round(it.w*s2)),h=Math.max(1,Math.round(it.h*s2)),x=Math.round(zx(it.x,it.z)-w/2),y=Math.round(zy(it.z)-it.y*s2-h);
+      if(it.y<=1&&!it.out)R('rgba(0,0,0,.35)',x+1,Math.round(zy(it.z))-1,w-1,2);q.drawImage(it.art,x,y,w,h);};
+  const claw=()=>{const cy=Math.round(zy(kz)-(CASEH-k.drop)*ks),cx=Math.round(kx),o=Math.round(k.open*3*ks),hw=Math.max(2,Math.round(3*ks));
+    R('#c8c0b0',cx,Math.round(ry)+1,1,cy-Math.round(ry)-1);R('#e8a020',cx-hw,cy,2*hw+1,3);R('#b06c10',cx-hw,cy+2,2*hw+1,1);
+    const pl=Math.round(4*ks);R('#d8d0c0',cx-hw-o,cy+3,1,pl);R('#d8d0c0',cx-hw-o+1,cy+3+pl,2,1);R('#d8d0c0',cx+hw+o,cy+3,1,pl);R('#d8d0c0',cx+hw+o-1,cy+3+pl,2,1);
+    if(CL.carry)draw(CL.carry);};
+  q.save();q.beginPath();q.rect(L+3,22,Rt-L-6,FYF-22);q.clip();
+  const list=CL.items.filter(it=>it!==CL.carry).concat(CL.mode==='shake'?[]:CL.next||[]).sort((a,b)=>b.z-a.z);let clawDone=false;
+  for(const it of list){if(!clawDone&&it.z<kz){claw();clawDone=true;}draw(it);
+    const i=CL.items.indexOf(it);if(i===CL.sel&&CL.mode==='idle'){const s2=zs(it.z),y=Math.round(zy(it.z)-it.h*s2-6+Math.round(Math.sin(CL.t*6))),x=Math.round(zx(it.x,it.z));R('#ffd866',x-2,y,5,1);R('#ffd866',x-1,y+1,3,1);R('#ffd866',x,y+2,1,1);}}
+  if(!clawDone)claw();
+  q.restore();
+  // the chute: a clear box at the front left, open at the top
+  R('rgba(200,230,255,.12)',CHUTE[0],FYF-20,CHUTE[1]-CHUTE[0],20);R('rgba(220,240,255,.45)',CHUTE[0],FYF-20,CHUTE[1]-CHUTE[0],1);R('rgba(220,240,255,.3)',CHUTE[1]-1,FYF-20,1,20);
+  // the glass: a glint, and the side glass
+  for(let y=22;y<FYF;y++){R('rgba(255,255,255,.07)',L+30+(FYF-y)*.4,y,4,1);R('rgba(255,255,255,.04)',L+70+(FYF-y)*.4,y,2,1);}
+  poly('rgba(150,200,230,.18)',[[Rt,22],[Rt+SD-2,22-SK+1],[Rt+SD-2,FYF-SK],[Rt,FYF]]);
+  R('#e8a020',L,20,Rt-L,2);R('#e8a020',L,FYF,Rt-L,2);R('#e8a020',L,20,2,FYF-18);R('#e8a020',Rt-2,20,2,FYF-18);
+  // the control ledge: its top, the joystick (it leans the way the claw moves), the button and a one-digit light for the shake left
+  poly('#c8861a',[[Rt,FYF+2],[Rt+SD,FYF+2-SK+1],[Rt+SD,FYF+13-SK],[Rt,FYF+13]]);poly('#f0b838',[[L-2,FYF+2],[Rt,FYF+2],[Rt,FYF+8],[L-2,FYF+8]]);
+  R('#2a160e',L-2,FYF+8,Rt-L+2,5);
+  const jx2=40+(k.vx||0)*2,jy=FYF+1-(k.vz||0);R('#2a160e',38,FYF+5,5,2);R('#5a5a60',39+((k.vx||0)>0?1:0),jy+2,1,4);R('#d83a2a',jx2-1,jy-1,4,3);R('#ff7a5a',jx2-1,jy-1,1,1);
+  R('#2a160e',56,FYF+3,9,5);txt(q,String(run.claw.shook||run.claw.took?0:1),59,FYF+3,'#ff4a32');
+  R('#7a7a80',78,FYF+4,7,3);R('#d8d8e0',79,FYF+3,5,2);
+  // the lower cabinet: the prize door, where your prize lands, and the coin slot
+  const dx=CHUTE[0]+2,dy=FYF+20,dw=28,dh=20;R('#2a160e',dx-2,dy-2,dw+4,dh+4);R('#0a0604',dx,dy,dw,dh);R('rgba(200,230,255,.15)',dx,dy,dw,2);
+  if(CL.door){const it=CL.door,w=it.w,h=it.h,bounce=Math.max(0,Math.round(Math.sin(Math.min(1,(CL.t-(CL.doorT??(CL.doorT=CL.t)))*4)*Math.PI)*-3));q.drawImage(it.art,Math.round(dx+dw/2-w/2),dy+dh-2-h+bounce,w,h);}
+  R('#7a1c12',86,dy+1,16,18);R('#2a160e',90,dy+4,8,12);R('#ffd866',93,dy+6,2,6);R('#d83a2a',91,dy+18,6,1);
+  R('#2a160e',L+2,CH2-8,6,3);R('#2a160e',Rt-8,CH2-8,6,3);
+  q.restore();}
+function clawLoop(ts){clawRAF=0;if(!CL||$('claw').hidden)return;const dt=Math.min(.05,CL.last?(ts-CL.last)/1000:.016);CL.last=ts;clawStep(dt);clawDraw();clawRAF=requestAnimationFrame(clawLoop);}
+$('clawCase').addEventListener('click',clawTap);
+$('clawShake').addEventListener('click',clawShakeIt);
+$('clawGo').addEventListener('click',()=>{const C=run.claw;if(!C.took)clawGrab();else if(C.placed||!clawCanPlace())clawDone();});
+
 function endGame(){const t=total(),won=t>=run.target,final=run.game===TARGETS.length-1;
   for(const k of buildKeys()){pstat(k,'g');if(won)pstat(k,'w');}progSave();
   if(won&&BOSS)progMark('beat',lvlBoss(run.game));
+  if(won&&BOSS&&!final)run.claw={prizes:rollPrizes(),shook:false,took:null,placed:false,done:false};
   if(won&&!final){const extra=Math.min(4,g.left||0),earn=PAY[run.game%3]+extra;run.cash+=earn;runTot().cash+=earn;run.rerolls=0;run.bought=false;topBar();tipsShopVisit();if(TOPT.rings)run.changed=[];rollOffers();
     run.pay={t,target:run.target,extra,earn,base:PAY[run.game%3],fresh:true,left:g.left||0};pending=null;sel=null;gsel=null;showWin();return;}
   $('overTitle').textContent=won?'Run complete':'Run over';$('overCash').textContent='$'+run.cash;
@@ -1796,13 +1935,13 @@ document.addEventListener('pointerdown',e=>{if(!$('ladder').hidden&&e.target.id!
 $('title').setAttribute('role','button');
 function peekOff(){if(!PEEK)return;PEEK=null;const el=$('laneInfo');el.hidden=true;el.innerHTML='';}
 
-function logText(){const sg=v=>(v>0?'+':'')+v;let t='Temperance Lanes Pieces Lab log. Lab pieces (switched off: '+([...LABOFF].join(' ')||'none')+'): Pegged pin (only the ball knocks it down; Peg), Kingpin (knocked down alone: + the standing pins’ value, up to 40; Kin), Tap power p (the only pin left standing: ×3), Reactive ball (pins it hits fly out 20° wider), Drop ball (pins it hits drop where they stand; stops after four), Live wood (pins topple each other more easily: ×0.7 the hit, bouncier), Dead wood (×1.6 the hit, much less bounce, pins slide half as far), Wedges (three holds a game: a held pin doesn’t advance that ball), Front line (clear 2+ front-row pins without a strike: ×2), Split pick (just two pins down with a gap between: ×2). Lab multipliers add to the ball’s ×, up to ×6. Next button (hold): shows where the standing pins will be next ball and what they will be worth if this ball misses them; the next column is 1 when it was looked at before that ball. Game conditions: every small and big game after the first has one, shown in the shop before it (Strike night: a strike scores ×3; Fresh wood: pins come back worth 2; Late harvest: balls 8 to 10 score double; Soft line: a break-through costs half; Warm start: pins grow ×3 for the first three balls); the condition column names it. Shop: a power can be moved to another pin ($1, then $1 more each move in a run) or sold for half its price; the shop column lists moves and sales. Four levels of '+NAMES.join(', ')+' (small, big, boss); ten balls a game at most, ending as soon as the target is reached ($1 per ball left, up to $4). One board per game that never resets. After each ball, pins left standing advance one row toward you and double in value (1, 2, 4, 8, 16); pins that fell come back worth 1 at the back, as far back as they fit. A pin that would advance past the red line breaks through: it costs its value and comes back at the back. A strike (every pin on the board) is worth '+ADV.STRIKEX+'x. Growth: '+ADV.GROW+'. Powers: each pin has three slots; a pin shows them as letters in brackets, e.g. 0:3=8[qqh] (q Quick growth, h Head start, k Spark, l Lantern, w Slow, d Shield, b Bomb, r Rent, t Fare). No pin grows past '+ADV.CAP+'. Rows before the line: '+(ADV.LASTK+1)+' (Short line boss: 4). Bosses, one per level, drawn each run from seven (level 1 from Rising tentacle, Pin quota, Flat rate, Cold lane; no repeats): Short line (the line one row closer), Sweep bar (after ball 5: every standing pin swept off for nothing), Bolted rack (a pin hit by another pin falls only to a very hard hit), Rising tentacle (a post that rises at the back of a middle column and advances each ball; it stops the ball), Pin quota (a ball that knocks down fewer than 3 pins scores nothing), Flat rate (multipliers count half: x2 is x1.5), Cold lane (no pin grows faster than x3). Toll ball: break-throughs cost nothing. Crowd pays +1 per other standing pin, up to +6, and only one Crowd pays a ball; all Rent together pays at most +8 a ball; at most two Sparks count on one ball. Rent and Crowd pay only on a ball that knocks pins down. Your ten pins keep their type: Slow, Spark, Shield, Runner, Anchor, Glass, Bomb, Huddle, Crown, Rent, Crowd, Fare; the board lists a type by its first three letters after the value. Rack lists your ten by starting spot 1 to 10. Ball used: the house ball, or the one you bought (Big, Small, Plastic: size and weight; Rush, Brake, Toll, Sweep, Seed: the house ball with an effect on how the board advances). Positions are px from lane centre (lane edges -120/+120). Board lists each pin as column:row=value, columns -3..3 are half a pin spacing apart (34.5 px), row 0 is the back. Hot is how many pins stood on the front row (they break through unless knocked down). Moved is how far the line changed from the previous ball (start + aim + half the bend). Timing is ms early (-) or late (+); drift is how far the ball was pushed off the drawn line. Runs are listed newest first. Open is how many pieces of the shop track were open (all: the whole shop; 0: the starter shop of 5 powers and 3 pins). Tips lists the first-time tips that fired since the previous ball (advten-tips flags: throw, advance, redline, broke, strike, early, shop, pick, pw:<power>, onlane, fx:<power>, boss:<boss>, bossgo:<boss>; tips-again when they were reset).\n';
+function logText(){const sg=v=>(v>0?'+':'')+v;let t='Temperance Lanes Pieces Lab log. Lab pieces (switched off: '+([...LABOFF].join(' ')||'none')+'): Pegged pin (only the ball knocks it down; Peg), Kingpin (knocked down alone: + the standing pins’ value, up to 40; Kin), Tap power p (the only pin left standing: ×3), Reactive ball (pins it hits fly out 20° wider), Drop ball (pins it hits drop where they stand; stops after four), Live wood (pins topple each other more easily: ×0.7 the hit, bouncier), Dead wood (×1.6 the hit, much less bounce, pins slide half as far), Wedges (three holds a game: a held pin doesn’t advance that ball), Front line (clear 2+ front-row pins without a strike: ×2), Split pick (just two pins down with a gap between: ×2). Lab multipliers add to the ball’s ×, up to ×6. Next button (hold): shows where the standing pins will be next ball and what they will be worth if this ball misses them; the next column is 1 when it was looked at before that ball. Game conditions: every small and big game after the first has one, shown in the shop before it (Strike night: a strike scores ×3; Fresh wood: pins come back worth 2; Late harvest: balls 8 to 10 score double; Soft line: a break-through costs half; Warm start: pins grow ×3 for the first three balls); the condition column names it. Prize counter: after each boss you beat (not the last), a claw machine shows five prizes (two pins, two powers, a ball or gear; dearer pieces likelier); one is taken free, one shake per case swaps all five; the shop column lists the case, any shake and the prize taken. Shop: a power can be moved to another pin ($1, then $1 more each move in a run) or sold for half its price; the shop column lists moves and sales. Four levels of '+NAMES.join(', ')+' (small, big, boss); ten balls a game at most, ending as soon as the target is reached ($1 per ball left, up to $4). One board per game that never resets. After each ball, pins left standing advance one row toward you and double in value (1, 2, 4, 8, 16); pins that fell come back worth 1 at the back, as far back as they fit. A pin that would advance past the red line breaks through: it costs its value and comes back at the back. A strike (every pin on the board) is worth '+ADV.STRIKEX+'x. Growth: '+ADV.GROW+'. Powers: each pin has three slots; a pin shows them as letters in brackets, e.g. 0:3=8[qqh] (q Quick growth, h Head start, k Spark, l Lantern, w Slow, d Shield, b Bomb, r Rent, t Fare). No pin grows past '+ADV.CAP+'. Rows before the line: '+(ADV.LASTK+1)+' (Short line boss: 4). Bosses, one per level, drawn each run from seven (level 1 from Rising tentacle, Pin quota, Flat rate, Cold lane; no repeats): Short line (the line one row closer), Sweep bar (after ball 5: every standing pin swept off for nothing), Bolted rack (a pin hit by another pin falls only to a very hard hit), Rising tentacle (a post that rises at the back of a middle column and advances each ball; it stops the ball), Pin quota (a ball that knocks down fewer than 3 pins scores nothing), Flat rate (multipliers count half: x2 is x1.5), Cold lane (no pin grows faster than x3). Toll ball: break-throughs cost nothing. Crowd pays +1 per other standing pin, up to +6, and only one Crowd pays a ball; all Rent together pays at most +8 a ball; at most two Sparks count on one ball. Rent and Crowd pay only on a ball that knocks pins down. Your ten pins keep their type: Slow, Spark, Shield, Runner, Anchor, Glass, Bomb, Huddle, Crown, Rent, Crowd, Fare; the board lists a type by its first three letters after the value. Rack lists your ten by starting spot 1 to 10. Ball used: the house ball, or the one you bought (Big, Small, Plastic: size and weight; Rush, Brake, Toll, Sweep, Seed: the house ball with an effect on how the board advances). Positions are px from lane centre (lane edges -120/+120). Board lists each pin as column:row=value, columns -3..3 are half a pin spacing apart (34.5 px), row 0 is the back. Hot is how many pins stood on the front row (they break through unless knocked down). Moved is how far the line changed from the previous ball (start + aim + half the bend). Timing is ms early (-) or late (+); drift is how far the ball was pushed off the drawn line. Runs are listed newest first. Open is how many pieces of the shop track were open (all: the whole shop; 0: the starter shop of 5 powers and 3 pins). Tips lists the first-time tips that fired since the previous ball (advten-tips flags: throw, advance, redline, broke, strike, early, shop, pick, pw:<power>, onlane, fx:<power>, boss:<boss>, bossgo:<boss>; tips-again when they were reset).\n';
   t+='run,game,target,ball,ball_used,start,aim,bend,moved,timing_ms,drift_px,setup_seconds,board_value,hot,pins_down,value_down,clean_pins,mult,score,triggers,broke_through,cost,swept,net,result,board_before,board_after,boss,cash,your_ten,gear,shop_before_game,open,tips,next,condition\n';
   // newest run first (balls in order within a run), so a paste cut short keeps the latest runs
   const runs=[];LOG.forEach(r=>{const l=runs.length&&runs[runs.length-1];if(l&&l[0].run===r.run)l.push(r);else runs.push([r]);});
   runs.reverse().flat().forEach(r=>{t+=[r.run,r.game,r.target,r.frame,r.ball||'house',sg(r.start),sg(r.aim),sg(r.bend),r.moved,sg(r.ms),sg(r.drift),r.setup,r.value,r.hot,r.down,r.downValue,r.clean,r.mult,r.score,r.notes||'',r.broke,r.cost,r.swept||0,r.net,r.result,r.rack,r.after,r.boss||'',r.cash||'',r.ten||'',r.gear||'',r.offers||'',r.open??'',r.tips||'',r.next||0,r.cond||''].join(',')+'\n';});
   const ps=PROG.ps||{},keys=Object.keys(ps).sort((a,b)=>ps[b].b-ps[a].b||ps[b].g-ps[a].g||ps[b].o-ps[a].o);
-  if(keys.length){t+='\nPieces across all runs since 26 November. offered: shops it was offered in (rerolls count); bought: times bought; games: games played with it in your build; won: those games won; sold: powers sold back.\npiece,kind,offered,bought,games,won,sold\n';keys.forEach(k=>{const[kind,id]=k.split(':'),x=ps[k];t+=[pieceName([kind,id]),kind,x.o,x.b,x.g,x.w,x.s||0].join(',')+'\n';});}
+  if(keys.length){t+='\nPieces across all runs since 26 November. offered: shops it was offered in (rerolls count); bought: times bought; games: games played with it in your build; won: those games won; sold: powers sold back; in_case: times it was in a prize-counter case; prize: times taken from one.\npiece,kind,offered,bought,games,won,sold,in_case,prize\n';keys.forEach(k=>{const[kind,id]=k.split(':'),x=ps[k];t+=[pieceName([kind,id]),kind,x.o,x.b,x.g,x.w,x.s||0,x.z||0,x.p||0].join(',')+'\n';});}
   return t;}
 function openLog(){$('logText').value=LOG.length?logText():'No throws recorded yet.';$('log').hidden=false;}
 $('rackLog').addEventListener('click',openLog);$('rackGame').addEventListener('click',()=>{location.href='../advancing-ten-pin/';});$('overLog').addEventListener('click',openLog);
@@ -1820,7 +1959,7 @@ const px=(k,x,y,w,h,col)=>{k.fillStyle=col;k.fillRect(Math.round(x),Math.round(y
 function disc(k,cx,cy,r,col){k.fillStyle=col;for(let y=-r;y<=r;y++){const w=Math.floor(Math.sqrt(r*r-y*y+.6));k.fillRect(cx-w,cy+y,w*2+1,1);}}
 function ringPx(k,cx,cy,rx,ry,col){k.fillStyle=col;const n=Math.ceil((rx+ry)*5);for(let i=0;i<n;i++){const a=i/n*6.28319;k.fillRect(Math.round(cx+Math.cos(a)*rx),Math.round(cy+Math.sin(a)*ry),1,1);}}
 function plotLine(k,x0,y0,x1,y1,col){const n=Math.max(1,Math.ceil(Math.max(Math.abs(x1-x0),Math.abs(y1-y0))));k.fillStyle=col;for(let i=0;i<=n;i++)k.fillRect(Math.round(x0+(x1-x0)*i/n),Math.round(y0+(y1-y0)*i/n),1,1);}
-const FONT={'+':'000010111010000','x':'000101010101000','0':'111101101101111','1':'010110010010111','2':'111001111100111','3':'111001111001111','4':'101101111001001','5':'111100111001111','6':'111100111101111','7':'111001001001001','8':'111101111101111','9':'111101111001111',A:'111101111101101',B:'110101110101110',C:'111100100100111',D:'110101101101110',E:'111100111100111',F:'111100111100100',G:'111100101101111',H:'101101111101101',I:'111010010010111',K:'101101110101101',L:'100100100100111',M:'101111111101101',N:'111101101101101',O:'111101101101111',P:'111101111100100',R:'111101110101101',S:'111100111001111',T:'111010010010010',U:'101101101101111',V:'101101101101010',W:'101101111111101',X:'101101010101101',Y:'101101010010010','/':'001001010100100','-':'000000111000000',' ':'000000000000000'};
+const FONT={'Z':'111001010100111','+':'000010111010000','x':'000101010101000','0':'111101101101111','1':'010110010010111','2':'111001111100111','3':'111001111001111','4':'101101111001001','5':'111100111001111','6':'111100111101111','7':'111001001001001','8':'111101111101111','9':'111101111001111',A:'111101111101101',B:'110101110101110',C:'111100100100111',D:'110101101101110',E:'111100111100111',F:'111100111100100',G:'111100101101111',H:'101101111101101',I:'111010010010111',K:'101101110101101',L:'100100100100111',M:'101111111101101',N:'111101101101101',O:'111101101101111',P:'111101111100100',R:'111101110101101',S:'111100111001111',T:'111010010010010',U:'101101101101111',V:'101101101101010',W:'101101111111101',X:'101101010101101',Y:'101101010010010','/':'001001010100100','-':'000000111000000',' ':'000000000000000'};
 function txt(k,s,x,y,col,m){m=m||1;k.fillStyle=col;for(const ch of s){const f=FONT[ch]||FONT[' '];for(let i=0;i<15;i++)if(f[i]==='1')k.fillRect(x+(i%3)*m,y+((i/3)|0)*m,m,m);x+=4*m;}}
 function sprite(rows,pal){const w=Math.max(...rows.map(r=>r.length)),k=mk(w,rows.length),q=k.getContext('2d');rows.forEach((r,y)=>{for(let x=0;x<r.length;x++){const col=pal[r[x]];if(col){q.fillStyle=col;q.fillRect(x,y,1,1);}}});return k;}
 function turned(s,flip){const k=mk(s.height,s.width),q=k.getContext('2d');if(flip){q.translate(0,s.width);q.rotate(-Math.PI/2);}else{q.translate(s.height,0);q.rotate(Math.PI/2);}q.drawImage(s,0,0);return k;}
@@ -2387,7 +2526,7 @@ function loadRun(){let d=null;try{d=JSON.parse(localStorage.getItem(SAVE)||'null
     const q=d.g;Object.assign(g,{holds:q.holds===undefined?3:q.holds,frames:q.frames,frame:q.frame,chain:q.chain,netUsed:q.netUsed,brakeUsed:q.brakeUsed,breaks:q.breaks,rackBalls:q.rackBalls,sx:q.sx,ex:q.ex,bend:q.bend,bx:(q.sx+q.ex)/2+q.bend/2,left:q.left,lastLine:q.lastLine});
     g.pins=q.pins.filter(o=>run.rack[o.i]).map(o=>{const p=mkPin(o.c,o.k,o.v,run.rack[o.i],o.stand,{shield:o.shield,w:o.w,b:o.b});p.cracked=o.cracked;p.hold=!!o.hold;return p;});
     pending=null;pick=null;sel=null;gsel=null;board();strip();topBar();hint();setBtn();
-    if(d.screen==='win'||d.screen==='shop'){g.mode='over';g.toastT=0;if(d.screen==='win')showWin();else showShop();}
+    if(d.screen==='win'||d.screen==='shop'||d.screen==='claw'){g.mode='over';g.toastT=0;if(d.screen==='win')showWin();else if(d.screen==='claw'&&run.claw&&!run.claw.done)showClaw();else showShop();}
     else if(d.screen==='thrown'&&typeof q.phase==='number'){g.phase=q.phase;g.ready=true;g.t0=performance.now();throwBall();}   // closed mid-roll: the same throw plays out
     else{saveRun('aim');if(BOSS&&g.frame===0&&!g.frames[0].balls.length)showIntro();else if(g.frame===0&&!g.frames[0].balls.length)tipsGame();}
     return true;}catch(e){console.error(e);clearSave();return false;}}

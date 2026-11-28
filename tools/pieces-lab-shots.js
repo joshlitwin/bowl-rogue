@@ -19,6 +19,8 @@ var good=function(n,N){for(let i=0;i<n&&g.mode==='aim';i++){let b=null,bs=-1e9;f
 var weak=function(){let k=0;while(g.mode==='aim'&&k++<14)good(1,3);};
 var winGame=function(){let k=0;while(g.mode==='aim'&&k++<14){if(g.frame>=7)run.target=Math.max(1,Math.min(run.target,total()+1));good(1);}};
 var leave=function(){run.bought=true;skipAsk=true;$('shopNext').click();if(!$('intro').hidden)$('introGo').click();};
+var toClaw=function(){run.game=2;startGame();if(!$('intro').hidden)$('introGo').click();winGame();$('winNext').click();cancelAnimationFrame(clawRAF);clawRAF=0;for(let i=0;i<240;i++)clawStep(.016);clawDraw();};
+var clawRun=function(n){for(let i=0;i<n;i++)clawStep(.016);clawDraw();};
 var toGame4=function(){run.bosses=['quota','sweep','short','bolted'];for(let i=0;i<3;i++){winGame();$('winNext').click();leave();}};
 `;
 const S={
@@ -35,6 +37,13 @@ const S={
   'shop-condition':{js:`winGame();$('winNext').click();run.conds={1:'late'};showShop();$('shopCond').click();`},
   'shop-condition-chip':{js:`winGame();$('winNext').click();run.conds={1:'soft'};showShop();`},
   'game-condition':{js:`winGame();$('winNext').click();run.conds={1:'warm'};skipAsk=true;$('shopNext').click();if(!$('intro').hidden)$('introGo').click();`,still:1},
+  'claw':{js:`toClaw();`},
+  'claw-pick':{js:`toClaw();clawPick(CL.items.findIndex(x=>x.p.kind==='pin'));clawUI();clawDraw();`},
+  'claw-grab':{js:`toClaw();clawPick(CL.items.length-1);clawGrab();clawRun(70);`},
+  'claw-carry':{js:`toClaw();clawPick(CL.items.length-1);clawGrab();let k=0;while(CL.phase!=='carry'&&k++<900)clawStep(.016);clawRun(10);`},
+  'claw-door':{js:`toClaw();const i=CL.items.findIndex(x=>x.p.kind==='ball'||x.p.kind==='gear');clawPick(i);clawGrab();clawRun(500);`},
+  'claw-place':{js:`toClaw();run.claw.prizes[0]={kind:'pow',t:'spark'};CL.items=clawSet(run.claw.prizes,false);clawPick(0);clawGrab();clawRun(400);`},
+  'claw-placed':{js:`toClaw();run.claw.prizes[0]={kind:'pow',t:'spark'};CL.items=clawSet(run.claw.prizes,false);clawPick(0);clawGrab();clawRun(400);clawPlace(4);`},
   'mid-board':{js:`for(let i=0;i<4;i++)good(1,2);quiet();`},
   'next-ball':{js:`for(let i=0;i<4;i++)good(1,2);quiet();NHOLD=true;nextBtn();`},
   'next-ball-runner':{js:`run.rack[1]=newItem('runner');run.rack[5]=newItem('anchor');run.rack[2].pw=['quick'];startGame();if(!$('intro').hidden)$('introGo').click();for(let i=0;i<3;i++)good(1,2);quiet();NHOLD=true;nextBtn();`},
